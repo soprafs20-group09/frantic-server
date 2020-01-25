@@ -1,49 +1,86 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
-import ch.uzh.ifi.seal.soprafs20.Application;
 import ch.uzh.ifi.seal.soprafs20.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs20.entity.User;
+import ch.uzh.ifi.seal.soprafs20.exceptions.SopraServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.UserRepository;
-import ch.uzh.ifi.seal.soprafs20.service.UserService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-/**
- * Test class for the UserResource REST resource.
- *
- * @see UserService
- */
-@WebAppConfiguration
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes= Application.class)
+import static org.junit.jupiter.api.Assertions.*;
+
 public class UserServiceTest {
 
-
-    @Qualifier("userRepository")
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
-    @Autowired
+    @InjectMocks
     private UserService userService;
 
-    @Test
-    public void createUser() {
-        Assert.assertNull(userRepository.findByUsername("testUsername"));
+    private User testUser;
 
-        User testUser = new User();
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+
+        // given
+        testUser = new User();
+        testUser.setId(1L);
         testUser.setName("testName");
         testUser.setUsername("testUsername");
 
+        // when -> any object is being save in the userRepository -> return the dummy testUser
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
+    }
+
+    @Test
+    public void createUser_validInputs_success() {
+        // when -> any object is being save in the userRepository -> return the dummy testUser
         User createdUser = userService.createUser(testUser);
 
-        Assert.assertNotNull(createdUser.getToken());
-        Assert.assertEquals(createdUser.getStatus(),UserStatus.ONLINE);
-        Assert.assertEquals(createdUser, userRepository.findByToken(createdUser.getToken()));
+        // then
+        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+
+        assertEquals(testUser.getId(), createdUser.getId());
+        assertEquals(testUser.getName(), createdUser.getName());
+        assertEquals(testUser.getUsername(), createdUser.getUsername());
+        assertNotNull(createdUser.getToken());
+        assertEquals(UserStatus.ONLINE, createdUser.getStatus());
     }
+
+    @Test
+    public void createUser_duplicateName_throwsException() {
+        // given -> a first user has already been created
+        userService.createUser(testUser);
+
+        // when -> setup additional mocks for UserRepository
+        Mockito.when(userRepository.findByName(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
+
+        // then -> attempt to create second user with same user -> check that an error is thrown
+        String exceptionMessage = "The name provided is not unique. Therefore, the user could not be created!";
+        SopraServiceException exception = assertThrows(SopraServiceException.class, () -> userService.createUser(testUser), exceptionMessage);
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void createUser_duplicateInputs_throwsException() {
+        // given -> a first user has already been created
+        userService.createUser(testUser);
+
+        // when -> setup additional mocks for UserRepository
+        Mockito.when(userRepository.findByName(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
+
+        // then -> attempt to create second user with same user -> check that an error is thrown
+        String exceptionMessage = "The username and the name provided are not unique. Therefore, the user could not be created!";
+        SopraServiceException exception = assertThrows(SopraServiceException.class, () -> userService.createUser(testUser), exceptionMessage);
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+
 }

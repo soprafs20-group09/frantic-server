@@ -1,35 +1,23 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7")
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'org.sonarqube'
-apply plugin: "jacoco"
-apply plugin: 'io.spring.dependency-management'
-
-bootJar {
-    baseName = 'gs-spring-boot'
-    version =  '0.1.0'
-}
-
-jacoco {
-    toolVersion = "0.8.2"
-    reportsDir = file("$buildDir/customJacocoReportDir")
+plugins {
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'idea'
+    id 'jacoco'
+    id "org.sonarqube" version "2.8"
 }
 
 group 'ch.uzh.ifi.seal'
 version '1.0.0'
 
-sourceCompatibility = 1.11
+sourceCompatibility = 1.13
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
 
 repositories {
     mavenCentral()
@@ -40,15 +28,39 @@ springBoot {
 }
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    runtime('com.h2database:h2')
+    implementation 'org.mapstruct:mapstruct:1.3.1.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+}
+
+bootJar {
+    baseName = 'gs-spring-boot'
+    version = '0.1.0'
 }
 
 test {
+    useJUnitPlatform()
     testLogging.showStandardStreams = true
     maxParallelForks = 1
+}
+
+test.finalizedBy jacocoTestReport
+
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("$buildDir/jacocoReportDir")
 }
 
 jacocoTestReport {
@@ -58,6 +70,30 @@ jacocoTestReport {
         csv.enabled false
         html.destination file("${buildDir}/jacocoHtml")
     }
+}
+
+File secretPropsFile = file('./local.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    p.load(new FileInputStream(secretPropsFile))
+    p.each { name, value ->
+        ext[name] = value
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", project.sonarProjectKey
+        property "sonar.organization", project.sonarOrganization
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", project.sonarToken
+        property "sonar.coverage.jacoco.xmlReportPaths", ["$buildDir/jacocoReportDir/test/jacocoTestReport.xml"]
+        property "sonar.cpd.exclusions", "**/entity/*.java,**/rest/dto/*.java"
+    }
+}
+
+project.tasks["sonarqube"].dependsOn {
+    test
 }
 
 defaultTasks 'bootJar', 'build'

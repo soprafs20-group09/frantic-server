@@ -11,6 +11,12 @@
 #Gradle temporary files
 target/
 
+# track the following gradle files
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
 #Eclipse files
 **/.project
 **/.classpath
@@ -29,3 +35,6 @@ hs_err_pid*
 
 /build
 *.DS_STORE
+
+# don't track the local.properties -> contains secrets
+local.properties

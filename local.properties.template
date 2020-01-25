@@ -1,0 +1,7 @@
+# 1. Create a file called local.properties using this file as a template
+# 2. Add the necessary values as shown below
+# 3. Run the following command: ./gradlew clean test jacocoTestReport sonarqube
+# 4. Check your sonarcloud project to verify the result -> test coverage + issues should be shown
+sonarToken=
+sonarOrganization=
+sonarProjectKey=

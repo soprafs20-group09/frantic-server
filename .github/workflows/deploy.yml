@@ -1,0 +1,53 @@
+name: Deploy Project
+
+on: 
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # uncomment both tokens for assignment 2-4
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORG: ${{ secrets.SONAR_ORG }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-generated
+      HEROKU_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+      HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+
+    steps:
+    - name: checkout repository code
+      uses: actions/checkout@v1
+
+    - name: install Java JDK 13
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.13
+
+    # uncomment for assignment 2-4
+    - name: test the project and upload test report -> sonarqube
+      run: ./gradlew test jacocoTestReport sonarqube -PsonarToken=$SONAR_TOKEN -PsonarProjectKey=$SONAR_PROJECT_KEY -PsonarOrganization=$SONAR_ORG
+
+    # https://devcenter.heroku.com/articles/authentication
+    - name: create .netrc file for heroku authentication
+      run: |+
+          cat >~/.netrc <<EOF
+          machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_KEY
+          machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_KEY
+          EOF
+
+    - name: login to heroku cli
+      run: heroku login
+
+    - name: add heroku as git remote
+      run: heroku git:remote -a $HEROKU_APP_NAME
+
+    - name: deploy project to heroku
+      run: git push heroku HEAD:refs/heads/master
