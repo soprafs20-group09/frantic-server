@@ -16,7 +16,7 @@ Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/)
 
 To build right click the `build.gradle` file and choose `Run Build`
 
-### Local Properties File
+<!-- ### Local Properties File
 
 Create a file named: `local.properties`. You use `local.properties.template` as an example.
 The file needs to have the following content. Paste the variables without quotes.
@@ -28,7 +28,7 @@ sonarOrganization='sonarcloud organization name'
 sonarProjectKey='sonarcloud project key'
 ```
 
-More instructions can be found in `local.properties.template`.
+More instructions can be found in `local.properties.template`. -->
 
 ## Building with Gradle
 
