@@ -9,7 +9,7 @@
 
 ## Setup this Template with your IDE of choice
 
-Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/), [IntelliJ](https://www.jetbrains.com/idea/download/)).
+Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/), [IntelliJ](https://www.jetbrains.com/idea/download/)) and make sure Java 13 is installed on your system.
 
 1. File -> Open... -> SoPra Server Template
 2. Accept to import the project as a `gradle project`
