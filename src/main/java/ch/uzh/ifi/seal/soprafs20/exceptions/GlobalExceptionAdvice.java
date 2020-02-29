@@ -29,23 +29,23 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SopraServiceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity handleBadRequestException(SopraServiceException ex) {
-        log.error(String.format("SopraServiceException raised:%s", ex));
-        return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleBadRequestException(SopraServiceException ex) {
+        log.error("SopraServiceException raised:", ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(TransactionSystemException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity handleTransactionSystemException(Exception ex, HttpServletRequest request) {
-        log.error(String.format("Request: %s raised %s", request.getRequestURL(), ex));
-        return new ResponseEntity(ex.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<String> handleTransactionSystemException(Exception ex, HttpServletRequest request) {
+        log.error("Request: {} raised {}", request.getRequestURL(), ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     // Keep this one disable for all testing purposes -> it shows more detail with this one disabled
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity handleException(Exception ex) {
-        log.error(String.format("Exception raised:%s", ex));
-        return new ResponseEntity(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> handleException(Exception ex) {
+        log.error("Default Exception Handler -> caught:", ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

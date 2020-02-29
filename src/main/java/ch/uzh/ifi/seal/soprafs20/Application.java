@@ -24,7 +24,6 @@ public class Application {
         return "The application is running.";
     }
 
-    // CORS configuration
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
