@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,25 +27,16 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
-    @ExceptionHandler(SopraServiceException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleBadRequestException(SopraServiceException ex) {
-        log.error("SopraServiceException raised:", ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(TransactionSystemException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> handleTransactionSystemException(Exception ex, HttpServletRequest request) {
+    public ResponseStatusException handleTransactionSystemException(Exception ex, HttpServletRequest request) {
         log.error("Request: {} raised {}", request.getRequestURL(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage(), ex);
     }
 
     // Keep this one disable for all testing purposes -> it shows more detail with this one disabled
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<String> handleException(Exception ex) {
+    public ResponseStatusException handleException(Exception ex) {
         log.error("Default Exception Handler -> caught:", ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
     }
 }

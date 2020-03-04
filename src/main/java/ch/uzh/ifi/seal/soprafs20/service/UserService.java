@@ -2,14 +2,15 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs20.entity.User;
-import ch.uzh.ifi.seal.soprafs20.exceptions.SopraServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +56,7 @@ public class UserService {
      * defined in the User entity. The method will do nothing if the input is unique and throw an error otherwise.
      *
      * @param userToBeCreated
-     * @throws SopraServiceException
+     * @throws org.springframework.web.server.ResponseStatusException
      * @see User
      */
     private void checkIfUserExists(User userToBeCreated) {
@@ -64,13 +65,13 @@ public class UserService {
 
         String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
         if (userByUsername != null && userByName != null) {
-            throw new SopraServiceException(String.format(baseErrorMessage, "username and the name", "are"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username and the name", "are"));
         }
         else if (userByUsername != null) {
-            throw new SopraServiceException(String.format(baseErrorMessage, "username", "is"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
         }
         else if (userByName != null) {
-            throw new SopraServiceException(String.format(baseErrorMessage, "name", "is"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
         }
     }
 }
