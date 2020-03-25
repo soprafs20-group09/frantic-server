@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.rest.mapper;
 
-import ch.uzh.ifi.seal.soprafs20.entity.User;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.UserGetDTO;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.UserPostDTO;
-import org.mapstruct.*;
+import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListDTO;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -19,13 +21,12 @@ public interface DTOMapper {
 
     DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
 
-    @Mapping(source = "name", target = "name")
     @Mapping(source = "username", target = "username")
-    User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
+    Player convertPlayerUsernameDTOToPlayer(PlayerUsernameDTO playerUsernameDTO);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
-    @Mapping(source = "username", target = "username")
-    @Mapping(source = "status", target = "status")
-    UserGetDTO convertEntityToUserGetDTO(User user);
+    @Mapping(source = "creator", target = "creator")
+    @Mapping(source = "players", target = "players")
+    LobbyListDTO convertLobbyToLobbyListDTO(Lobby lobby);
 }

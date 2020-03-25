@@ -1,18 +1,19 @@
 package ch.uzh.ifi.seal.soprafs20.rest.dto;
 
+public class LobbyJoinDTO {
 
-public class UserGetDTO {
+    private String token;
 
-    private Long id;
     private String name;
+
     private String username;
 
-    public Long getId() {
-        return id;
+    public String getToken() {
+        return token;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getName() {
