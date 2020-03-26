@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # uncomment tokens for assignment 2-4
-      # SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      # SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-      # SONAR_ORG: ${{ secrets.SONAR_ORG }}
-      # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-generated
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORG: ${{ secrets.SONAR_ORG }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-generated
       HEROKU_KEY: ${{ secrets.HEROKU_API_KEY }}
       HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
       HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
