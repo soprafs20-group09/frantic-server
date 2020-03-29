@@ -57,7 +57,11 @@ public class RESTControllerTest {
         // when
         MockHttpServletRequestBuilder getRequest = get("/lobbies").contentType(MediaType.APPLICATION_JSON);
         // then
-        mockMvc.perform(getRequest).andExpect(status().isOk());
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", is(lobby.getName())))
+                .andExpect(jsonPath("$[0].creator", is(lobby.getCreator())))
+                .andExpect(jsonPath("$[0].players", is(lobby.getPlayers())));
     }
 
     @Test
@@ -79,9 +83,9 @@ public class RESTControllerTest {
                 .content(asJsonString(player));
         // then
         mockMvc.perform(postRequest).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token", is("123")))
-                .andExpect(jsonPath("$.name", is("foo")))
-                .andExpect(jsonPath("$.username", is("foo")));
+                .andExpect(jsonPath("$.token", is(lobby.getToken())))
+                .andExpect(jsonPath("$.name", is(lobby.getName())))
+                .andExpect(jsonPath("$.username", is(lobby.getUsername())));
     }
 
     @Test
