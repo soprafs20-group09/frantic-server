@@ -26,6 +26,10 @@ public class Player implements Serializable {
     @Column(nullable = false, unique = true)
     private String token;
 
+    // necessary to check if a username is already taken inside of a lobby.
+    @Column(nullable = false)
+    private Long lobbyId;
+
     public Long getId() {
         return id;
     }
@@ -48,5 +52,13 @@ public class Player implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Long getLobbyId() {
+        return lobbyId;
+    }
+
+    public void setLobbyId(Long lobbyId) {
+        this.lobbyId = lobbyId;
     }
 }
