@@ -37,7 +37,7 @@ public class RESTController {
         // dummy response
         if (filter != null && filter.equals("test")) {
             LobbyListElementDTO lobby = new LobbyListElementDTO();
-            lobby.setId(1L);
+            lobby.setLobbyId(1L);
             lobby.setName("foo's lobby");
             lobby.setCreator("foo");
             lobby.setPlayers(1);
