@@ -48,7 +48,7 @@ public class LobbyService {
         return this.lobbyRepository.findAll();
     }
 
-    public List<Lobby> getLobbies(String name, String creator) {
+    public List<Lobby> getLobbies(String filter) {
         return this.lobbyRepository.findAll();
     }
 
