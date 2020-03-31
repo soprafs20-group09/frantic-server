@@ -18,7 +18,7 @@ public class Lobby implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Long lobbyId;
 
     @Column(nullable = false)
     private String name;
@@ -29,12 +29,12 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
-    public Long getId() {
-        return id;
+    public Long getLobbyId() {
+        return lobbyId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLobbyId(Long lobbyId) {
+        this.lobbyId = lobbyId;
     }
 
     public String getName() {

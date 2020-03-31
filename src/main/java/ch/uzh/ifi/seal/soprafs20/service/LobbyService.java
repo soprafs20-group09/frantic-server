@@ -40,14 +40,6 @@ public class LobbyService {
         this.lobbyRepository = lobbyRepository;
     }
 
-    public List<Player> getPlayers() {
-        return this.playerRepository.findAll();
-    }
-
-    public List<Lobby> getLobbies() {
-        return this.lobbyRepository.findAll();
-    }
-
     public List<Lobby> getLobbies(String name, String creator) {
         return this.lobbyRepository.findAll();
     }
@@ -62,40 +54,32 @@ public class LobbyService {
 
     public LobbyJoinDTO joinLobby(long id, PlayerUsernameDTO playerUsernameDTO) {
         LobbyJoinDTO response = new LobbyJoinDTO();
-        List<Player> players = this.getPlayers();
-        List<Lobby> lobbies = this.getLobbies();
 
-        //creates a new Player, if there is no other Player with the same name in the lobby.
-        for (Player player : players) {
-            if (id == player.getLobbyId() && playerUsernameDTO.getUsername().equals(player.getUsername())){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken.");
-            } else {
-                Player newPlayer = new Player();
-                newPlayer.setUsername(playerUsernameDTO.getUsername());
-                newPlayer.setToken(UUID.randomUUID().toString());
-                newPlayer.setLobbyId(id);
+        //creates a new Player, if there is no other Player with the same username in the lobby.
+        if (this.playerRepository.findByUsernameAndLobbyId(playerUsernameDTO.getUsername(), id) == null) {
+            Player newPlayer = new Player();
+            newPlayer.setUsername(playerUsernameDTO.getUsername());
+            newPlayer.setToken(UUID.randomUUID().toString());
+            newPlayer.setLobbyId(id);
 
-                // saves the given entity but data is only persisted in the database once flush() is called
-                newPlayer = playerRepository.save(newPlayer);
-                playerRepository.flush();
+            // saves the given entity but data is only persisted in the database once flush() is called
+            newPlayer = playerRepository.save(newPlayer);
+            playerRepository.flush();
 
-                log.debug("Created a new Player: {}", newPlayer);
+            log.debug("Created a new Player: {}", newPlayer);
 
-                response.setUsername(newPlayer.getUsername());
-                response.setToken(newPlayer.getToken());
-            }
+            response.setUsername(newPlayer.getUsername());
+            response.setToken(newPlayer.getToken());
+
+            //finds the lobby name for the response and adds +1 to players in the lobby.
+            Lobby lobby = lobbyRepository.findByLobbyId(id);
+            lobby.setPlayers(lobby.getPlayers() + 1);
+            lobbyRepository.save(lobby);
+            lobbyRepository.flush();
+            response.setName(lobby.getName());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken.");
         }
-
-        //finds the lobby name for the response
-        for (Lobby lobby : lobbies) {
-            if (id == lobby.getId()){
-                lobby.setPlayers(lobby.getPlayers() + 1);
-                lobbyRepository.save(lobby);
-                lobbyRepository.flush();
-                response.setName(lobby.getName());
-            }
-        }
-
         return response;
     }
 }

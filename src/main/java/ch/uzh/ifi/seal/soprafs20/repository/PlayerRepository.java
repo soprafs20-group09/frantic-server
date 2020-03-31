@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     Player findByUsername(String username);
+    Player findByUsernameAndLobbyId(String username, Long lobbyId);
 }

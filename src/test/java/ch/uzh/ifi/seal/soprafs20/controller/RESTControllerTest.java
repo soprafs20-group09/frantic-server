@@ -46,7 +46,7 @@ public class RESTControllerTest {
     public void getLobbies_returnsLobbyList() throws Exception {
 
         Lobby lobby = new Lobby();
-        lobby.setId(1L);
+        lobby.setLobbyId(1L);
         lobby.setName("foo");
         lobby.setCreator("bar");
         lobby.setPlayers(3);
