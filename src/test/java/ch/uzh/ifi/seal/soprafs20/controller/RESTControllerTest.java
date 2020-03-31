@@ -52,7 +52,7 @@ public class RESTControllerTest {
         lobby.setPlayers(3);
 
         List<Lobby> allLobbies = Collections.singletonList(lobby);
-        given(lobbyService.getLobbies(Mockito.any(), Mockito.any())).willReturn(allLobbies);
+        given(lobbyService.getLobbies(Mockito.any())).willReturn(allLobbies);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/lobbies").contentType(MediaType.APPLICATION_JSON);

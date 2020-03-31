@@ -2,7 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.rest.mapper;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListDTO;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,5 +28,5 @@ public interface DTOMapper {
     @Mapping(source = "name", target = "name")
     @Mapping(source = "creator", target = "creator")
     @Mapping(source = "players", target = "players")
-    LobbyListDTO convertLobbyToLobbyListDTO(Lobby lobby);
+    LobbyListElementDTO convertLobbyToLobbyListDTO(Lobby lobby);
 }

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.rest.dto;
 
-public class LobbyListDTO {
+public class LobbyListElementDTO {
 
     private long id;
 
