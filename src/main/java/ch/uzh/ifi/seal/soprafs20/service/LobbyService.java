@@ -61,7 +61,7 @@ public class LobbyService {
 
         //create Lobby
         Lobby newLobby = new Lobby();
-        newLobby.setCreator(hostname);
+        newLobby.setHost(hostname);
         newLobby.setPlayers(1);
         newLobby.setName(lobbyName);
         lobbyRepository.save(newLobby);
@@ -107,7 +107,7 @@ public class LobbyService {
 
             //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
             Lobby lobby = lobbyRepository.findByLobbyId(id);
-            lobby.setPlayers(lobby.getPlayers() + 1);
+            lobby.setSize(lobby.getSize() + 1);
             lobbyRepository.flush();
             response.setName(lobby.getName());
         } else {
@@ -127,7 +127,7 @@ public class LobbyService {
         }
 
         //remove player from lobby
-        currentLobby.setPlayers(currentLobby.getPlayers() - 1);
+        currentLobby.setSize(currentLobby.getSize() - 1);
         lobbyRepository.flush();
 
         //remove lobby reference from player

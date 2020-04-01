@@ -1,7 +1,10 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Internal User Representation
@@ -24,10 +27,19 @@ public class Lobby implements Serializable {
     private String name;
 
     @Column(nullable = false)
-    private String creator;
+    private String host;
 
     @Column(nullable = false)
-    private int players;
+    private int size;
+
+    private GameLength gameLength;
+
+    private boolean isPublic;
+
+    private Thread gameThread;
+
+    private List players;
+
 
     public Long getLobbyId() {
         return lobbyId;
@@ -45,19 +57,25 @@ public class Lobby implements Serializable {
         this.name = name;
     }
 
-    public String getCreator() {
-        return creator;
+    public String getHost() {
+        return host;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setHost(String creator) {
+        this.host = host;
     }
 
-    public int getPlayers() {
-        return players;
+    public int getSize() {
+        return size;
     }
 
-    public void setPlayers(int players) {
-        this.players = players;
+    public void setSize(int size) {
+        this.size = size;
     }
+
+    private void setGameLength(GameLength gameLength) { this.gameLength = gameLength; }
+
+    private void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
+
+    private Thread getGameThread() {return this.gameThread; }
 }
