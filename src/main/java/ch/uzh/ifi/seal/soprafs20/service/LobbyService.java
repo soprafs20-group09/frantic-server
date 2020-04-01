@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
-import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.LobbyServiceException;
@@ -46,6 +45,12 @@ public class LobbyService {
     }
 
     public List<Lobby> getLobbies(String filter) {
+
+        if (filter != null) {
+            List<Lobby> response = this.lobbyRepository.findByName(filter);
+            response.addAll(this.lobbyRepository.findByHost(filter));
+            return response;
+        }
         return this.lobbyRepository.findAll();
     }
 
@@ -53,44 +58,24 @@ public class LobbyService {
         return null;
     }
 
-    public LobbyJoinDTO createLobby(PlayerUsernameDTO playerUsernameDTO) {
+    public long createLobby(Player creator) {
 
-        String hostname = playerUsernameDTO.getUsername();
-        String lobbyName = hostname + "'s lobby";
-
-        if (hostname == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
-        }
-
-        //create Player
-        Player newPlayer = new Player();
-        newPlayer.setUsername(hostname);
-        String token = UUID.randomUUID().toString();
-        newPlayer.setToken(token);
-        playerRepository.save(newPlayer);
-        playerRepository.flush();
+        String lobbyName = creator.getUsername() + "'s lobby";
 
         //create Lobby
         Lobby newLobby = new Lobby();
-        newLobby.setHost(newPlayer);
+        newLobby.setHost(creator);
+        newLobby.addPlayer(creator);
         newLobby.setName(lobbyName);
-        newLobby.addPlayer(newPlayer);
-        lobbyRepository.save(newLobby);
-        lobbyRepository.flush();
+        newLobby = this.lobbyRepository.save(newLobby);
+        this.lobbyRepository.flush();
 
-        //add lobbyId to Host
-        Lobby lobbyInRepo = lobbyRepository.findByName(lobbyName);
-        Long lobbyInRepoId = lobbyInRepo.getLobbyId();
-        Player hostInRepo = playerRepository.findByUsernameAndLobbyId(hostname, lobbyInRepoId);
-        hostInRepo.setLobbyId(lobbyInRepoId);
+        Long lobbyInRepoId = newLobby.getLobbyId();
+        creator.setLobbyId(lobbyInRepoId);
+        playerRepository.save(creator);
         playerRepository.flush();
 
-        //create response
-        LobbyJoinDTO response = new LobbyJoinDTO();
-        response.setName(lobbyName);
-        response.setUsername(hostname);
-        response.setToken(token);
-        return response;
+        return lobbyInRepoId;
     }
 
     public LobbyJoinDTO joinLobby(long id, PlayerUsernameDTO playerUsernameDTO) {
@@ -112,7 +97,7 @@ public class LobbyService {
             response.setUsername(newPlayer.getUsername());
             response.setToken(newPlayer.getToken());
 
-            //finds the lobby name for the response and adds the player.
+            //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
             Lobby lobby = lobbyRepository.findByLobbyId(id);
             lobby.addPlayer(newPlayer);
             lobbyRepository.flush();
@@ -137,8 +122,9 @@ public class LobbyService {
         currentLobby.removePlayer(player);
         lobbyRepository.flush();
 
-        //remove player from PlayerRepository
-        playerRepository.delete(player);
+        //remove lobby reference from player
+        player.setLobbyId(null);
+        playerRepository.flush();
 
         DisconnectDTO response = new DisconnectDTO();
         response.setReason("You were kicked out of the Lobby.");
