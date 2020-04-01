@@ -59,26 +59,30 @@ public class LobbyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
         }
 
-        //create Lobby
-        Lobby newLobby = new Lobby();
-        newLobby.setHost(hostname);
-        newLobby.setPlayers(1);
-        newLobby.setName(lobbyName);
-        lobbyRepository.save(newLobby);
-        lobbyRepository.flush();
-
         //create Player
         Player newPlayer = new Player();
         newPlayer.setUsername(hostname);
         String token = UUID.randomUUID().toString();
         newPlayer.setToken(token);
-
-        Lobby lobbyInRepo = lobbyRepository.findByName(lobbyName);
-        Long lobbyInRepoId = lobbyInRepo.getLobbyId();
-        newPlayer.setLobbyId(lobbyInRepoId);
         playerRepository.save(newPlayer);
         playerRepository.flush();
 
+        //create Lobby
+        Lobby newLobby = new Lobby();
+        newLobby.setHost(newPlayer);
+        newLobby.setName(lobbyName);
+        newLobby.addPlayer(newPlayer);
+        lobbyRepository.save(newLobby);
+        lobbyRepository.flush();
+
+        //add lobbyId to Host
+        Lobby lobbyInRepo = lobbyRepository.findByName(lobbyName);
+        Long lobbyInRepoId = lobbyInRepo.getLobbyId();
+        Player hostInRepo = playerRepository.findByUsernameAndLobbyId(hostname, lobbyInRepoId);
+        hostInRepo.setLobbyId(lobbyInRepoId);
+        playerRepository.flush();
+
+        //create response
         LobbyJoinDTO response = new LobbyJoinDTO();
         response.setName(lobbyName);
         response.setUsername(hostname);
@@ -105,9 +109,9 @@ public class LobbyService {
             response.setUsername(newPlayer.getUsername());
             response.setToken(newPlayer.getToken());
 
-            //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
+            //finds the lobby name for the response and adds the player.
             Lobby lobby = lobbyRepository.findByLobbyId(id);
-            lobby.setSize(lobby.getSize() + 1);
+            lobby.addPlayer(newPlayer);
             lobbyRepository.flush();
             response.setName(lobby.getName());
         } else {
@@ -127,12 +131,11 @@ public class LobbyService {
         }
 
         //remove player from lobby
-        currentLobby.setSize(currentLobby.getSize() - 1);
+        currentLobby.removePlayer(player);
         lobbyRepository.flush();
 
-        //remove lobby reference from player
-        player.setLobbyId(null);
-        playerRepository.flush();
+        //remove player from PlayerRepository
+        playerRepository.delete(player);
 
         DisconnectDTO response = new DisconnectDTO();
         response.setReason("You were kicked out of the Lobby.");

@@ -27,7 +27,7 @@ public class Lobby implements Serializable {
     private String name;
 
     @Column(nullable = false)
-    private String host;
+    private Player host;
 
     @Column(nullable = false)
     private int size;
@@ -57,11 +57,11 @@ public class Lobby implements Serializable {
         this.name = name;
     }
 
-    public String getHost() {
+    public Player getHost() {
         return host;
     }
 
-    public void setHost(String creator) {
+    public void setHost(Player host) {
         this.host = host;
     }
 
@@ -69,13 +69,22 @@ public class Lobby implements Serializable {
         return size;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setGameLength(GameLength gameLength) { this.gameLength = gameLength; }
+
+    public void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
+
+    public Thread getGameThread() {return this.gameThread; }
+
+    public void addPlayer(Player player) {
+        players.add(player);
+        this.size = players.size();
     }
 
-    private void setGameLength(GameLength gameLength) { this.gameLength = gameLength; }
+    public void removePlayer(Player player) {
+        players.remove(player);
+        this.size = players.size();
+    }
 
-    private void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
+    public void startGame() { }
 
-    private Thread getGameThread() {return this.gameThread; }
 }

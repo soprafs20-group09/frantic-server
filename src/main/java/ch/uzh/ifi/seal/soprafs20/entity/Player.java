@@ -27,7 +27,7 @@ public class Player implements Serializable {
     private String token;
 
     // necessary to check if a username is already taken inside of a lobby.
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long lobbyId;
 
     private int points;
