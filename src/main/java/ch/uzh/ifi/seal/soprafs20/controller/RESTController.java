@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.mapper.DTOMapper;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
+import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,18 +26,20 @@ import java.util.UUID;
 public class RESTController {
 
     private final LobbyService lobbyService;
+    private final PlayerService playerService;
 
-    RESTController(LobbyService lobbyService) {
+    RESTController(LobbyService lobbyService, PlayerService playerService) {
         this.lobbyService = lobbyService;
+        this.playerService = playerService;
     }
 
     @GetMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String filter) {
+    public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
 
         // dummy response
-        if (filter != null && filter.equals("test")) {
+        if (q != null && q.equals("test")) {
             LobbyListElementDTO lobby = new LobbyListElementDTO();
             lobby.setLobbyId(1L);
             lobby.setName("foo's lobby");
@@ -44,12 +48,11 @@ public class RESTController {
             return Collections.singletonList(lobby);
         }
         List<LobbyListElementDTO> ret = new ArrayList<>();
-        List<Lobby> l = lobbyService.getLobbies(filter);
+        List<Lobby> l = lobbyService.getLobbies(q);
         for (Lobby lobby : l) {
             ret.add(DTOMapper.INSTANCE.convertLobbyToLobbyListDTO(lobby));
         }
         return ret;
-
     }
 
     @GetMapping("/lobbies/{id}")
@@ -84,7 +87,13 @@ public class RESTController {
         } else if (playerUsernameDTO.getUsername().equals("err")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        return lobbyService.createLobby(playerUsernameDTO);
+
+        Player newPlayer = playerService.createPlayer(playerUsernameDTO);
+        LobbyJoinDTO response = new LobbyJoinDTO();
+        response.setToken(newPlayer.getAuthToken());
+        response.setName(newPlayer.getUsername() + "'s lobby");
+        response.setUsername(newPlayer.getUsername());
+        return response;
     }
 
     @PutMapping("/lobbies/{id}")
