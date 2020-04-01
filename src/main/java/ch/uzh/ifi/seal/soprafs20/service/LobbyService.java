@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,23 @@ public class LobbyService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken.");
         }
+        return response;
+    }
+
+    public DisconnectDTO kickPlayer(Player player) {
+        Long currentLobbyId = player.getLobbyId();
+        Lobby currentLobby = lobbyRepository.findByLobbyId(currentLobbyId);
+
+        //remove player from lobby
+        currentLobby.setPlayers(currentLobby.getPlayers() - 1);
+        lobbyRepository.flush();
+
+        //remove lobby reference from player
+        player.setLobbyId(null);
+        playerRepository.flush();
+
+        DisconnectDTO response = new DisconnectDTO();
+        response.setReason("You were kicked out of the Lobby.");
         return response;
     }
 }
