@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Internal User Representation
@@ -23,11 +24,13 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String token;
 
+    private final String authToken = UUID.randomUUID().toString();
+
     // necessary to check if a username is already taken inside of a lobby.
-    @Column(nullable = true)
+    @Column
     private Long lobbyId;
 
     private int points;
@@ -66,6 +69,10 @@ public class Player implements Serializable {
 
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 
     public int getPoints() {
