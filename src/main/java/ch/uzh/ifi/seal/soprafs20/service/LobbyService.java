@@ -50,7 +50,39 @@ public class LobbyService {
     }
 
     public LobbyJoinDTO createLobby(PlayerUsernameDTO playerUsernameDTO) {
-        return new LobbyJoinDTO();
+
+        String hostname = playerUsernameDTO.getUsername();
+        String lobbyName = hostname + "'s lobby";
+
+        if (hostname == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
+        }
+
+        //create Lobby
+        Lobby newLobby = new Lobby();
+        newLobby.setCreator(hostname);
+        newLobby.setPlayers(1);
+        newLobby.setName(lobbyName);
+        lobbyRepository.save(newLobby);
+        lobbyRepository.flush();
+
+        //create Player
+        Player newPlayer = new Player();
+        newPlayer.setUsername(hostname);
+        String token = UUID.randomUUID().toString();
+        newPlayer.setToken(token);
+
+        Lobby lobbyInRepo = lobbyRepository.findByName(lobbyName);
+        Long lobbyInRepoId = lobbyInRepo.getLobbyId();
+        newPlayer.setLobbyId(lobbyInRepoId);
+        playerRepository.save(newPlayer);
+        playerRepository.flush();
+
+        LobbyJoinDTO response = new LobbyJoinDTO();
+        response.setName(lobbyName);
+        response.setUsername(hostname);
+        response.setToken(token);
+        return response;
     }
 
     public LobbyJoinDTO joinLobby(long id, PlayerUsernameDTO playerUsernameDTO) {
