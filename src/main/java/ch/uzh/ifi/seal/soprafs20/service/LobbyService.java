@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.LobbyServiceException;
@@ -8,7 +9,9 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +142,23 @@ public class LobbyService {
 
         DisconnectDTO response = new DisconnectDTO();
         response.setReason("You were kicked out of the Lobby.");
+        return response;
+    }
+
+    public LobbyStateDTO updateLobbySettings(Lobby lobbyToUpdate, LobbySettingsDTO newSettings) {
+        if (newSettings.getLobbyName() != null) {
+            lobbyToUpdate.setName(newSettings.getLobbyName());
+        }
+        if (newSettings.getDuration() != null) {
+            lobbyToUpdate.setGameDuration(newSettings.getDuration());
+        }
+        if (newSettings.getPublicLobby() != null) {
+            lobbyToUpdate.setIsPublic(newSettings.getPublicLobby());
+        }
+        lobbyRepository.flush();
+
+        LobbyStateDTO response = new LobbyStateDTO();
+        response.setSettings(newSettings);
         return response;
     }
 }

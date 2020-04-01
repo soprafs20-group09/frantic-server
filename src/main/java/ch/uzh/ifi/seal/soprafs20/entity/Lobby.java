@@ -32,13 +32,19 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int size;
 
-    private GameLength gameLength;
+    private GameLength gameDuration;
 
     private boolean isPublic;
 
     private Thread gameThread;
 
     private List players;
+
+
+    public Lobby() {
+        this.gameDuration = GameLength.MEDIUM;
+        this.isPublic = false;
+    }
 
 
     public Long getLobbyId() {
@@ -69,7 +75,7 @@ public class Lobby implements Serializable {
         return size;
     }
 
-    public void setGameLength(GameLength gameLength) { this.gameLength = gameLength; }
+    public void setGameDuration(GameLength gameDuration) { this.gameDuration = gameDuration; }
 
     public void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
 

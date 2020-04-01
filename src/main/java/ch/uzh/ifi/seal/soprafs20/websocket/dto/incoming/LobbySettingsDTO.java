@@ -1,10 +1,12 @@
 package ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming;
 
+import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+
 public class LobbySettingsDTO {
 
     private String lobbyName;
 
-    private String duration;
+    private GameLength duration;
 
     private Boolean publicLobby;
 
@@ -16,11 +18,11 @@ public class LobbySettingsDTO {
         this.lobbyName = lobbyName;
     }
 
-    public String getDuration() {
+    public GameLength getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(GameLength duration) {
         this.duration = duration;
     }
 
