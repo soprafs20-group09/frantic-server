@@ -104,10 +104,9 @@ public class LobbyService {
             response.setUsername(newPlayer.getUsername());
             response.setToken(newPlayer.getToken());
 
-            //finds the lobby name for the response and adds +1 to players in the lobby.
+            //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
             Lobby lobby = lobbyRepository.findByLobbyId(id);
             lobby.setPlayers(lobby.getPlayers() + 1);
-            lobbyRepository.save(lobby);
             lobbyRepository.flush();
             response.setName(lobby.getName());
         } else {
