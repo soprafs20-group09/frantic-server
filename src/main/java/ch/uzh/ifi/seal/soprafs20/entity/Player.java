@@ -30,6 +30,12 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private Long lobbyId;
 
+    private int points;
+
+    private Hand hand;
+
+    private boolean blocked;
+
     public Long getId() {
         return id;
     }
@@ -61,4 +67,40 @@ public class Player implements Serializable {
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
     }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public Card popCard(int index) {
+        return hand.pop(index);
+    }
+
+    public void pushCardToHand(Card card) {
+        this.hand.push(card);
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public boolean isValidChoose(int index) {
+        //get card from hand
+        //compare to Discard Pile
+        //return true/false
+        return true;
+    }
+
+    public Hand getCards() {
+        return hand;
+    }
+
 }
