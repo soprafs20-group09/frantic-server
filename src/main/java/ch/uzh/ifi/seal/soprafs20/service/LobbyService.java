@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.exceptions.LobbyServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
@@ -117,7 +118,13 @@ public class LobbyService {
 
     public DisconnectDTO kickPlayer(Player player) {
         Long currentLobbyId = player.getLobbyId();
+        if (currentLobbyId == null) {
+            throw new LobbyServiceException("There is no lobbyId associated with the given player");
+        }
         Lobby currentLobby = lobbyRepository.findByLobbyId(currentLobbyId);
+        if (currentLobby == null) {
+            throw new LobbyServiceException("The lobby associated with the given player does not exist");
+        }
 
         //remove player from lobby
         currentLobby.setPlayers(currentLobby.getPlayers() - 1);
