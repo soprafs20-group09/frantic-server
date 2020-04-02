@@ -33,23 +33,31 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
+    @Transient
+    private List<Player> listOfPlayers;
+
+    @Transient
     private GameLength gameDuration;
 
+    @Transient
     private boolean isPublic;
 
     @Transient
-    private Thread gameThread;
+    private boolean isPlaying;
 
     @Transient
-    private List<Player> listOfPlayers;
+    private Game game;
+
+    @Transient
+    private Thread gameThread;
 
 
     public Lobby() {
         this.gameDuration = GameLength.MEDIUM;
         this.isPublic = false;
         this.listOfPlayers = new ArrayList<>();
+        this.isPlaying = false;
     }
-
 
     public Long getLobbyId() {
         return lobbyId;
@@ -104,10 +112,10 @@ public class Lobby implements Serializable {
         if (this.players < 2) {
             return;
         }
-        Game game = new Game(gameDuration, listOfPlayers);
-
-        Thread gameThread = new Thread(game);
+        this.game = new Game(gameDuration, listOfPlayers);
+        this.gameThread = new Thread(game);
         gameThread.start();
+        this.isPlaying = true;
     }
 
 }
