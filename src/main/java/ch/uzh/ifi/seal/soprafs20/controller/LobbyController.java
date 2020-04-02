@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
@@ -21,54 +22,46 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
-
 @Controller
-public class LobbyController {
+public class LobbyController extends WebSocketController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-
-    private final LobbyService lobbyService;
-    private final PlayerService playerService;
-
-    private final PlayerRepository playerRepository;
-    private final LobbyRepository lobbyRepository;
 
     private String base = "/topic/lobby";
 
     public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
-        this.lobbyService = lobbyService;
-        this.playerService = playerService;
-        this.playerRepository = playerRepository;
-        this.lobbyRepository = lobbyRepository;
+        super(lobbyService, playerService, playerRepository, lobbyRepository);
     }
 
     @MessageMapping("/lobby/{lobbyId}/settings")
     public void changeLobbySettings(@DestinationVariable long lobbyId,
                                     SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) throws Exception {
-        String token = sha.getUser().getName();
-        if (checkSender(token, lobbyId)) {
-            Lobby lobbyToUpdate = this.lobbyRepository.findByLobbyId(lobbyId);
+        String identity = sha.getUser().getName();
+        if (checkSender(identity, lobbyId)) {
+            Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
             LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyToUpdate, lobbySettingsDTO);
 
             //TODO: add player array to DTO
 
-            sendToLobby(lobbyId, "/lobby-state", newLobbyState);
+            sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
         }
     }
 
     @MessageMapping("/lobby/{lobbyId}/kick")
     public void kickPlayer(@DestinationVariable long lobbyId,
                            SimpMessageHeaderAccessor sha, KickDTO kickDTO) throws Exception {
-        String token = sha.getUser().getName();
-        if (checkSender(token, lobbyId)) {
+        String identity = sha.getUser().getName();
+        if (checkSender(identity, lobbyId)) {
 
-            // TODO: has to be admin
+            Player admin = playerRepository.findByIdentity(identity);
+            if (!admin.isAdmin()) {
+                throw new PlayerServiceException("Invalid action. Not admin.");
+            }
 
             Player player = this.playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = this.lobbyService.kickPlayer(player);
+            DisconnectDTO disconnectDTO = this.lobbyService.kickPlayer(lobbyId, player);
             simpMessagingTemplate.convertAndSendToUser(player.getIdentity(),
                     base + lobbyId + "/disconnect", disconnectDTO);
 
@@ -77,7 +70,7 @@ public class LobbyController {
 
             // send new lobby state to remaining players
             LobbyStateDTO newLobbyState = this.lobbyService.getLobbyState(lobbyId);
-            sendToLobby(lobbyId, "/lobby-state", newLobbyState);
+            sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
         }
     }
 
@@ -91,20 +84,9 @@ public class LobbyController {
             chatDTO.setType("msg");
             chatDTO.setUsername(sender.getUsername());
 
-            sendToLobby(lobbyId, "/chat", chatDTO);
+            sendToLobby(lobbyId, base,"/chat", chatDTO);
         }
     }
 
-    private boolean checkSender(String identity, long lobbyId) {
-        Player toCheck = this.playerRepository.findByIdentity(identity);
-        return toCheck.getLobbyId().equals(lobbyId);
-    }
 
-    private void sendToLobby(long lobbyId, String destination, Object dto) {
-        List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
-        for (Player player : lobby) {
-            simpMessagingTemplate.convertAndSendToUser(player.getIdentity(),
-                    base + lobbyId + destination, dto);
-        }
-    }
 }
