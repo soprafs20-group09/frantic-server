@@ -117,6 +117,13 @@ public class RESTController {
         } else if (id == 409L) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
-        return lobbyService.joinLobby(id, playerUsernameDTO);
+
+        Player newPlayer = playerService.createPlayerInLobby(id, playerUsernameDTO);
+        Lobby newPlayersLobby = lobbyService.getLobbyFromLobbyId(id);
+        LobbyJoinDTO response = new LobbyJoinDTO();
+        response.setToken(newPlayer.getAuthToken());
+        response.setName(newPlayer.getUsername() + "'s lobby");
+        response.setUsername(newPlayer.getUsername());
+        return response;
     }
 }
