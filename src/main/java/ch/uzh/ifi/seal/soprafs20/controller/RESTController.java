@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
@@ -13,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class is responsible for handling all REST request that are related to the user.
@@ -24,6 +20,8 @@ import java.util.UUID;
  */
 @RestController
 public class RESTController {
+
+    private static Map<String, String[]> authMap = new HashMap<>();
 
     private final LobbyService lobbyService;
     private final PlayerService playerService;
@@ -88,11 +86,13 @@ public class RESTController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Player newPlayer = playerService.createPlayer(playerUsernameDTO);
+        String authToken = UUID.randomUUID().toString();
+        authMap.put(authToken, new String[]{playerUsernameDTO.getUsername()});
+
         LobbyJoinDTO response = new LobbyJoinDTO();
-        response.setToken(newPlayer.getAuthToken());
-        response.setName(newPlayer.getUsername() + "'s lobby");
-        response.setUsername(newPlayer.getUsername());
+        response.setToken(authToken);
+        response.setName(playerUsernameDTO.getUsername() + "'s lobby");
+        response.setUsername(playerUsernameDTO.getUsername());
         return response;
     }
 
@@ -118,12 +118,29 @@ public class RESTController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
-        Player newPlayer = playerService.createPlayerInLobby(id, playerUsernameDTO);
-        Lobby newPlayersLobby = lobbyService.getLobbyFromLobbyId(id);
+        //lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
+
+        String authToken = UUID.randomUUID().toString();
+        authMap.put(authToken, new String[]{playerUsernameDTO.getUsername(), String.valueOf(id)});
+
         LobbyJoinDTO response = new LobbyJoinDTO();
-        response.setToken(newPlayer.getAuthToken());
-        response.setName(newPlayer.getUsername() + "'s lobby");
-        response.setUsername(newPlayer.getUsername());
+        response.setToken(authToken);
+        response.setName(playerUsernameDTO.getUsername() + "'s lobby");
+        response.setUsername(playerUsernameDTO.getUsername());
         return response;
+    }
+
+    public static String getUsernameFromAuthToken(String authToken) {
+        return authMap.get(authToken)[0];
+    }
+    public static Long getLobbyIdFromAuthToken(String authToken) {
+        if (authMap.get(authToken).length > 1) {
+            return Long.valueOf(authMap.get(authToken)[1]);
+        }
+        return null;
+    }
+
+    public static void removeFromAuthMap(String authToken) {
+        authMap.remove(authToken);
     }
 }
