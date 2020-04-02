@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,22 +33,31 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
+    @Transient
+    private List<Player> listOfPlayers;
+
+    @Transient
     private GameLength gameDuration;
 
+    @Transient
     private boolean isPublic;
 
     @Transient
-    private Thread gameThread;
+    private boolean isPlaying;
 
     @Transient
-    private List<Player> listOfPlayers;
+    private Game game;
+
+    @Transient
+    private Thread gameThread;
 
 
     public Lobby() {
         this.gameDuration = GameLength.MEDIUM;
         this.isPublic = false;
+        this.listOfPlayers = new ArrayList<>();
+        this.isPlaying = false;
     }
-
 
     public Long getLobbyId() {
         return lobbyId;
@@ -107,5 +117,15 @@ public class Lobby implements Serializable {
         return listOfPlayers;
     }
 
-    public void startGame() { }
+    public void startGame() {
+        //The game can only be started if there are more than one player in the lobby
+        if (this.players < 2) {
+            return;
+        }
+        this.game = new Game(gameDuration, listOfPlayers);
+        this.gameThread = new Thread(game);
+        gameThread.start();
+        this.isPlaying = true;
+    }
+
 }
