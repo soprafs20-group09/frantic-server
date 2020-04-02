@@ -1,10 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
+import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +43,9 @@ public class RESTControllerTest {
 
     @MockBean
     private LobbyService lobbyService;
+
+    @MockBean
+    private PlayerService playerService;
 
     @Test
     public void getLobbies_returnsLobbyList() throws Exception {
@@ -64,28 +69,26 @@ public class RESTControllerTest {
                 .andExpect(jsonPath("$[0].players", is(lobby.getPlayers())));
     }
 
-    @Test
-    public void createLobby_validUsername_returnsLobby() throws Exception {
+    @Test()
+    public void post_validUsername_returnsAuthToken() throws Exception {
 
-        PlayerUsernameDTO player = new PlayerUsernameDTO();
+        PlayerUsernameDTO username = new PlayerUsernameDTO();
+        username.setUsername("foo");
+
+        Player player = new Player();
+        player.setId(1L);
         player.setUsername("foo");
 
-        LobbyJoinDTO lobby = new LobbyJoinDTO();
-        lobby.setName("foo");
-        lobby.setToken("123");
-        lobby.setUsername("foo");
-
-        given(lobbyService.createLobby(Mockito.any())).willReturn(lobby);
+        given(playerService.createPlayer(Mockito.any())).willReturn(player);
 
         // when
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(player));
+                .content(asJsonString(username));
         // then
         mockMvc.perform(postRequest).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token", is(lobby.getToken())))
-                .andExpect(jsonPath("$.name", is(lobby.getName())))
-                .andExpect(jsonPath("$.username", is(lobby.getUsername())));
+                .andExpect(jsonPath("$.name", is(player.getUsername() + "'s lobby")))
+                .andExpect(jsonPath("$.username", is(player.getUsername())));
     }
 
     @Test
@@ -110,41 +113,39 @@ public class RESTControllerTest {
     }
 
     @Test
-    public void joinLobby_validUsername_returnsLobby() throws Exception {
+    public void put_validUsername_returnsAuthToken() throws Exception {
 
-        PlayerUsernameDTO player = new PlayerUsernameDTO();
-        player.setUsername("foo");
+        PlayerUsernameDTO username = new PlayerUsernameDTO();
+        username.setUsername("foo");
 
-        LobbyJoinDTO lobby = new LobbyJoinDTO();
-        lobby.setName("foo");
-        lobby.setToken("123");
-        lobby.setUsername(player.getUsername());
-
-        given(lobbyService.joinLobby(Mockito.anyLong(), Mockito.any())).willReturn(lobby);
+        given(lobbyService.isUsernameAlreadyInLobby(Mockito.anyLong(), Mockito.any())).willReturn(false);
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(player));
+                .content(asJsonString(username));
         // then
         mockMvc.perform(putRequest).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token", is(lobby.getToken())))
-                .andExpect(jsonPath("$.name", is(lobby.getName())))
-                .andExpect(jsonPath("$.username", is(lobby.getUsername())));
+                .andExpect(jsonPath("$.name", is(username.getUsername() + "'s lobby")))
+                .andExpect(jsonPath("$.username", is(username.getUsername())));
     }
 
     @Test
-    public void joinLobby_privateLobby_throwsException() throws Exception {
+    public void put_privateLobby_throwsException() throws Exception {
 
-        PlayerUsernameDTO player = new PlayerUsernameDTO();
+        PlayerUsernameDTO username = new PlayerUsernameDTO();
+        username.setUsername("foo");
+
+        Player player = new Player();
+        player.setId(1L);
         player.setUsername("foo");
 
-        given(lobbyService.joinLobby(Mockito.anyLong(), Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.FORBIDDEN));
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN)).when(lobbyService).checkLobbyJoin(Mockito.anyLong(), Mockito.any());
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(player));
+                .content(asJsonString(username));
         // then
         mockMvc.perform(putRequest).andExpect(status().isForbidden());
     }

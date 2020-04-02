@@ -23,19 +23,19 @@ public class PlayerRepositoryIntegrationTest {
         // given
         Player player = new Player();
         player.setUsername("firstname@lastname");
-        player.setToken("1234-ABCD-5678-EFGH-9012-IJKL");
+        player.setIdentity("1234-ABCD-5678-EFGH-9012-IJKL");
         player.setLobbyId((long) 100);
 
         entityManager.persist(player);
         entityManager.flush();
 
         // when
-        Player found = playerRepository.findByUsername(player.getUsername());
+        Player found = playerRepository.findByUsernameAndLobbyId(player.getUsername(), player.getLobbyId());
 
         // then
         assertNotNull(found.getId());
         assertEquals(found.getUsername(), player.getUsername());
-        assertEquals(found.getToken(), player.getToken());
+        assertEquals(found.getIdentity(), player.getIdentity());
         assertEquals(found.getLobbyId(), player.getLobbyId());
     }
 }

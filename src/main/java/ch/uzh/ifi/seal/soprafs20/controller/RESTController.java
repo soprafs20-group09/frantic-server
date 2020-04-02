@@ -118,7 +118,7 @@ public class RESTController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
-        //lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
+        lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
 
         String authToken = UUID.randomUUID().toString();
         authMap.put(authToken, new String[]{playerUsernameDTO.getUsername(), String.valueOf(id)});
