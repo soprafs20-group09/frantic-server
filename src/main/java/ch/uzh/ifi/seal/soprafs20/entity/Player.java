@@ -25,7 +25,7 @@ public class Player implements Serializable {
     private String username;
 
     @Column(unique = true)
-    private String token;
+    private String identity;
 
     private final String authToken = UUID.randomUUID().toString();
 
@@ -35,8 +35,10 @@ public class Player implements Serializable {
 
     private int points;
 
+    @Transient
     private Hand hand;
 
+    @Transient
     private boolean blocked;
 
     public Long getId() {
@@ -55,12 +57,12 @@ public class Player implements Serializable {
         this.username = username;
     }
 
-    public String getToken() {
-        return token;
+    public String getIdentity() {
+        return identity;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setIdentity(String identity) {
+        this.identity = identity;
     }
 
     public Long getLobbyId() {

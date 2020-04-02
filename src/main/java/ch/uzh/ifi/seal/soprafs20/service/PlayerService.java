@@ -55,10 +55,17 @@ public class PlayerService {
         return newPlayer;
     }
 
-    public RegisteredDTO registerPlayer(String token, RegisterDTO registerDTO) {
+    public Player createPlayerInLobby(long lobbyId, PlayerUsernameDTO playerUsernameDTO) {
+        Player newPlayer = createPlayer(playerUsernameDTO);
+        newPlayer.setLobbyId(lobbyId);
+        playerRepository.flush();
+        return newPlayer;
+    }
+
+    public RegisteredDTO registerPlayer(String identity, RegisterDTO registerDTO) {
 
         Player player = playerRepository.findByAuthToken(registerDTO.getToken());
-        player.setToken(token);
+        player.setIdentity(identity);
         playerRepository.flush();
 
         long lobbyId = lobbyService.createLobby(player);

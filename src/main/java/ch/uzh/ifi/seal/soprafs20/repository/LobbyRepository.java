@@ -9,7 +9,6 @@ import java.util.List;
 @Repository("lobbyRepository")
 public interface LobbyRepository extends JpaRepository<Lobby, Long> {
 
-    List<Lobby> findByName(String name);
-    List<Lobby> findByHost(String host);
+    List<Lobby> findByNameContainsOrCreatorContains(String name, String creator);
     Lobby findByLobbyId(Long id);
 }

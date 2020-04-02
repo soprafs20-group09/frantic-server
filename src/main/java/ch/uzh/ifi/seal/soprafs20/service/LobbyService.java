@@ -47,9 +47,7 @@ public class LobbyService {
     public List<Lobby> getLobbies(String filter) {
 
         if (filter != null) {
-            List<Lobby> response = this.lobbyRepository.findByName(filter);
-            response.addAll(this.lobbyRepository.findByHost(filter));
-            return response;
+            return this.lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
         }
         return this.lobbyRepository.findAll();
     }
@@ -64,7 +62,7 @@ public class LobbyService {
 
         //create Lobby
         Lobby newLobby = new Lobby();
-        newLobby.setHost(creator);
+        newLobby.setCreator(creator.getUsername());
         newLobby.addPlayer(creator);
         newLobby.setName(lobbyName);
         newLobby = this.lobbyRepository.save(newLobby);
@@ -85,7 +83,7 @@ public class LobbyService {
         if (this.playerRepository.findByUsernameAndLobbyId(playerUsernameDTO.getUsername(), id) == null) {
             Player newPlayer = new Player();
             newPlayer.setUsername(playerUsernameDTO.getUsername());
-            newPlayer.setToken(UUID.randomUUID().toString());
+            newPlayer.setIdentity(UUID.randomUUID().toString());
             newPlayer.setLobbyId(id);
 
             // saves the given entity but data is only persisted in the database once flush() is called
@@ -95,7 +93,7 @@ public class LobbyService {
             log.debug("Created a new Player: {}", newPlayer);
 
             response.setUsername(newPlayer.getUsername());
-            response.setToken(newPlayer.getToken());
+            response.setToken(newPlayer.getIdentity());
 
             //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
             Lobby lobby = lobbyRepository.findByLobbyId(id);
@@ -146,5 +144,18 @@ public class LobbyService {
         LobbyStateDTO response = new LobbyStateDTO();
         response.setSettings(newSettings);
         return response;
+    }
+
+    public LobbyStateDTO getLobbyState(long lobbyId) {
+        Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
+        LobbyStateDTO response = new LobbyStateDTO();
+
+        // TODO: lobby fields
+
+        return response;
+    }
+
+    public Lobby getLobbyFromLobbyId(long lobbyId) {
+        return this.lobbyRepository.findByLobbyId(lobbyId);
     }
 }

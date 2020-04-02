@@ -27,10 +27,10 @@ public class RegisterController {
     @MessageMapping("/register")
     public void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO registerDTO) throws Exception {
 
-        String token = sha.getUser().getName();
-        RegisteredDTO registeredDTO = playerService.registerPlayer(token, registerDTO);
+        String identity = sha.getUser().getName();
+        RegisteredDTO registeredDTO = playerService.registerPlayer(identity, registerDTO);
 
         simpMessagingTemplate.convertAndSendToUser(
-                token, "/queue/register", registeredDTO);
+                identity, "/queue/register", registeredDTO);
     }
 }
