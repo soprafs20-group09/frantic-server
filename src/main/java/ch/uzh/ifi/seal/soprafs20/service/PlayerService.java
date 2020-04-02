@@ -1,10 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,40 +38,47 @@ public class PlayerService {
         this.lobbyRepository = lobbyRepository;
     }
 
-    public Player createPlayer(PlayerUsernameDTO playerUsernameDTO) {
+    public Player createPlayer(String username) {
 
-        String hostname = playerUsernameDTO.getUsername();
+        checkCreate(username);
 
-        if (hostname == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
-        }
-
-        //create Player
         Player newPlayer = new Player();
-        newPlayer.setUsername(hostname);
+        newPlayer.setUsername(username);
         playerRepository.save(newPlayer);
         playerRepository.flush();
         return newPlayer;
     }
 
-    public Player createPlayerInLobby(long lobbyId, PlayerUsernameDTO playerUsernameDTO) {
-        Player newPlayer = createPlayer(playerUsernameDTO);
-        newPlayer.setLobbyId(lobbyId);
-        playerRepository.flush();
-        return newPlayer;
-    }
+    public RegisteredDTO registerPlayer(String identity, Player player, long lobbyId) {
 
-    public RegisteredDTO registerPlayer(String identity, RegisterDTO registerDTO) {
-
-        Player player = playerRepository.findByAuthToken(registerDTO.getToken());
         player.setIdentity(identity);
         playerRepository.flush();
 
-        long lobbyId = lobbyService.createLobby(player);
         RegisteredDTO registeredDTO = new RegisteredDTO();
         registeredDTO.setUsername(player.getUsername());
         registeredDTO.setLobbyId(Long.toString(lobbyId));
 
         return registeredDTO;
+    }
+
+    private void checkCreate(String username) {
+        if (username == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
+        }
+    }
+
+    private void checkCreateInLobby(long lobbyId, String username) {
+
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+
+        if (lobby == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
+        }
+        if (!lobby.isPublic()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
+        }
+        if (playerRepository.findByUsernameAndLobbyId(username, lobbyId) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
     }
 }

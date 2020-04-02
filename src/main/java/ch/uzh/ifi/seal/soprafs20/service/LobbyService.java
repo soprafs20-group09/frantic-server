@@ -5,11 +5,10 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.LobbyServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * User Service
@@ -60,7 +58,6 @@ public class LobbyService {
 
         String lobbyName = creator.getUsername() + "'s lobby";
 
-        //create Lobby
         Lobby newLobby = new Lobby();
         newLobby.setCreator(creator.getUsername());
         newLobby.addPlayer(creator);
@@ -68,55 +65,26 @@ public class LobbyService {
         newLobby = this.lobbyRepository.save(newLobby);
         this.lobbyRepository.flush();
 
-        Long lobbyInRepoId = newLobby.getLobbyId();
-        creator.setLobbyId(lobbyInRepoId);
+        long lobbyId = newLobby.getLobbyId();
+        creator.setLobbyId(lobbyId);
         playerRepository.save(creator);
         playerRepository.flush();
 
-        return lobbyInRepoId;
+        return lobbyId;
     }
 
-    public LobbyJoinDTO joinLobby(long id, PlayerUsernameDTO playerUsernameDTO) {
-        LobbyJoinDTO response = new LobbyJoinDTO();
+    public void joinLobby(long lobbyId, Player player) {
 
-        //finds lobby and look if it is already full (8/8 players)
-        Lobby lobby = lobbyRepository.findByLobbyId(id);
-        if (lobby.getPlayers() >= 8) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The lobby is already full.");
-        }
-
-        //creates a new Player, if there is no other Player with the same username in the lobby.
-        if (this.playerRepository.findByUsernameAndLobbyId(playerUsernameDTO.getUsername(), id) == null) {
-            Player newPlayer = new Player();
-            newPlayer.setUsername(playerUsernameDTO.getUsername());
-            newPlayer.setIdentity(UUID.randomUUID().toString());
-            newPlayer.setLobbyId(id);
-
-            // saves the given entity but data is only persisted in the database once flush() is called
-            newPlayer = playerRepository.save(newPlayer);
-            playerRepository.flush();
-
-            log.debug("Created a new Player: {}", newPlayer);
-
-            response.setUsername(newPlayer.getUsername());
-            response.setToken(newPlayer.getIdentity());
-
-            //adds player to the lobby and adds +1 to amount of players in the lobby-repository.
-            lobby.addPlayer(newPlayer);
-            lobbyRepository.flush();
-            response.setName(lobby.getName());
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken.");
-        }
-        return response;
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        lobby.addPlayer(player);
+        lobbyRepository.flush();
+        player.setLobbyId(lobbyId);
+        playerRepository.flush();
     }
 
-    public DisconnectDTO kickPlayer(Player player) {
-        Long currentLobbyId = player.getLobbyId();
-        if (currentLobbyId == null) {
-            throw new LobbyServiceException("There is no lobbyId associated with the given player");
-        }
-        Lobby currentLobby = lobbyRepository.findByLobbyId(currentLobbyId);
+    public DisconnectDTO kickPlayer(long lobbyId, Player player) {
+
+        Lobby currentLobby = lobbyRepository.findByLobbyId(lobbyId);
         if (currentLobby == null) {
             throw new LobbyServiceException("The lobby associated with the given player does not exist");
         }
@@ -155,12 +123,49 @@ public class LobbyService {
         Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
         LobbyStateDTO response = new LobbyStateDTO();
 
-        // TODO: lobby fields
+        LobbyPlayerDTO[] players = new LobbyPlayerDTO[lobby.getPlayers()];
+        int c = 0;
+        for (Player p : lobby.getListOfPlayers()) {
+            LobbyPlayerDTO player = new LobbyPlayerDTO();
+            player.setUsername(p.getUsername());
+            player.setAdmin(p.isAdmin());
+            players[c] = player;
+        }
+        response.setPlayers(players);
+
+        LobbySettingsDTO settings = new LobbySettingsDTO();
+        settings.setLobbyName(lobby.getName());
+        settings.setDuration(lobby.getGameDuration());
+        settings.setPublicLobby(lobby.isPublic());
+        response.setSettings(settings);
 
         return response;
     }
 
-    public Lobby getLobbyFromLobbyId(long lobbyId) {
-        return this.lobbyRepository.findByLobbyId(lobbyId);
+    public boolean isUsernameAlreadyInLobby(long lobbyId, String username) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        List<Player> players = lobby.getListOfPlayers();
+        for (Player player : players) {
+            if (player.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void checkLobbyJoin(long lobbyId, String username) {
+
+        if (username == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing.");
+        }
+        if (lobbyRepository.findByLobbyId(lobbyId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
+        }
+        if (!lobbyRepository.findByLobbyId(lobbyId).isPublic()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
+        }
+        if (isUsernameAlreadyInLobby(lobbyId, username)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists.");
+        }
     }
 }
