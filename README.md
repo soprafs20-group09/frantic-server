@@ -1,4 +1,4 @@
-# Frantic
+# Frantic-Server
 ![Heroku](https://heroku-badge.herokuapp.com/?app=sopra-fs20-group-09-server)
 
 Frantic is a chaotic card game created by Rulefactory. This repository is the back-end part of an online implementation for this card game.
