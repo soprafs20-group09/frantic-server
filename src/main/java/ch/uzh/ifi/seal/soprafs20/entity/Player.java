@@ -2,7 +2,6 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Internal User Representation
@@ -26,8 +25,6 @@ public class Player implements Serializable {
 
     @Column(unique = true)
     private String identity;
-
-    private final String authToken = UUID.randomUUID().toString();
 
     @Column
     private boolean admin;
@@ -74,10 +71,6 @@ public class Player implements Serializable {
 
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
-    }
-
-    public String getAuthToken() {
-        return authToken;
     }
 
     public int getPoints() {

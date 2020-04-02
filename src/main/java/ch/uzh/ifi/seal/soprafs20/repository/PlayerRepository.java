@@ -10,7 +10,6 @@ import java.util.List;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     Player findByUsernameAndLobbyId(String username, Long lobbyId);
-    Player findByAuthToken(String authToken);
     Player findByIdentity(String identity);
     List<Player> findByLobbyId(Long lobbyId);
 }
