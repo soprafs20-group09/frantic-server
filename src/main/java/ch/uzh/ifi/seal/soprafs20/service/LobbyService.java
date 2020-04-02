@@ -79,6 +79,12 @@ public class LobbyService {
     public LobbyJoinDTO joinLobby(long id, PlayerUsernameDTO playerUsernameDTO) {
         LobbyJoinDTO response = new LobbyJoinDTO();
 
+        //finds lobby and look if it is already full (8/8 players)
+        Lobby lobby = lobbyRepository.findByLobbyId(id);
+        if (lobby.getPlayers() >= 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The lobby is already full.");
+        }
+
         //creates a new Player, if there is no other Player with the same username in the lobby.
         if (this.playerRepository.findByUsernameAndLobbyId(playerUsernameDTO.getUsername(), id) == null) {
             Player newPlayer = new Player();
@@ -95,8 +101,7 @@ public class LobbyService {
             response.setUsername(newPlayer.getUsername());
             response.setToken(newPlayer.getIdentity());
 
-            //finds the lobby name for the response and adds +1 to amount of players in the lobby-repository.
-            Lobby lobby = lobbyRepository.findByLobbyId(id);
+            //adds player to the lobby and adds +1 to amount of players in the lobby-repository.
             lobby.addPlayer(newPlayer);
             lobbyRepository.flush();
             response.setName(lobby.getName());
