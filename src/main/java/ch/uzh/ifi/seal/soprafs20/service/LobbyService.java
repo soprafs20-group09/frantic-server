@@ -122,8 +122,8 @@ public class LobbyService {
         currentLobby.removePlayer(player);
         lobbyRepository.flush();
 
-        //remove lobby reference from player
-        player.setLobbyId(null);
+        //remove player from PlayerRepository
+        playerRepository.delete(player);
         playerRepository.flush();
 
         DisconnectDTO response = new DisconnectDTO();
