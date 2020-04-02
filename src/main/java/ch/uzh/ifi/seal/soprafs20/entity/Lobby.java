@@ -99,6 +99,15 @@ public class Lobby implements Serializable {
         return listOfPlayers;
     }
 
-    public void startGame() { }
+    public void startGame() {
+        //The game can only be started if there are more than one player in the lobby
+        if (this.players < 2) {
+            return;
+        }
+        Game game = new Game(gameDuration, listOfPlayers);
+
+        Thread gameThread = new Thread(game);
+        gameThread.start();
+    }
 
 }
