@@ -29,6 +29,9 @@ public class Player implements Serializable {
 
     private final String authToken = UUID.randomUUID().toString();
 
+    @Column
+    private boolean admin;
+
     // necessary to check if a username is already taken inside of a lobby.
     @Column
     private Long lobbyId;
@@ -112,4 +115,11 @@ public class Player implements Serializable {
         return hand;
     }
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
 }

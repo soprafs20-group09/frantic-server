@@ -77,7 +77,17 @@ public class Lobby implements Serializable {
         return players;
     }
 
+    public void setPlayers(int players) {
+        this.players = players;
+    }
+
+    public GameLength getGameDuration() { return gameDuration; }
+
     public void setGameDuration(GameLength gameDuration) { this.gameDuration = gameDuration; }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
 
     public void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
 
@@ -98,5 +108,4 @@ public class Lobby implements Serializable {
     }
 
     public void startGame() { }
-
 }
