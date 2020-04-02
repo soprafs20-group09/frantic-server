@@ -8,6 +8,8 @@ public class LobbySettingsDTO {
 
     private GameLength duration;
 
+    private DurationItem[] durationItems = setDurationItems();
+
     private Boolean publicLobby;
 
     public String getLobbyName() {
@@ -32,5 +34,21 @@ public class LobbySettingsDTO {
 
     public void setPublicLobby(Boolean publicLobby) {
         this.publicLobby = publicLobby;
+    }
+
+    public DurationItem[] setDurationItems() {
+        return new DurationItem[]{
+                new DurationItem("Short", "short"),
+                new DurationItem("Medium", "medium"),
+                new DurationItem("Long", "long")
+        };
+    }
+
+
+
+    private static class DurationItem {
+
+        public DurationItem(String name, String value) {
+        }
     }
 }
