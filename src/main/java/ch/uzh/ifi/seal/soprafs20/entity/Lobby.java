@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,6 +47,7 @@ public class Lobby implements Serializable {
     public Lobby() {
         this.gameDuration = GameLength.MEDIUM;
         this.isPublic = false;
+        this.listOfPlayers = new ArrayList<>();
     }
 
 
