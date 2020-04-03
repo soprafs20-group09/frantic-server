@@ -44,10 +44,14 @@ public class LobbyService {
 
     public List<Lobby> getLobbies(String filter) {
 
+        List<Lobby> allLobbies;
         if (filter != null) {
-            return this.lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
+            allLobbies =  lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
+        } else {
+            allLobbies = lobbyRepository.findAll();
         }
-        return this.lobbyRepository.findAll();
+        allLobbies.removeIf(lobby -> !lobby.isPublic());
+        return allLobbies;
     }
 
     public List<PlayerScoreDTO> getScores(long id) {
@@ -67,6 +71,7 @@ public class LobbyService {
 
         long lobbyId = newLobby.getLobbyId();
         creator.setLobbyId(lobbyId);
+        creator.setAdmin(true);
         playerRepository.save(creator);
         playerRepository.flush();
 
@@ -84,7 +89,16 @@ public class LobbyService {
 
     public DisconnectDTO kickPlayer(long lobbyId, Player player) {
 
-        Lobby currentLobby = lobbyRepository.findByLobbyId(lobbyId);
+        removePlayer(player);
+
+        DisconnectDTO response = new DisconnectDTO();
+        response.setReason("You were kicked out of the Lobby.");
+        return response;
+    }
+
+    public long removePlayer(Player player) {
+
+        Lobby currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
         if (currentLobby == null) {
             throw new LobbyServiceException("The lobby associated with the given player does not exist");
         }
@@ -96,10 +110,7 @@ public class LobbyService {
         //remove player from PlayerRepository
         playerRepository.delete(player);
         playerRepository.flush();
-
-        DisconnectDTO response = new DisconnectDTO();
-        response.setReason("You were kicked out of the Lobby.");
-        return response;
+        return currentLobby.getLobbyId();
     }
 
     public LobbyStateDTO updateLobbySettings(Lobby lobbyToUpdate, LobbySettingsDTO newSettings) {
@@ -114,9 +125,7 @@ public class LobbyService {
         }
         lobbyRepository.flush();
 
-        LobbyStateDTO response = new LobbyStateDTO();
-        response.setSettings(newSettings);
-        return response;
+        return getLobbyState(lobbyToUpdate.getLobbyId());
     }
 
     public LobbyStateDTO getLobbyState(long lobbyId) {
@@ -130,6 +139,7 @@ public class LobbyService {
             player.setUsername(p.getUsername());
             player.setAdmin(p.isAdmin());
             players[c] = player;
+            c++;
         }
         response.setPlayers(players);
 

@@ -28,7 +28,7 @@ public class LobbyController extends WebSocketController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    private String base = "/topic/lobby";
+    private String base = "/topic/lobby/";
 
     public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -42,8 +42,6 @@ public class LobbyController extends WebSocketController {
         if (checkSender(identity, lobbyId)) {
             Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
             LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyToUpdate, lobbySettingsDTO);
-
-            //TODO: add player array to DTO
 
             sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
         }
@@ -69,8 +67,8 @@ public class LobbyController extends WebSocketController {
             simpMessagingTemplate.convertAndSendToUser(player.getIdentity(), "/", disconnect);
 
             // send new lobby state to remaining players
-            LobbyStateDTO newLobbyState = this.lobbyService.getLobbyState(lobbyId);
-            sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
+            sendChatNotification(lobbyId, player.getUsername() + " was kicked!");
+            sendToLobby(lobbyId, base,"/lobby-state", this.lobbyService.getLobbyState(lobbyId));
         }
     }
 

@@ -33,7 +33,7 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
-    @Transient
+    @OneToMany
     private List<Player> listOfPlayers;
 
     @Transient

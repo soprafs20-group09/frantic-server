@@ -8,9 +8,13 @@ public class LobbySettingsDTO {
 
     private GameLength duration;
 
-    private DurationItem[] durationItems = setDurationItems();
+    private DurationItem[] durationItems;
 
     private Boolean publicLobby;
+
+    public LobbySettingsDTO() {
+        this.durationItems = setDurationItems();
+    }
 
     public String getLobbyName() {
         return lobbyName;
@@ -37,18 +41,45 @@ public class LobbySettingsDTO {
     }
 
     public DurationItem[] setDurationItems() {
-        return new DurationItem[]{
-                new DurationItem("Short", "short"),
-                new DurationItem("Medium", "medium"),
-                new DurationItem("Long", "long")
-        };
+        String[] names = new String[]{"Short", "Medium", "Long"};
+        String[] values = new String[]{"SHORT", "MEDIUM", "LONG"};
+
+        DurationItem[] items = new DurationItem[3];
+
+        for (int i = 0; i < names.length; i++) {
+            DurationItem d = new DurationItem();
+            d.name = names[i];
+            d.value = values[i];
+            items[i] = d;
+        }
+        return items;
     }
 
+    public DurationItem[] getDurationItems() {
+        return durationItems;
+    }
 
 
     private static class DurationItem {
 
-        public DurationItem(String name, String value) {
+        private String name;
+
+        private String value;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 }

@@ -109,13 +109,13 @@ public class RESTController {
             join.setUsername(playerUsernameDTO.getUsername());
             return join;
         } else if (id == 400L) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request invalid.");
         } else if (id == 403L) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
         } else if (id == 404L) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
         } else if (id == 409L) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists in lobby.");
         }
 
         lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());

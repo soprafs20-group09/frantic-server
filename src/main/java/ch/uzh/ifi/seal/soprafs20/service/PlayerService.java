@@ -38,12 +38,13 @@ public class PlayerService {
         this.lobbyRepository = lobbyRepository;
     }
 
-    public Player createPlayer(String username) {
+    public Player createPlayer(String identity, String username) {
 
         checkCreate(username);
 
         Player newPlayer = new Player();
         newPlayer.setUsername(username);
+        newPlayer.setIdentity(identity);
         playerRepository.save(newPlayer);
         playerRepository.flush();
         return newPlayer;
