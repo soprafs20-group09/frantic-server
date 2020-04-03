@@ -6,6 +6,8 @@ public class ChatDTO {
 
     private String username;
 
+    private String icon;
+
     private String message;
 
     public String getType() {
@@ -30,5 +32,13 @@ public class ChatDTO {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
