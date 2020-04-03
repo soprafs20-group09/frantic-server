@@ -5,9 +5,12 @@ import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.List;
 
@@ -30,9 +33,25 @@ public class WebSocketController {
         this.lobbyRepository = lobbyRepository;
     }
 
+    @EventListener
+    public void handleSessionDisconnect(SessionDisconnectEvent event) {
+        String identity = event.getUser().getName();
+        Player player = playerRepository.findByIdentity(identity);
+
+        long lobbyId = lobbyService.removePlayer(player);
+        sendChatNotification(lobbyId, player.getUsername() + " left the lobby!");
+    }
+
     protected boolean checkSender(String identity, long lobbyId) {
         Player toCheck = this.playerRepository.findByIdentity(identity);
         return toCheck.getLobbyId().equals(lobbyId);
+    }
+
+    protected void sendChatNotification(long lobbyId, String message) {
+        ChatDTO chat = new ChatDTO();
+        chat.setType("event");
+        chat.setMessage(message);
+        sendToLobby(lobbyId, "/topic/lobby/", "/chat", chat);
     }
 
     protected void sendToLobby(long lobbyId, String base, String destination, Object dto) {

@@ -27,7 +27,7 @@ public class RegisterController extends WebSocketController {
 
         String identity = sha.getUser().getName();
         String username = checkAuthentication(registerDTO.getToken());
-        Player player = playerService.createPlayer(username);
+        Player player = playerService.createPlayer(identity, username);
 
         Long lobbyId = RESTController.getLobbyIdFromAuthToken(registerDTO.getToken());
         if (lobbyId == null) {
@@ -44,7 +44,8 @@ public class RegisterController extends WebSocketController {
         Thread.sleep(500);
         // send initial lobby-state packet
         LobbyStateDTO lobbyStateDTO = lobbyService.getLobbyState(lobbyId);
-        sendToLobby(lobbyId, "/topic/lobby", "/lobby-state", lobbyStateDTO);
+        sendToLobby(lobbyId, "/topic/lobby/", "/lobby-state", lobbyStateDTO);
+        sendChatNotification(lobbyId, player.getUsername() + " joined the lobby!");
     }
 
     private String checkAuthentication(String authToken) {
