@@ -32,13 +32,13 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
-    @OneToMany
-    private List<Player> listOfPlayers;
+    @ElementCollection
+    private List<String> listOfPlayers;
 
-    @Transient
+    @Column
     private GameLength gameDuration;
 
-    @Transient
+    @Column
     private boolean isPublic;
 
     @Transient
@@ -54,7 +54,7 @@ public class Lobby implements Serializable {
     public Lobby() {
         this.lobbyId = generateLobbyId();
         this.gameDuration = GameLength.MEDIUM;
-        this.isPublic = false;
+        this.isPublic = true;
         this.listOfPlayers = new ArrayList<>();
         this.isPlaying = false;
     }
@@ -114,16 +114,16 @@ public class Lobby implements Serializable {
     public Thread getGameThread() {return this.gameThread; }
 
     public void addPlayer(Player player) {
-        listOfPlayers.add(player);
+        listOfPlayers.add(player.getUsername());
         this.players = listOfPlayers.size();
     }
 
     public void removePlayer(Player player) {
-        listOfPlayers.remove(player);
+        listOfPlayers.remove(player.getUsername());
         this.players = listOfPlayers.size();
     }
 
-    public List<Player> getListOfPlayers() {
+    public List<String> getListOfPlayers() {
         return listOfPlayers;
     }
 
