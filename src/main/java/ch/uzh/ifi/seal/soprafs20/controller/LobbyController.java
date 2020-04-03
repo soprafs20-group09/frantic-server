@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
@@ -18,8 +17,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -28,7 +25,7 @@ public class LobbyController extends WebSocketController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    private String base = "/topic/lobby/";
+    private String base = "/queue/lobby/";
 
     public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -40,8 +37,7 @@ public class LobbyController extends WebSocketController {
                                     SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) throws Exception {
         String identity = sha.getUser().getName();
         if (checkSender(identity, lobbyId)) {
-            Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
-            LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyToUpdate, lobbySettingsDTO);
+            LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyId, lobbySettingsDTO);
 
             sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
         }
@@ -59,16 +55,12 @@ public class LobbyController extends WebSocketController {
             }
 
             Player player = this.playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = this.lobbyService.kickPlayer(lobbyId, player);
+            DisconnectDTO disconnectDTO = this.lobbyService.kickPlayer();
             simpMessagingTemplate.convertAndSendToUser(player.getIdentity(),
-                    base + lobbyId + "/disconnect", disconnectDTO);
-
-            StompHeaderAccessor disconnect = StompHeaderAccessor.create(StompCommand.DISCONNECT);
-            simpMessagingTemplate.convertAndSendToUser(player.getIdentity(), "/", disconnect);
+                    "/queue/disconnect", disconnectDTO);
 
             // send new lobby state to remaining players
-            sendChatNotification(lobbyId, player.getUsername() + " was kicked!");
-            sendToLobby(lobbyId, base,"/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+            sendChatPlayerNotification(lobbyId, player.getUsername() + " was kicked!", player.getUsername());
         }
     }
 

@@ -39,7 +39,10 @@ public class WebSocketController {
         Player player = playerRepository.findByIdentity(identity);
 
         String lobbyId = lobbyService.removePlayer(player);
-        sendChatNotification(lobbyId, player.getUsername() + " left the lobby!");
+        if (lobbyId != null) {
+            sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+            sendToLobby(lobbyId, "/queue/lobby/","/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+        }
     }
 
     protected boolean checkSender(String identity, String lobbyId) {
@@ -54,9 +57,21 @@ public class WebSocketController {
         sendToLobby(lobbyId, "/topic/lobby/", "/chat", chat);
     }
 
+    protected void sendChatPlayerNotification(String lobbyId, String message, String username) {
+        ChatDTO chat = new ChatDTO();
+        chat.setType("event");
+        chat.setMessage(message);
+        chat.setIcon("avatar:" + username);
+        sendToLobby(lobbyId, "/queue/lobby/", "/chat", chat);
+    }
+
     protected void sendToLobby(String lobbyId, String base, String destination, Object dto) {
         List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
+        /*simp.convertAndSendToUser(lobby.get(0).getIdentity(),
+                base + lobbyId + destination, dto);
+        */
         for (Player player : lobby) {
+            System.out.println(player.getUsername() + "  " + destination);
             simp.convertAndSendToUser(player.getIdentity(),
                     base + lobbyId + destination, dto);
         }

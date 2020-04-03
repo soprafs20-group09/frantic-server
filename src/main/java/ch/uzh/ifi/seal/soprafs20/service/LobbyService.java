@@ -83,13 +83,12 @@ public class LobbyService {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.addPlayer(player);
         lobbyRepository.flush();
+        player = playerRepository.findByIdentity(player.getIdentity());
         player.setLobbyId(lobbyId);
         playerRepository.flush();
     }
 
-    public DisconnectDTO kickPlayer(String lobbyId, Player player) {
-
-        removePlayer(player);
+    public DisconnectDTO kickPlayer() {
 
         DisconnectDTO response = new DisconnectDTO();
         response.setReason("You were kicked out of the Lobby.");
@@ -98,14 +97,20 @@ public class LobbyService {
 
     public String removePlayer(Player player) {
 
-        Lobby currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
+        Lobby currentLobby = null;
+        try {
+            currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
         if (currentLobby == null) {
             throw new LobbyServiceException("The lobby associated with the given player does not exist");
+        } else {
+            //remove player from lobby
+            currentLobby.removePlayer(player);
+            lobbyRepository.flush();
         }
-
-        //remove player from lobby
-        currentLobby.removePlayer(player);
-        lobbyRepository.flush();
 
         //remove player from PlayerRepository
         playerRepository.delete(player);
@@ -113,7 +118,9 @@ public class LobbyService {
         return currentLobby.getLobbyId();
     }
 
-    public LobbyStateDTO updateLobbySettings(Lobby lobbyToUpdate, LobbySettingsDTO newSettings) {
+    public LobbyStateDTO updateLobbySettings(String lobbyId, LobbySettingsDTO newSettings) {
+
+        Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
         if (newSettings.getLobbyName() != null) {
             lobbyToUpdate.setName(newSettings.getLobbyName());
         }
@@ -134,10 +141,11 @@ public class LobbyService {
 
         LobbyPlayerDTO[] players = new LobbyPlayerDTO[lobby.getPlayers()];
         int c = 0;
-        for (Player p : lobby.getListOfPlayers()) {
+        for (String p : lobby.getListOfPlayers()) {
+            Player currentPlayer = playerRepository.findByUsernameAndLobbyId(p, lobbyId);
             LobbyPlayerDTO player = new LobbyPlayerDTO();
-            player.setUsername(p.getUsername());
-            player.setAdmin(p.isAdmin());
+            player.setUsername(currentPlayer.getUsername());
+            player.setAdmin(currentPlayer.isAdmin());
             players[c] = player;
             c++;
         }
@@ -154,9 +162,9 @@ public class LobbyService {
 
     public boolean isUsernameAlreadyInLobby(String lobbyId, String username) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-        List<Player> players = lobby.getListOfPlayers();
-        for (Player player : players) {
-            if (player.getUsername().equals(username)) {
+        List<String> players = lobby.getListOfPlayers();
+        for (String player : players) {
+            if (player.equals(username)) {
                 return true;
             }
         }
