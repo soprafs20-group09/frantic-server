@@ -79,7 +79,7 @@ public class RESTControllerTest {
         player.setId(1L);
         player.setUsername("foo");
 
-        given(playerService.createPlayer(Mockito.any())).willReturn(player);
+        given(playerService.createPlayer(Mockito.any(), Mockito.any())).willReturn(player);
 
         // when
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
