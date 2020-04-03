@@ -21,8 +21,7 @@ public class Lobby implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
-    private Long lobbyId;
+    private String lobbyId;
 
     @Column(nullable = false)
     private String name;
@@ -53,17 +52,28 @@ public class Lobby implements Serializable {
 
 
     public Lobby() {
+        this.lobbyId = generateLobbyId();
         this.gameDuration = GameLength.MEDIUM;
         this.isPublic = false;
         this.listOfPlayers = new ArrayList<>();
         this.isPlaying = false;
     }
 
-    public Long getLobbyId() {
+    private String generateLobbyId() {
+        StringBuilder s = new StringBuilder();
+        String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        for (int i = 0; i < 8; i++) {
+            int idx = (int) (chars.length() * Math.random());
+            s.append(chars.charAt(idx));
+        }
+        return s.toString();
+    }
+
+    public String getLobbyId() {
         return lobbyId;
     }
 
-    public void setLobbyId(Long lobbyId) {
+    public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
     }
 

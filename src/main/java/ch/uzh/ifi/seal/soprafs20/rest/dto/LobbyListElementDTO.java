@@ -2,7 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.rest.dto;
 
 public class LobbyListElementDTO {
 
-    private long lobbyId;
+    private String lobbyId;
 
     private String name;
 
@@ -10,11 +10,11 @@ public class LobbyListElementDTO {
 
     private int players;
 
-    public long getLobbyId() {
+    public String getLobbyId() {
         return lobbyId;
     }
 
-    public void setLobbyId(long lobbyId) {
+    public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
     }
 

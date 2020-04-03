@@ -31,7 +31,7 @@ public class Player implements Serializable {
 
     // necessary to check if a username is already taken inside of a lobby.
     @Column
-    private Long lobbyId;
+    private String lobbyId;
 
     private int points;
 
@@ -65,11 +65,11 @@ public class Player implements Serializable {
         this.identity = identity;
     }
 
-    public Long getLobbyId() {
+    public String getLobbyId() {
         return lobbyId;
     }
 
-    public void setLobbyId(Long lobbyId) {
+    public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
     }
 

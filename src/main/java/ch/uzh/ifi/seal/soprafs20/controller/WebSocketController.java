@@ -38,23 +38,23 @@ public class WebSocketController {
         String identity = event.getUser().getName();
         Player player = playerRepository.findByIdentity(identity);
 
-        long lobbyId = lobbyService.removePlayer(player);
+        String lobbyId = lobbyService.removePlayer(player);
         sendChatNotification(lobbyId, player.getUsername() + " left the lobby!");
     }
 
-    protected boolean checkSender(String identity, long lobbyId) {
+    protected boolean checkSender(String identity, String lobbyId) {
         Player toCheck = this.playerRepository.findByIdentity(identity);
         return toCheck.getLobbyId().equals(lobbyId);
     }
 
-    protected void sendChatNotification(long lobbyId, String message) {
+    protected void sendChatNotification(String lobbyId, String message) {
         ChatDTO chat = new ChatDTO();
         chat.setType("event");
         chat.setMessage(message);
         sendToLobby(lobbyId, "/topic/lobby/", "/chat", chat);
     }
 
-    protected void sendToLobby(long lobbyId, String base, String destination, Object dto) {
+    protected void sendToLobby(String lobbyId, String base, String destination, Object dto) {
         List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
         for (Player player : lobby) {
             simp.convertAndSendToUser(player.getIdentity(),

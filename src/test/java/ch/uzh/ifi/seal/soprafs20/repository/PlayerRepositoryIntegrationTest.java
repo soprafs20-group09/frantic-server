@@ -24,7 +24,7 @@ public class PlayerRepositoryIntegrationTest {
         Player player = new Player();
         player.setUsername("firstname@lastname");
         player.setIdentity("1234-ABCD-5678-EFGH-9012-IJKL");
-        player.setLobbyId((long) 100);
+        player.setLobbyId("abc");
 
         entityManager.persist(player);
         entityManager.flush();

@@ -29,7 +29,7 @@ public class RegisterController extends WebSocketController {
         String username = checkAuthentication(registerDTO.getToken());
         Player player = playerService.createPlayer(identity, username);
 
-        Long lobbyId = RESTController.getLobbyIdFromAuthToken(registerDTO.getToken());
+        String lobbyId = RESTController.getLobbyIdFromAuthToken(registerDTO.getToken());
         if (lobbyId == null) {
             lobbyId = lobbyService.createLobby(player);
         } else {

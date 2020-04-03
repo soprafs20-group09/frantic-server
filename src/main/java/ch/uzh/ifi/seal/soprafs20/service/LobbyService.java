@@ -58,7 +58,7 @@ public class LobbyService {
         return null;
     }
 
-    public long createLobby(Player creator) {
+    public String createLobby(Player creator) {
 
         String lobbyName = creator.getUsername() + "'s lobby";
 
@@ -69,7 +69,7 @@ public class LobbyService {
         newLobby = this.lobbyRepository.save(newLobby);
         this.lobbyRepository.flush();
 
-        long lobbyId = newLobby.getLobbyId();
+        String lobbyId = newLobby.getLobbyId();
         creator.setLobbyId(lobbyId);
         creator.setAdmin(true);
         playerRepository.save(creator);
@@ -78,7 +78,7 @@ public class LobbyService {
         return lobbyId;
     }
 
-    public void joinLobby(long lobbyId, Player player) {
+    public void joinLobby(String lobbyId, Player player) {
 
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.addPlayer(player);
@@ -87,7 +87,7 @@ public class LobbyService {
         playerRepository.flush();
     }
 
-    public DisconnectDTO kickPlayer(long lobbyId, Player player) {
+    public DisconnectDTO kickPlayer(String lobbyId, Player player) {
 
         removePlayer(player);
 
@@ -96,7 +96,7 @@ public class LobbyService {
         return response;
     }
 
-    public long removePlayer(Player player) {
+    public String removePlayer(Player player) {
 
         Lobby currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
         if (currentLobby == null) {
@@ -128,7 +128,7 @@ public class LobbyService {
         return getLobbyState(lobbyToUpdate.getLobbyId());
     }
 
-    public LobbyStateDTO getLobbyState(long lobbyId) {
+    public LobbyStateDTO getLobbyState(String lobbyId) {
         Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
         LobbyStateDTO response = new LobbyStateDTO();
 
@@ -152,7 +152,7 @@ public class LobbyService {
         return response;
     }
 
-    public boolean isUsernameAlreadyInLobby(long lobbyId, String username) {
+    public boolean isUsernameAlreadyInLobby(String lobbyId, String username) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         List<Player> players = lobby.getListOfPlayers();
         for (Player player : players) {
@@ -163,7 +163,7 @@ public class LobbyService {
         return false;
     }
 
-    public void checkLobbyJoin(long lobbyId, String username) {
+    public void checkLobbyJoin(String lobbyId, String username) {
 
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing.");

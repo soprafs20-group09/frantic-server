@@ -50,14 +50,14 @@ public class PlayerService {
         return newPlayer;
     }
 
-    public RegisteredDTO registerPlayer(String identity, Player player, long lobbyId) {
+    public RegisteredDTO registerPlayer(String identity, Player player, String lobbyId) {
 
         player.setIdentity(identity);
         playerRepository.flush();
 
         RegisteredDTO registeredDTO = new RegisteredDTO();
         registeredDTO.setUsername(player.getUsername());
-        registeredDTO.setLobbyId(Long.toString(lobbyId));
+        registeredDTO.setLobbyId(lobbyId);
 
         return registeredDTO;
     }
@@ -68,7 +68,7 @@ public class PlayerService {
         }
     }
 
-    private void checkCreateInLobby(long lobbyId, String username) {
+    private void checkCreateInLobby(String lobbyId, String username) {
 
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
 

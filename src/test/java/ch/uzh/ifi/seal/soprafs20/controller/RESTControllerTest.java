@@ -51,7 +51,7 @@ public class RESTControllerTest {
     public void getLobbies_returnsLobbyList() throws Exception {
 
         Lobby lobby = new Lobby();
-        lobby.setLobbyId(1L);
+        lobby.setLobbyId("1");
         lobby.setName("foo");
         lobby.setCreator("bar");
         lobby.setPlayers(3);
@@ -118,7 +118,7 @@ public class RESTControllerTest {
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");
 
-        given(lobbyService.isUsernameAlreadyInLobby(Mockito.anyLong(), Mockito.any())).willReturn(false);
+        given(lobbyService.isUsernameAlreadyInLobby(Mockito.any(), Mockito.any())).willReturn(false);
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
@@ -140,7 +140,7 @@ public class RESTControllerTest {
         player.setId(1L);
         player.setUsername("foo");
 
-        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN)).when(lobbyService).checkLobbyJoin(Mockito.anyLong(), Mockito.any());
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN)).when(lobbyService).checkLobbyJoin(Mockito.any(), Mockito.any());
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")

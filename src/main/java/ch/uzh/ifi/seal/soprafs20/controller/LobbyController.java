@@ -36,7 +36,7 @@ public class LobbyController extends WebSocketController {
     }
 
     @MessageMapping("/lobby/{lobbyId}/settings")
-    public void changeLobbySettings(@DestinationVariable long lobbyId,
+    public void changeLobbySettings(@DestinationVariable String lobbyId,
                                     SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) throws Exception {
         String identity = sha.getUser().getName();
         if (checkSender(identity, lobbyId)) {
@@ -48,7 +48,7 @@ public class LobbyController extends WebSocketController {
     }
 
     @MessageMapping("/lobby/{lobbyId}/kick")
-    public void kickPlayer(@DestinationVariable long lobbyId,
+    public void kickPlayer(@DestinationVariable String lobbyId,
                            SimpMessageHeaderAccessor sha, KickDTO kickDTO) throws Exception {
         String identity = sha.getUser().getName();
         if (checkSender(identity, lobbyId)) {
@@ -73,7 +73,7 @@ public class LobbyController extends WebSocketController {
     }
 
     @MessageMapping("/lobby/{lobbyId}/chat")
-    public void newChatMessage(@DestinationVariable long lobbyId,
+    public void newChatMessage(@DestinationVariable String lobbyId,
                                SimpMessageHeaderAccessor sha, ChatDTO chatDTO) throws Exception {
         String identity = sha.getUser().getName();
         if (checkSender(identity, lobbyId)) {

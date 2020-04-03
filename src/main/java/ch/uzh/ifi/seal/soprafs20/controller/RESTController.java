@@ -38,8 +38,9 @@ public class RESTController {
 
         // dummy response
         if (q != null && q.equals("test")) {
+            Lobby l = new Lobby();
             LobbyListElementDTO lobby = new LobbyListElementDTO();
-            lobby.setLobbyId(1L);
+            lobby.setLobbyId(l.getLobbyId());
             lobby.setName("foo's lobby");
             lobby.setCreator("foo");
             lobby.setPlayers(1);
@@ -99,23 +100,24 @@ public class RESTController {
     @PutMapping("/lobbies/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyJoinDTO joinLobby(@PathVariable long id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
+    public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
         // dummy response
-        if (id == 201L) {
-            LobbyJoinDTO join = new LobbyJoinDTO();
-            join.setToken(UUID.randomUUID().toString());
-            join.setName(playerUsernameDTO.getUsername() + "'s lobby");
-            join.setUsername(playerUsernameDTO.getUsername());
-            return join;
-        } else if (id == 400L) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request invalid.");
-        } else if (id == 403L) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
-        } else if (id == 404L) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
-        } else if (id == 409L) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists in lobby.");
+        switch (id) {
+            case "201":
+                LobbyJoinDTO join = new LobbyJoinDTO();
+                join.setToken(UUID.randomUUID().toString());
+                join.setName(playerUsernameDTO.getUsername() + "'s lobby");
+                join.setUsername(playerUsernameDTO.getUsername());
+                return join;
+            case "400":
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request invalid.");
+            case "403":
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
+            case "404":
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
+            case "409":
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists in lobby.");
         }
 
         lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
@@ -133,9 +135,9 @@ public class RESTController {
     public static String getUsernameFromAuthToken(String authToken) {
         return authMap.get(authToken)[0];
     }
-    public static Long getLobbyIdFromAuthToken(String authToken) {
+    public static String getLobbyIdFromAuthToken(String authToken) {
         if (authMap.get(authToken).length > 1) {
-            return Long.valueOf(authMap.get(authToken)[1]);
+            return authMap.get(authToken)[1];
         }
         return null;
     }
