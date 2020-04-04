@@ -22,7 +22,7 @@ public abstract class Card {
     }
 
     // resets the value of a card (ex. when shuffling) -> really needed??
-    public void reset(){}
+    //public void reset(){}
 
     public abstract void performAction();
 }
