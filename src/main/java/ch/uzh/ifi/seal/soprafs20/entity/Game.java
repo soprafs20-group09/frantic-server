@@ -2,21 +2,22 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Game implements Runnable {
 
     private GameLength gameDuration;
 
-    private List listOfPlayers;
+    private ArrayList<Player> listOfPlayers;
 
     private int maxPoints;
 
-    private int firstPlayer;
+    private Player firstPlayer;
 
     private Player winner;
 
-    public Game(GameLength gameDuration, List listOfPlayers) {
+    public Game(GameLength gameDuration, ArrayList<Player> listOfPlayers) {
         this.gameDuration = gameDuration;
         this.listOfPlayers = listOfPlayers;
         this.maxPoints = calculateMaxPoints();
@@ -38,7 +39,9 @@ public class Game implements Runnable {
     }
 
     private void changeFirstPlayer() {
-        this.firstPlayer = (this.firstPlayer + 1)%listOfPlayers.size();
+        int playersIndex = this.listOfPlayers.indexOf(this.firstPlayer);
+        playersIndex = (playersIndex + 1)%listOfPlayers.size();
+        this.firstPlayer = listOfPlayers.get(playersIndex);
     }
 
     private int calculateMaxPoints() {

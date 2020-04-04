@@ -127,6 +127,7 @@ public class Lobby implements Serializable {
         return listOfPlayers;
     }
 
+    /*
     public void startGame() {
         //The game can only be started if there are more than one player in the lobby
         if (this.players < 2) {
@@ -137,5 +138,7 @@ public class Lobby implements Serializable {
         gameThread.start();
         this.isPlaying = true;
     }
+
+     */
 
 }
