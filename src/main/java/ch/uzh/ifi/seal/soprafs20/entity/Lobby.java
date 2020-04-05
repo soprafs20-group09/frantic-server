@@ -111,6 +111,12 @@ public class Lobby implements Serializable {
 
     public void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
 
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public Game getGame() {return game; }
+
     public Thread getGameThread() {return this.gameThread; }
 
     public void addPlayer(Player player) {
