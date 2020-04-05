@@ -100,7 +100,7 @@ public class RESTControllerTest {
 
         List<PlayerScoreDTO> allScores = Collections.singletonList(player);
 
-        given(lobbyService.getScores(Mockito.anyLong())).willReturn(allScores);
+        given(lobbyService.getScores(Mockito.any())).willReturn(allScores);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1")

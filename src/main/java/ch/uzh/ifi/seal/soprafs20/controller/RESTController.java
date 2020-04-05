@@ -10,7 +10,6 @@ import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -36,16 +35,6 @@ public class RESTController {
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
 
-        // dummy response
-        if (q != null && q.equals("test")) {
-            Lobby l = new Lobby();
-            LobbyListElementDTO lobby = new LobbyListElementDTO();
-            lobby.setLobbyId(l.getLobbyId());
-            lobby.setName("foo's lobby");
-            lobby.setCreator("foo");
-            lobby.setPlayers(1);
-            return Collections.singletonList(lobby);
-        }
         List<LobbyListElementDTO> ret = new ArrayList<>();
         List<Lobby> l = lobbyService.getLobbies(q);
         for (Lobby lobby : l) {
@@ -57,17 +46,8 @@ public class RESTController {
     @GetMapping("/lobbies/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<PlayerScoreDTO> getAllPlayerScores(@PathVariable long id) {
+    public List<PlayerScoreDTO> getAllPlayerScores(@PathVariable String id) {
 
-        // dummy response
-        if (id == 200L) {
-            PlayerScoreDTO score = new PlayerScoreDTO();
-            score.setUsername("foo");
-            score.setScore(69);
-            return Collections.singletonList(score);
-        } else if (id == 404L) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
         return lobbyService.getScores(id);
     }
 
@@ -76,16 +56,7 @@ public class RESTController {
     @ResponseBody
     public LobbyJoinDTO createLobby(@RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
-        // dummy response
-        if (playerUsernameDTO.getUsername().equals("test")) {
-            LobbyJoinDTO join = new LobbyJoinDTO();
-            join.setToken(UUID.randomUUID().toString());
-            join.setName(playerUsernameDTO.getUsername() + "'s lobby");
-            join.setUsername(playerUsernameDTO.getUsername());
-            return join;
-        } else if (playerUsernameDTO.getUsername().equals("err")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        lobbyService.checkLobbyCreate(playerUsernameDTO.getUsername());
 
         String authToken = UUID.randomUUID().toString();
         authMap.put(authToken, new String[]{playerUsernameDTO.getUsername()});
@@ -102,24 +73,6 @@ public class RESTController {
     @ResponseBody
     public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
-        // dummy response
-        switch (id) {
-            case "201":
-                LobbyJoinDTO join = new LobbyJoinDTO();
-                join.setToken(UUID.randomUUID().toString());
-                join.setName(playerUsernameDTO.getUsername() + "'s lobby");
-                join.setUsername(playerUsernameDTO.getUsername());
-                return join;
-            case "400":
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request invalid.");
-            case "403":
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
-            case "404":
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
-            case "409":
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists in lobby.");
-        }
-
         lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
 
         String authToken = UUID.randomUUID().toString();
@@ -135,6 +88,7 @@ public class RESTController {
     public static String getUsernameFromAuthToken(String authToken) {
         return authMap.get(authToken)[0];
     }
+
     public static String getLobbyIdFromAuthToken(String authToken) {
         if (authMap.get(authToken).length > 1) {
             return authMap.get(authToken)[1];
