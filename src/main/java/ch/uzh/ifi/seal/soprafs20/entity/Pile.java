@@ -20,22 +20,22 @@ public abstract class Pile<E> extends Stack<E> {
         return elements.toArray(new Object[elements.size()]);
     }
 
-    public E push(E item) {
+    public synchronized E push(E item) {
         if (elements.add(item))
             return item;
         else
             return null;
     }
 
-    public E pop() {
+    public synchronized E pop() {
         return elements.remove(elements.size() - 1);
     }
 
-    public E peek() {
+    public synchronized E peek() {
         return elements.get(elements.size() - 1);
     }
 
-    public E peekSecond() {
+    public synchronized E peekSecond() {
         return elements.get(elements.size() - 2);
     }
 }
