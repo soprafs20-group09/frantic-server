@@ -48,35 +48,36 @@ public class LobbyController extends WebSocketController {
                            SimpMessageHeaderAccessor sha, KickDTO kickDTO) throws Exception {
         String identity = sha.getUser().getName();
         if (checkSender(identity, lobbyId)) {
-
             Player admin = playerRepository.findByIdentity(identity);
             if (!admin.isAdmin()) {
                 throw new PlayerServiceException("Invalid action. Not admin.");
             }
 
             Player player = this.playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = this.lobbyService.kickPlayer();
+            DisconnectDTO disconnectDTO = new DisconnectDTO();
+            disconnectDTO.setReason("You were kicked out of the Lobby.");
             simpMessagingTemplate.convertAndSendToUser(player.getIdentity(),
                     "/queue/disconnect", disconnectDTO);
+            playerService.removePlayer(player);
 
-            // send new lobby state to remaining players
             sendChatPlayerNotification(lobbyId, player.getUsername() + " was kicked!", player.getUsername());
+            sendToLobby(lobbyId, base,"/lobby-state", this.lobbyService.getLobbyState(lobbyId));
         }
     }
 
     @MessageMapping("/lobby/{lobbyId}/chat")
     public void newChatMessage(@DestinationVariable String lobbyId,
                                SimpMessageHeaderAccessor sha, ChatDTO chatDTO) throws Exception {
-        String identity = sha.getUser().getName();
-        if (checkSender(identity, lobbyId)) {
-            Player sender = this.playerRepository.findByIdentity(identity);
+        if (chatDTO.getMessage() != null && !chatDTO.getMessage().matches("^\\s*$")) {
+            String identity = sha.getUser().getName();
+            if (checkSender(identity, lobbyId)) {
+                Player sender = this.playerRepository.findByIdentity(identity);
 
-            chatDTO.setType("msg");
-            chatDTO.setUsername(sender.getUsername());
+                chatDTO.setType("msg");
+                chatDTO.setUsername(sender.getUsername());
 
-            sendToLobby(lobbyId, base,"/chat", chatDTO);
+                sendToLobby(lobbyId, base,"/chat", chatDTO);
+            }
         }
     }
-
-
 }

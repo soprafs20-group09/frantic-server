@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
@@ -38,10 +39,24 @@ public class WebSocketController {
         String identity = event.getUser().getName();
         Player player = playerRepository.findByIdentity(identity);
 
-        String lobbyId = lobbyService.removePlayer(player);
-        if (lobbyId != null) {
-            sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
-            sendToLobby(lobbyId, "/queue/lobby/","/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+        if (player != null) {
+            if (player.isAdmin()) {
+                String lobbyId = playerService.removePlayer(player);
+                if (lobbyId != null) {
+                    sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+                    DisconnectDTO message = new DisconnectDTO();
+                    message.setReason("Host left the lobby.");
+                    sendDisconnectToLobby(lobbyId, message);
+                    sendToLobby(lobbyId, "/queue/lobby/", "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+                    lobbyService.closeLobby(lobbyId);
+                }
+            } else {
+                String lobbyId = playerService.removePlayer(player);
+                if (lobbyId != null) {
+                    sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+                    sendToLobby(lobbyId, "/queue/lobby/", "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+                }
+            }
         }
     }
 
@@ -67,13 +82,17 @@ public class WebSocketController {
 
     protected void sendToLobby(String lobbyId, String base, String destination, Object dto) {
         List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
-        /*simp.convertAndSendToUser(lobby.get(0).getIdentity(),
-                base + lobbyId + destination, dto);
-        */
         for (Player player : lobby) {
-            System.out.println(player.getUsername() + "  " + destination);
             simp.convertAndSendToUser(player.getIdentity(),
                     base + lobbyId + destination, dto);
+        }
+    }
+
+    private void sendDisconnectToLobby(String lobbyId, DisconnectDTO message) {
+        List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
+        for (Player player : lobby) {
+            simp.convertAndSendToUser(player.getIdentity(),
+                    "/queue/disconnect", message);
         }
     }
 }
