@@ -2,12 +2,10 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
-import ch.uzh.ifi.seal.soprafs20.exceptions.LobbyServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.slf4j.Logger;
@@ -54,7 +52,7 @@ public class LobbyService {
         return allLobbies;
     }
 
-    public List<PlayerScoreDTO> getScores(long id) {
+    public List<PlayerScoreDTO> getScores(String lobbyId) {
         return null;
     }
 
@@ -88,40 +86,23 @@ public class LobbyService {
         playerRepository.flush();
     }
 
-    public DisconnectDTO kickPlayer() {
+    public void closeLobby(String lobbyId) {
 
-        DisconnectDTO response = new DisconnectDTO();
-        response.setReason("You were kicked out of the Lobby.");
-        return response;
-    }
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
 
-    public String removePlayer(Player player) {
-
-        Lobby currentLobby = null;
-        try {
-            currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
-        } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-            return null;
+        List<String> players = lobby.getListOfPlayers();
+        for (String player : players) {
+            Player p = playerRepository.findByUsernameAndLobbyId(player, lobby.getLobbyId());
+            playerRepository.delete(p);
         }
-        if (currentLobby == null) {
-            throw new LobbyServiceException("The lobby associated with the given player does not exist");
-        } else {
-            //remove player from lobby
-            currentLobby.removePlayer(player);
-            lobbyRepository.flush();
-        }
-
-        //remove player from PlayerRepository
-        playerRepository.delete(player);
         playerRepository.flush();
-        return currentLobby.getLobbyId();
+        lobbyRepository.delete(lobby);
     }
 
     public LobbyStateDTO updateLobbySettings(String lobbyId, LobbySettingsDTO newSettings) {
 
         Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
-        if (newSettings.getLobbyName() != null) {
+        if (newSettings.getLobbyName() != null && !newSettings.getLobbyName().matches("^\\s*$")) {
             lobbyToUpdate.setName(newSettings.getLobbyName());
         }
         if (newSettings.getDuration() != null) {
@@ -173,17 +154,19 @@ public class LobbyService {
 
     public void checkLobbyJoin(String lobbyId, String username) {
 
-        if (username == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing.");
-        }
+        checkLobbyCreate(username);
         if (lobbyRepository.findByLobbyId(lobbyId) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
         }
-        if (!lobbyRepository.findByLobbyId(lobbyId).isPublic()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
-        }
         if (isUsernameAlreadyInLobby(lobbyId, username)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists.");
+        }
+    }
+
+    public void checkLobbyCreate(String username) {
+
+        if (username == null || username.matches("^\\s*$")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username missing or invalid.");
         }
     }
 }

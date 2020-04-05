@@ -9,10 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * User Service
@@ -40,8 +38,6 @@ public class PlayerService {
 
     public Player createPlayer(String identity, String username) {
 
-        checkCreate(username);
-
         Player newPlayer = new Player();
         newPlayer.setUsername(username);
         newPlayer.setIdentity(identity);
@@ -62,24 +58,22 @@ public class PlayerService {
         return registeredDTO;
     }
 
-    private void checkCreate(String username) {
-        if (username == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is missing or invalid.");
-        }
-    }
+    public String removePlayer(Player player) {
 
-    private void checkCreateInLobby(String lobbyId, String username) {
+        Lobby currentLobby = null;
+        try {
+            currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
+        } catch (NullPointerException e) {
+            return null;
+        }
+        //remove player from lobby
+        currentLobby.removePlayer(player);
+        lobbyRepository.flush();
 
-        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        //remove player from PlayerRepository
+        playerRepository.delete(player);
+        playerRepository.flush();
 
-        if (lobby == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
-        }
-        if (!lobby.isPublic()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby is private.");
-        }
-        if (playerRepository.findByUsernameAndLobbyId(username, lobbyId) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
-        }
+        return currentLobby.getLobbyId();
     }
 }
