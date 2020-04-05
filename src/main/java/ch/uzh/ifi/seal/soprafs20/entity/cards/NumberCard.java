@@ -7,8 +7,6 @@ import ch.uzh.ifi.seal.soprafs20.entity.Card;
 public class NumberCard extends Card {
 
     private int number;
-    private Color color;
-    private Type type;
 
     public NumberCard(Color c, Type t, int n){
         super(c, t);
