@@ -8,6 +8,6 @@ public class DiscardPile extends Pile<Card>{
         super();
     }
 
-    //takePile() necessary
+
 
 }

@@ -1,5 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.constant;
 
 public enum Type {
-    SECONDCHANCE, COUNTERATTACK, EQUALITY, EXCHANGE, FANTASTIC, FANTASTICFOUR, FUCKYOU, GIFT, NICETRY, SKIP, NUMBER
+    BACK, SPECIAL, NUMBER
 }

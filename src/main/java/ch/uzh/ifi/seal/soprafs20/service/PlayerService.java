@@ -60,17 +60,17 @@ public class PlayerService {
         Lobby currentLobby = null;
         try {
             currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
+
+            //remove player from lobby
+            currentLobby.removePlayer(player);
+            lobbyRepository.flush();
+
+            //remove player from PlayerRepository
+            playerRepository.delete(player);
+            playerRepository.flush();
         } catch (NullPointerException e) {
             return null;
         }
-        //remove player from lobby
-        currentLobby.removePlayer(player);
-        lobbyRepository.flush();
-
-        //remove player from PlayerRepository
-        playerRepository.delete(player);
-        playerRepository.flush();
-
         return currentLobby.getLobbyId();
     }
 }
