@@ -54,6 +54,8 @@ dependencies {
     implementation 'org.webjars:stomp-websocket:2.3.3'
     implementation 'org.webjars:bootstrap:3.3.7'
     implementation 'org.webjars:jquery:3.1.1-1'
+
+    implementation 'org.jsoup:jsoup:1.13.1'
 }
 
 bootJar {
