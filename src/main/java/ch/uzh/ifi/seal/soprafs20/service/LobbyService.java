@@ -40,15 +40,16 @@ public class LobbyService {
         this.lobbyRepository = lobbyRepository;
     }
 
-    public List<Lobby> getLobbies(String filter) {
+    public List<Lobby> getLobbies(String q) {
 
         List<Lobby> allLobbies;
-        if (filter != null) {
-            allLobbies =  lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
+        if (q != null) {
+            allLobbies =  lobbyRepository.findByNameContainsOrCreatorContains(q, q);
         } else {
             allLobbies = lobbyRepository.findAll();
         }
         allLobbies.removeIf(lobby -> !lobby.isPublic());
+        log.debug(String.format("Retrieved list of lobbies that contain '%s'", q));
         return allLobbies;
     }
 
@@ -66,6 +67,8 @@ public class LobbyService {
         newLobby.setName(lobbyName);
         newLobby = this.lobbyRepository.save(newLobby);
         this.lobbyRepository.flush();
+        log.debug(String.format("'%s' created lobby '%s' with ID '%s'",
+                creator.getUsername(), newLobby.getName(), newLobby.getLobbyId()));
 
         String lobbyId = newLobby.getLobbyId();
         creator.setLobbyId(lobbyId);
@@ -84,6 +87,8 @@ public class LobbyService {
         player = playerRepository.findByIdentity(player.getIdentity());
         player.setLobbyId(lobbyId);
         playerRepository.flush();
+        log.debug(String.format("'%s' joined lobby '%s' with ID '%s'",
+                player.getUsername(), lobby.getName(), lobby.getLobbyId()));
     }
 
     public void closeLobby(String lobbyId) {
@@ -97,6 +102,7 @@ public class LobbyService {
         }
         playerRepository.flush();
         lobbyRepository.delete(lobby);
+        log.debug(String.format("Lobby '%s' with ID '%s' was closed", lobby.getName(), lobby.getLobbyId()));
     }
 
     public LobbyStateDTO updateLobbySettings(String lobbyId, LobbySettingsDTO newSettings) {
