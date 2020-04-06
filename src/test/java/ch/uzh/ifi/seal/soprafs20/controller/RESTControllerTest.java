@@ -91,6 +91,26 @@ public class RESTControllerTest {
                 .andExpect(jsonPath("$.username", is(player.getUsername())));
     }
 
+    @Test()
+    public void post_invalidUsername_throwsException() throws Exception {
+
+        PlayerUsernameDTO username = new PlayerUsernameDTO();
+        username.setUsername(" ");
+
+        Player player = new Player();
+        player.setId(1L);
+        player.setUsername(" ");
+
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username missing or invalid.")).when(lobbyService).checkLobbyCreate(Mockito.any());
+
+        // when
+        MockHttpServletRequestBuilder postRequest = post("/lobbies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(username));
+        // then
+        mockMvc.perform(postRequest).andExpect(status().isBadRequest());
+    }
+
     @Test
     public void getPlayersInLobby_returnsListOfPlayersInLobby() throws Exception {
 
