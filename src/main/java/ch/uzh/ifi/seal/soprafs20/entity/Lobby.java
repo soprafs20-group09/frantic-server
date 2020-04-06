@@ -19,6 +19,8 @@ import java.util.Random;
 @Table(name = "Lobby")
 public class Lobby implements Serializable {
 
+    private Random random = new Random();
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -64,8 +66,7 @@ public class Lobby implements Serializable {
         StringBuilder s = new StringBuilder();
         String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
         for (int i = 0; i < 8; i++) {
-            Random r = new Random();
-            int idx = r.nextInt(chars.length());
+            int idx = random.nextInt(chars.length());
             s.append(chars.charAt(idx));
         }
         return s.toString();
