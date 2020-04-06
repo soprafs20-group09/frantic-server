@@ -7,10 +7,14 @@ import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.mapper.DTOMapper;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
-import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -20,11 +24,13 @@ import java.util.*;
 @RestController
 public class RESTController {
 
+    private final Logger log = LoggerFactory.getLogger(RESTController.class);
+
     private static Map<String, String[]> authMap = new HashMap<>();
 
     private final LobbyService lobbyService;
 
-    RESTController(LobbyService lobbyService, PlayerService playerService) {
+    RESTController(LobbyService lobbyService) {
         this.lobbyService = lobbyService;
     }
 
@@ -32,6 +38,8 @@ public class RESTController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
+
+        log.debug(q==null ? "GET /lobbies" : "GET /lobbies?q=" + q);
 
         List<LobbyListElementDTO> ret = new ArrayList<>();
         List<Lobby> l = lobbyService.getLobbies(q);
@@ -46,23 +54,28 @@ public class RESTController {
     @ResponseBody
     public List<PlayerScoreDTO> getAllPlayerScores(@PathVariable String id) {
 
+        log.debug("GET /lobbies/" + id);
+
         return lobbyService.getScores(id);
     }
 
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyJoinDTO createLobby(@RequestBody PlayerUsernameDTO playerUsernameDTO) {
+    public LobbyJoinDTO createLobby(@Valid @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
-        lobbyService.checkLobbyCreate(playerUsernameDTO.getUsername());
+        String username = clean(playerUsernameDTO.getUsername());
+
+        log.debug("POST /lobbies, body: " + playerUsernameDTO.toString());
+        lobbyService.checkLobbyCreate(username);
 
         String authToken = UUID.randomUUID().toString();
-        authMap.put(authToken, new String[]{playerUsernameDTO.getUsername()});
+        authMap.put(authToken, new String[]{username});
 
         LobbyJoinDTO response = new LobbyJoinDTO();
         response.setToken(authToken);
-        response.setName(playerUsernameDTO.getUsername() + "'s lobby");
-        response.setUsername(playerUsernameDTO.getUsername());
+        response.setName(username + "'s lobby");
+        response.setUsername(username);
         return response;
     }
 
@@ -71,15 +84,18 @@ public class RESTController {
     @ResponseBody
     public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
-        lobbyService.checkLobbyJoin(id, playerUsernameDTO.getUsername());
+        String username = clean(playerUsernameDTO.getUsername());
+
+        log.debug("PUT /lobbies/" + id + ", body: " + playerUsernameDTO.toString());
+        lobbyService.checkLobbyJoin(id, username);
 
         String authToken = UUID.randomUUID().toString();
-        authMap.put(authToken, new String[]{playerUsernameDTO.getUsername(), String.valueOf(id)});
+        authMap.put(authToken, new String[]{username, String.valueOf(id)});
 
         LobbyJoinDTO response = new LobbyJoinDTO();
         response.setToken(authToken);
-        response.setName(playerUsernameDTO.getUsername() + "'s lobby");
-        response.setUsername(playerUsernameDTO.getUsername());
+        response.setName(username + "'s lobby");
+        response.setUsername(username);
         return response;
     }
 
@@ -96,5 +112,9 @@ public class RESTController {
 
     public static void removeFromAuthMap(String authToken) {
         authMap.remove(authToken);
+    }
+
+    private String clean(String arg) {
+        return Jsoup.clean(arg, Whitelist.basic());
     }
 }

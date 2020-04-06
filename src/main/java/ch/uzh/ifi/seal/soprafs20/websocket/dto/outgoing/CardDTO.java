@@ -8,6 +8,8 @@ public class CardDTO {
 
     private String color;
 
+    private int key;
+
     public String getType() {
         return type;
     }
@@ -30,5 +32,13 @@ public class CardDTO {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 }
