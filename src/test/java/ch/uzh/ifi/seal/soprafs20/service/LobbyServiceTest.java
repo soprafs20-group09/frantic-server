@@ -205,18 +205,16 @@ public class LobbyServiceTest {
         fail("ResponseStatusException expected");
     }
 
-    /*
     @Test
     public void checkLobbyCreate_InputNotValid_throwResponseStatusException() {
         try {
-            lobbyService.checkLobbyCreate("test\\user");
+            lobbyService.checkLobbyCreate(" ");
         } catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.BAD_REQUEST);
             return;
         }
         fail("ResponseStatusException expected");
     }
-    */
 
     @Test void checkLobbyJoin_LobbyNotFound_throwResponseStatusException() {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(null);
