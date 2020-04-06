@@ -161,6 +161,9 @@ public class LobbyService {
         if (isUsernameAlreadyInLobby(lobbyId, username)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists.");
         }
+        if (lobbyRepository.findByLobbyId(lobbyId).getPlayers() >= 8) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Lobby is full.");
+        }
     }
 
     public void checkLobbyCreate(String username) {

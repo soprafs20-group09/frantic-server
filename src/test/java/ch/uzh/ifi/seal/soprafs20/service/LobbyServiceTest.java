@@ -62,10 +62,10 @@ public class LobbyServiceTest {
         List<Lobby> returnedList = lobbyService.getLobbies(null);
 
         // then
-        assertEquals(returnedList.size(), listOfLobbies.size());
-        assertEquals(returnedList.get(0), listOfLobbies.get(0));
-        assertEquals(returnedList.get(1), listOfLobbies.get(1));
-        assertEquals(returnedList.get(2), listOfLobbies.get(2));
+        assertEquals(listOfLobbies.size(), returnedList.size());
+        assertEquals(listOfLobbies.get(0), returnedList.get(0));
+        assertEquals(listOfLobbies.get(1), returnedList.get(1));
+        assertEquals(listOfLobbies.get(2), returnedList.get(2));
     }
 
     @Test
@@ -87,8 +87,8 @@ public class LobbyServiceTest {
         List<Lobby> returnedList = lobbyService.getLobbies("alpha");
 
         // then
-        assertEquals(returnedList.size(), listOfLobbies.size());
-        assertEquals(returnedList.get(0), listOfLobbies.get(0));
+        assertEquals(listOfLobbies.size(), returnedList.size());
+        assertEquals(listOfLobbies.get(0), returnedList.get(0));
     }
 
     @Test
@@ -112,8 +112,8 @@ public class LobbyServiceTest {
         List<Lobby> returnedList = lobbyService.getLobbies(null);
 
         // then
-        assertEquals(returnedList.size(), 1);
-        assertEquals(returnedList.get(0), reference.get(1));
+        assertEquals(1, returnedList.size());
+        assertEquals(reference.get(1), returnedList.get(0));
     }
 
     @Test

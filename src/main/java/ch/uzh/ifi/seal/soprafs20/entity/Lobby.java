@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Internal User Representation
@@ -17,6 +18,8 @@ import java.util.List;
 @Entity
 @Table(name = "Lobby")
 public class Lobby implements Serializable {
+
+    private Random random = new Random();
 
     private static final long serialVersionUID = 1L;
 
@@ -63,7 +66,7 @@ public class Lobby implements Serializable {
         StringBuilder s = new StringBuilder();
         String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
         for (int i = 0; i < 8; i++) {
-            int idx = (int) (chars.length() * Math.random());
+            int idx = random.nextInt(chars.length());
             s.append(chars.charAt(idx));
         }
         return s.toString();

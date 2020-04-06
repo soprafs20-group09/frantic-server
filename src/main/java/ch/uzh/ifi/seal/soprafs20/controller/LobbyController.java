@@ -25,8 +25,6 @@ public class LobbyController extends WebSocketController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    private String base = "/queue/lobby/";
-
     public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         super(lobbyService, playerService, playerRepository, lobbyRepository);
