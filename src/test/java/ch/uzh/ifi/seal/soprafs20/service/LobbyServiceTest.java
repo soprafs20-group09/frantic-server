@@ -1,7 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
+import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,23 +12,38 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class LobbyServiceTest {
+
     @Mock
     private LobbyRepository lobbyRepository;
+    @Mock
+    private PlayerRepository playerRepository;
+    @Mock
+    private Player testPlayer;
 
     @InjectMocks
     private LobbyService lobbyService;
 
+    @InjectMocks
     private Lobby testLobby;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
+
+        // given
+        testLobby.setName("testLobby");
+        testLobby.setCreator("Brian");
+
+        // when -> any object is being save in the userRepository -> return the dummy testUser
+        Mockito.when(lobbyRepository.save(Mockito.any())).thenReturn(testLobby);
+        Mockito.when(testPlayer.getUsername()).thenReturn("testPlayer");
+        Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
     }
 
     @Test
@@ -97,5 +114,25 @@ public class LobbyServiceTest {
         // then
         assertEquals(returnedList.size(), 1);
         assertEquals(returnedList.get(0), reference.get(1));
+    }
+
+    @Test
+    public void createLobby_returnLobbyId() {
+        String response = lobbyService.createLobby(testPlayer);
+
+        Mockito.verify(lobbyRepository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(playerRepository, Mockito.times(1)).save(Mockito.any());
+
+        assertNotNull(response);
+    }
+
+    @Test
+    public void joinLobby_addPlayer() {
+        Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(testLobby);
+        Mockito.when(playerRepository.findByIdentity(Mockito.any())).thenReturn(testPlayer);
+        lobbyService.joinLobby("abc", testPlayer);
+
+        Mockito.verify(lobbyRepository, Mockito.times(1)).findByLobbyId(Mockito.any());
+        Mockito.verify(playerRepository, Mockito.times(1)).findByIdentity(Mockito.any());
     }
 }
