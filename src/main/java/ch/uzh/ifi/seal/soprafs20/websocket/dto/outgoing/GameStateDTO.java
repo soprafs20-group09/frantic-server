@@ -2,15 +2,15 @@ package ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing;
 
 public class GameStateDTO {
 
-    private DiscardPileDTO discardPile;
+    private CardDTO discardPile;
 
     private PlayerStateDTO[] players;
 
-    public DiscardPileDTO getDiscardPile() {
+    public CardDTO getDiscardPile() {
         return discardPile;
     }
 
-    public void setDiscardPile(DiscardPileDTO discardPile) {
+    public void setDiscardPile(CardDTO discardPile) {
         this.discardPile = discardPile;
     }
 

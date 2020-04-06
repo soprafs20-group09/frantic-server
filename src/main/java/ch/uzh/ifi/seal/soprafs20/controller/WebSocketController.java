@@ -26,6 +26,8 @@ public class WebSocketController {
     protected final PlayerRepository playerRepository;
     protected final LobbyRepository lobbyRepository;
 
+    protected String base = "/queue/lobby/";
+
     public WebSocketController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.lobbyService = lobbyService;
@@ -47,14 +49,14 @@ public class WebSocketController {
                     DisconnectDTO message = new DisconnectDTO();
                     message.setReason("Host left the lobby.");
                     sendDisconnectToLobby(lobbyId, message);
-                    sendToLobby(lobbyId, "/queue/lobby/", "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+                    sendToLobby(lobbyId, base, "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
                     lobbyService.closeLobby(lobbyId);
                 }
             } else {
                 String lobbyId = playerService.removePlayer(player);
                 if (lobbyId != null) {
                     sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
-                    sendToLobby(lobbyId, "/queue/lobby/", "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+                    sendToLobby(lobbyId, base, "/lobby-state", this.lobbyService.getLobbyState(lobbyId));
                 }
             }
         }
@@ -69,7 +71,7 @@ public class WebSocketController {
         ChatDTO chat = new ChatDTO();
         chat.setType("event");
         chat.setMessage(message);
-        sendToLobby(lobbyId, "/topic/lobby/", "/chat", chat);
+        sendToLobby(lobbyId, base, "/chat", chat);
     }
 
     protected void sendChatPlayerNotification(String lobbyId, String message, String username) {
@@ -77,7 +79,7 @@ public class WebSocketController {
         chat.setType("event");
         chat.setMessage(message);
         chat.setIcon("avatar:" + username);
-        sendToLobby(lobbyId, "/queue/lobby/", "/chat", chat);
+        sendToLobby(lobbyId, base, "/chat", chat);
     }
 
     protected void sendToLobby(String lobbyId, String base, String destination, Object dto) {

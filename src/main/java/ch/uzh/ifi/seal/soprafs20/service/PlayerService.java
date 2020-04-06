@@ -23,15 +23,12 @@ public class PlayerService {
 
     private final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-    private final LobbyService lobbyService;
-
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
-    public PlayerService(LobbyService lobbyService, @Qualifier("playerRepository") PlayerRepository playerRepository,
+    public PlayerService(@Qualifier("playerRepository") PlayerRepository playerRepository,
                          @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
-        this.lobbyService = lobbyService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
     }

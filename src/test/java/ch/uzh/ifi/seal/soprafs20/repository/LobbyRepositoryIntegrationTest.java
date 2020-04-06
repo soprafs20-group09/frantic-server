@@ -49,7 +49,7 @@ public class LobbyRepositoryIntegrationTest {
         List<Lobby> foundLobbies = lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
 
         // then
-        assertEquals(foundLobbies.size() , 1);
+        assertEquals(1, foundLobbies.size());
         Lobby foundLobby = foundLobbies.get(0);
         assertEquals(foundLobby.getName(), lobby1.getName());
         assertEquals(foundLobby.getCreator(), lobby1.getCreator());
@@ -74,7 +74,7 @@ public class LobbyRepositoryIntegrationTest {
         List<Lobby> foundLobbies = lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
 
         // then
-        assertEquals(foundLobbies.size() , 0);
+        assertEquals(0, foundLobbies.size());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class LobbyRepositoryIntegrationTest {
         List<Lobby> foundLobbies = lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
 
         // then
-        assertEquals(foundLobbies.size() , 2);
+        assertEquals(2, foundLobbies.size());
         Lobby foundLobby1 = foundLobbies.get(0);
         assertEquals(foundLobby1.getName(), lobby1.getName());
         assertEquals(foundLobby1.getCreator(), lobby1.getCreator());
@@ -143,7 +143,7 @@ public class LobbyRepositoryIntegrationTest {
         List<Lobby> foundLobbies = lobbyRepository.findByNameContainsOrCreatorContains(filter, filter);
 
         // then
-        assertEquals(foundLobbies.size() , 1);
+        assertEquals(1, foundLobbies.size());
         Lobby foundLobby1 = foundLobbies.get(0);
         assertEquals(foundLobby1.getName(), lobby1.getName());
         assertEquals(foundLobby1.getCreator(), lobby1.getCreator());

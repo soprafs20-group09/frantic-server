@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Internal User Representation
@@ -63,7 +64,8 @@ public class Lobby implements Serializable {
         StringBuilder s = new StringBuilder();
         String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
         for (int i = 0; i < 8; i++) {
-            int idx = (int) (chars.length() * Math.random());
+            Random r = new Random();
+            int idx = r.nextInt(chars.length());
             s.append(chars.charAt(idx));
         }
         return s.toString();

@@ -23,11 +23,9 @@ public class RESTController {
     private static Map<String, String[]> authMap = new HashMap<>();
 
     private final LobbyService lobbyService;
-    private final PlayerService playerService;
 
     RESTController(LobbyService lobbyService, PlayerService playerService) {
         this.lobbyService = lobbyService;
-        this.playerService = playerService;
     }
 
     @GetMapping("/lobbies")

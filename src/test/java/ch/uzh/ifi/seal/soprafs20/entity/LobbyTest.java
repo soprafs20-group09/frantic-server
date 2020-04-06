@@ -17,7 +17,7 @@ public class LobbyTest {
 
         lobby.addPlayer(testPlayer1);
         lobby.addPlayer(testPlayer2);
-        assertEquals(lobby.getPlayers(), 2);
+        assertEquals(2, lobby.getPlayers());
     }
 
     @Test
@@ -30,18 +30,18 @@ public class LobbyTest {
 
         lobby.addPlayer(testPlayer1);
         lobby.addPlayer(testPlayer2);
-        assertEquals(lobby.getPlayers(), 2);
+        assertEquals(2, lobby.getPlayers());
         lobby.removePlayer(testPlayer2);
-        assertEquals(lobby.getPlayers(), 1);
+        assertEquals(1, lobby.getPlayers());
     }
 
     @Test
     public void createLobby_baseSettings() {
         Lobby lobby = new Lobby();
         assertNotNull(lobby.getLobbyId());
-        assertEquals(lobby.getGameDuration(), GameLength.MEDIUM);
+        assertEquals(GameLength.MEDIUM, lobby.getGameDuration());
         assertTrue(lobby.isPublic());
-        assertEquals(lobby.getListOfPlayers().size(), 0);
+        assertEquals(0, lobby.getListOfPlayers().size());
         assertFalse(lobby.isPlaying());
     }
 
@@ -56,7 +56,7 @@ public class LobbyTest {
         lobby.addPlayer(testPlayer1);
         lobby.addPlayer(testPlayer2);
 
-        assertEquals(lobby.getListOfPlayers().size(), 2);
+        assertEquals(2, lobby.getListOfPlayers().size());
         assertEquals(lobby.getListOfPlayers().get(0), testPlayer1.getUsername());
         assertEquals(lobby.getListOfPlayers().get(1), testPlayer2.getUsername());
     }
