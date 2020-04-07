@@ -1,10 +1,13 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import java.util.ArrayList;
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
+
+import java.util.List;
 
 public class GameRound {
 
-    private ArrayList<Player> listOfPlayers;
+    private List<Player> listOfPlayers;
     private Player currentPlayer;
     private int remainingTurns;
     private ActionStack actionStack;
@@ -12,7 +15,7 @@ public class GameRound {
     //private Pile discardPile
 
 
-    public GameRound(ArrayList<Player> listOfPlayers, Player firstPlayer) {
+    public GameRound(List<Player> listOfPlayers, Player firstPlayer) {
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
         this.actionStack = new ActionStack();
@@ -36,16 +39,15 @@ public class GameRound {
         // moves #amount cards from Stack to players hand
     }
 
-    /*
     private boolean moveCard(Card card, Pile pileA, Pile pileB) {
         // moves card from pileA to pileB
+        return true;
     }
-     */
 
-    /*
     private Card takeRandomCard(Pile pile) {
-       // takes random card from pile and returns it. Do not remove card
-     */
+        // takes random card from pile and returns it. Do not remove card
+        return new NumberCard(Color.BLACK, 5);
+    }
 
     private void changePlayer() {
         int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
