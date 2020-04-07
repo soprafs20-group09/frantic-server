@@ -8,14 +8,13 @@ import ch.uzh.ifi.seal.soprafs20.entity.Card;
 public class NumberCard extends Card {
 
 
-    public NumberCard(Color c, Type t, Value v) {
-        super(c, t, v);
+    public NumberCard(Color c, int i) {
+        super(c, Type.NUMBER, Value.values()[i-1]);
+        if (i > 10) {
+            throw new RuntimeException("Invalid number");
+        }
     }
 
     public void performAction() {
-    }
-
-    public boolean isPlayable(Card other) {
-        return this.getColor() == other.getColor() || this.getValue() == other.getValue();
     }
 }

@@ -6,9 +6,9 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 
 public abstract class Card {
 
-    private Color color;
-    private Type type;
-    private Value value;
+    protected Color color;
+    protected Type type;
+    protected Value value;
 
     public Card(Color c, Type t, Value v){
         this.type = t;
@@ -33,7 +33,9 @@ public abstract class Card {
 
     public abstract void performAction();
 
-    public abstract boolean isPlayable(Card other);
+    public boolean isPlayable(Card other){
+        return this.getColor() == other.getColor() || this.getValue() == other.getValue();
+    }
 
 
 }
