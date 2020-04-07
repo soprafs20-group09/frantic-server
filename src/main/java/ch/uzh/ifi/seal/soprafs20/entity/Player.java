@@ -108,6 +108,8 @@ public class Player implements Serializable {
         return hand;
     }
 
+    public int getHandSize() {return hand.size(); }
+
     public boolean isAdmin() {
         return admin;
     }
