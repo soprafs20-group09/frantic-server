@@ -9,7 +9,7 @@ public class Game implements Runnable {
 
     private GameLength gameDuration;
 
-    private ArrayList<Player> listOfPlayers;
+    private List<Player> listOfPlayers;
 
     private int maxPoints;
 
@@ -17,7 +17,7 @@ public class Game implements Runnable {
 
     private Player winner;
 
-    public Game(GameLength gameDuration, ArrayList<Player> listOfPlayers) {
+    public Game(GameLength gameDuration, List<Player> listOfPlayers) {
         this.gameDuration = gameDuration;
         this.listOfPlayers = listOfPlayers;
         this.maxPoints = calculateMaxPoints();
