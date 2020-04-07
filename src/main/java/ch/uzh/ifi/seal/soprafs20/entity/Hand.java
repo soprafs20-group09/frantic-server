@@ -7,14 +7,16 @@ public class Hand {
     private List<Card> cards;
 
     public Card pop(int index) {
-        return cards.remove(index);
+        return this.cards.remove(index);
     }
 
     public void push(Card card) {
-        cards.add(card);
+        //insert the new card at the right position BLUE, GREEN, YELLOW, RED, BLACK, MULTICOLOR
+        //re-indexing of cards that come after the newly inserted card
+        this.cards.add(card);
     }
 
     public int size(){
-        return cards.size();
+        return this.cards.size();
     }
 }
