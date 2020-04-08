@@ -10,7 +10,6 @@ public class GameRound {
     private List<Player> listOfPlayers;
     private Player currentPlayer;
     private boolean turnIsRunning;
-    private boolean remainingTime;
     private Timer timer;
     private boolean timebomb; // indicates if the timebomb-event is currently running
     private int remainingTurns;
@@ -28,7 +27,7 @@ public class GameRound {
         this.events = events;
     }
 
-    //creates card stacks & player hands
+    //creates Piles & player hands
     public void initializeGameRound() {
         this.drawStack = new DrawStack();
         this.discardPile = new DiscardPile();
@@ -41,39 +40,70 @@ public class GameRound {
         this.discardPile.push(this.drawStack.pop());
     }
 
+    private void sendGameState() {
+        //TODO: send current Game state to all players
+        //TODO: send Hand to each player individually
+    }
+
     public void startGameRound() {
         initializeGameRound();
+        sendGameState();
         startTurn();
     }
 
     private void startTurn() {
-        //TODO: send start turn package with this.currentPlayer as content
-        //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
-        startTimer(30);
-        this.turnIsRunning = true;
+        if (!isRoundOver()) {
+            //TODO: send start turn package with this.currentPlayer as content
+            //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
+            startTimer(30);
+            this.turnIsRunning = true;
+        } else {
+            onRoundOver();
+        }
+
     }
 
     private void finishTurn() {
         timer.cancel();
         this.turnIsRunning = false;
+        changePlayer();
+        startTurn();
     }
 
-    private List<Integer> getPlayableCards (Player player) {
-        List playableCards = new ArrayList();
-        //player.getPlayableCards(this.discardPile.peek())
-        return playableCards;
+    //this method is called when the timer runs out
+    private  void abortTurn() {
+        timer.cancel();
+        drawCardFromStack(currentPlayer, 1);
+        turnIsRunning = false;
+        changePlayer();
+        startTurn();
     }
 
-    private boolean playCard(Player player, Card card) {
+    public void startTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                abortTurn();
+            }
+        };
+        timer.schedule(timerTask, milliseconds);
+    }
+
+    private void playCard(Player player, Card card) {
         Card uppermostCard = (Card)discardPile.peek();
         if (player == currentPlayer) {
             if (card.isPlayable(uppermostCard) && moveCardFromPlayerToDiscardPile(player, card)) {
-                return true;
+                finishTurn();
             }
         } else {
             // needed later for special cards
         }
-        return false;
+    }
+
+    private void performEvent() {
+        //performs event
     }
 
     // moves #amount cards from Stack to players hand
@@ -94,20 +124,10 @@ public class GameRound {
         return new NumberCard(Color.BLACK, 5); //just a random example
     }
 
-    private void changePlayer() {
-        int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
-        playersIndex = (playersIndex + 1)%listOfPlayers.size();
-        this.currentPlayer = listOfPlayers.get(playersIndex);
-    }
-
-    private void calculatePoints() {
-        //goes through cards of each player and adds up the points
-    }
-
-    //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
-    // or in case of the time-bomb event, if the 3 rounds are played
-    private boolean isRoundOver() {
-        return (getHandSizes().containsValue(0) || remainingTurns == 0);
+    private List<Integer> getPlayableCards (Player player) {
+        List playableCards = new ArrayList();
+        //player.getPlayableCards(this.discardPile.peek())
+        return playableCards;
     }
 
     private Map<Player, Integer> getHandSizes() {
@@ -119,32 +139,30 @@ public class GameRound {
         return mappedPlayers;
     }
 
-    private void performEvent() {
-        //performs event
+    private void changePlayer() {
+        int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+        playersIndex = (playersIndex + 1)%listOfPlayers.size();
+        this.currentPlayer = listOfPlayers.get(playersIndex);
+    }
+
+    //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
+    // or in case of the time-bomb event, if the 3 rounds are played
+    private boolean isRoundOver() {
+        return (getHandSizes().containsValue(0) || remainingTurns == 0);
+    }
+
+    private void onRoundOver() {
+        calculatePoints();
+        removeCardsFromHands();
+        //TODO: Send end of round package or end of game package
+    }
+
+    private void calculatePoints() {
+        //goes through cards of each player and adds up the points
     }
 
     private void removeCardsFromHands() {
         // makes sure, that after each round, all players have 0 cards
-    }
-
-    //this method is called when the timer runs out
-    private  void abortTurn() {
-        timer.cancel();
-        drawCardFromStack(currentPlayer, 1);
-        turnIsRunning = false;
-        changePlayer();
-    }
-
-    public void startTimer(int seconds) {
-        int milliseconds = seconds * 1000;
-        timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                abortTurn();
-            }
-        };
-        timer.schedule(timerTask, milliseconds);
     }
 
 }
