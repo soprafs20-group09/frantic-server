@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 public class MarryChristmasEvent implements Event {
-    public int getId(){
-        return 11;
+    public String getName(){
+        return "merry-christmas";
     };
     public void performEvent() {};
-    public void getMessage() {};
+    public String getMessage() {return "";};
 }

@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 public class VandalismEvent implements Event {
-    public int getId(){
-        return 21;
+    public String getName(){
+        return "vandalism";
     };
     public void performEvent() {};
-    public void getMessage() {};
+    public String getMessage() {return "";};
 }
