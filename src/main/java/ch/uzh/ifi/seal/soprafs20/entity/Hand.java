@@ -10,11 +10,17 @@ public class Hand {
         return this.cards.remove(index);
     }
 
+    /*
     public void push(Card card) {
-        //insert the new card at the right position BLUE, GREEN, YELLOW, RED, BLACK, MULTICOLOR
-        //re-indexing of cards that come after the newly inserted card
-        this.cards.add(card);
+        int counter = 0;
+        for (Card handCard : cards){
+            if (card.getOrderKey() < handCard.getOrderKey()){
+                this.cards.add(counter, card);
+            }
+            counter++;
+        }
     }
+     */
 
     public int size(){
         return this.cards.size();
