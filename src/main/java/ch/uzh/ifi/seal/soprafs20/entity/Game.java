@@ -8,6 +8,8 @@ import java.util.*;
 
 public class Game implements Runnable {
 
+    private GameRound currentGameRound;
+
     private GameLength gameDuration;
 
     private List<Player> listOfPlayers;
@@ -28,17 +30,16 @@ public class Game implements Runnable {
     }
 
     @Override
-    public void run() {
-        while (!gameOver()) {
-            StartNewGameRound();
-            changeFirstPlayer();
-        }
+    public void startGame() {
+        initEvents();
+        StartNewGameRound();
     }
 
     private void StartNewGameRound() {
-        GameRound currentGameRound = new GameRound(listOfPlayers, firstPlayer);
-        currentGameRound.initializeGameRound();
-        currentGameRound.startGameRound();
+        if (!gameOver()) {
+            this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
+            currentGameRound.startGameRound();
+        }
     }
 
     private Map<String, Integer> getScores() {
@@ -90,7 +91,7 @@ public class Game implements Runnable {
         }
     }
 
-    private List<Event> init() {
+    private List<Event> initEvents() {
         //initialize all Events
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();

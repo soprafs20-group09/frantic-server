@@ -12,17 +12,20 @@ public class GameRound {
 
     private List<Player> listOfPlayers;
     private Player currentPlayer;
+    private boolean timebomb; // indicates if the timebomb-event is currently running
     private int remainingTurns;
+    private List events;
     private ActionStack actionStack;
     private Pile drawStack;
     private Pile discardPile;
 
 
-    public GameRound(List<Player> listOfPlayers, Player firstPlayer) {
+    public GameRound(List<Player> listOfPlayers, Player firstPlayer, List events) {
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
         this.actionStack = new ActionStack();
         this.remainingTurns = -1; //indicates that there is no limit
+        this.events = events;
     }
 
     //creates card stacks & player hands
@@ -37,14 +40,9 @@ public class GameRound {
         }
     }
 
-    //main game loop
     public void startGameRound() {
-        while (!isRoundOver() && (remainingTurns == -1 || remainingTurns > 0)) {
-            performTurn();
-            changePlayer();
-        }
-        calculatePoints();
-        removeCardsFromHands();
+        initializeGameRound();
+        performTurn();
     }
 
     private boolean playCard(Player player, Card card) {
@@ -80,8 +78,10 @@ public class GameRound {
         //goes through cards of each player and adds up the points
     }
 
+    //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
+    // or in case of the time-bomb event, if the 3 rounds are played
     private boolean isRoundOver() {
-        return getHandSizes().containsValue(0);
+        return (getHandSizes().containsValue(0) || remainingTurns == 0);
     }
 
     private Map<Player, Integer> getHandSizes() {

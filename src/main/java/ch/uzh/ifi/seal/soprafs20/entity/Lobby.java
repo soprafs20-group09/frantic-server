@@ -53,9 +53,6 @@ public class Lobby implements Serializable {
     @Transient
     private Game game;
 
-    @Transient
-    private Thread gameThread;
-
 
     public Lobby() {
         this.lobbyId = generateLobbyId();
@@ -124,7 +121,6 @@ public class Lobby implements Serializable {
 
     public Game getGame() {return game; }
 
-    public Thread getGameThread() {return this.gameThread; }
 
     public void addPlayer(Player player) {
         listOfPlayers.add(player.getUsername());
@@ -148,8 +144,7 @@ public class Lobby implements Serializable {
             return;
         }
         this.game = new Game(gameDuration, playerRepresentations);
-        this.gameThread = new Thread(game);
-        gameThread.start();
+        this.game.startGame();
         this.isPlaying = true;
     }
 }
