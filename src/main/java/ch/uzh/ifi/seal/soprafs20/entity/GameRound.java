@@ -3,15 +3,15 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameRound {
 
     private List<Player> listOfPlayers;
     private Player currentPlayer;
+    private boolean turnIsRunning;
+    private boolean remainingTime;
+    private Timer timer;
     private boolean timebomb; // indicates if the timebomb-event is currently running
     private int remainingTurns;
     private List events;
@@ -31,24 +31,49 @@ public class GameRound {
     //creates card stacks & player hands
     public void initializeGameRound() {
         this.drawStack = new DrawStack();
-        this.discardPile = new DrawStack();
-        // Add cards to stacks here...?
+        this.discardPile = new DiscardPile();
 
         //move 7 initial cards to player hands
         for (Player player : listOfPlayers) {
             drawCardFromStack(player, 7);
         }
+        //move initial card to discardPile
+        this.discardPile.push(this.drawStack.pop());
     }
 
     public void startGameRound() {
         initializeGameRound();
-        performTurn();
+        startTurn();
+    }
+
+    private void startTurn() {
+        //TODO: send start turn package with this.currentPlayer as content
+        //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
+        startTimer(30);
+        this.turnIsRunning = true;
+    }
+
+    private void finishTurn() {
+        timer.cancel();
+        this.turnIsRunning = false;
+    }
+
+    private List<Integer> getPlayableCards (Player player) {
+        List playableCards = new ArrayList();
+        //player.getPlayableCards(this.discardPile.peek())
+        return playableCards;
     }
 
     private boolean playCard(Player player, Card card) {
-        // check in card-class if card can be put on discard pile
-        // put card on pile
-        return true;
+        Card uppermostCard = (Card)discardPile.peek();
+        if (player == currentPlayer) {
+            if (card.isPlayable(uppermostCard) && moveCardFromPlayerToDiscardPile(player, card)) {
+                return true;
+            }
+        } else {
+            // needed later for special cards
+        }
+        return false;
     }
 
     // moves #amount cards from Stack to players hand
@@ -58,8 +83,9 @@ public class GameRound {
         }
     }
 
-    private boolean moveCard(Card card, Pile pileA, Pile pileB) {
-        // moves card from pileA to pileB
+    private boolean moveCardFromPlayerToDiscardPile(Player player, Card card) {
+        // moves card from Players hand to discardPile
+        // return true if possible
         return true;
     }
 
@@ -93,16 +119,32 @@ public class GameRound {
         return mappedPlayers;
     }
 
-    private void performTurn() {
-        //performs turn
-    }
-
     private void performEvent() {
         //performs event
     }
 
     private void removeCardsFromHands() {
         // makes sure, that after each round, all players have 0 cards
+    }
+
+    //this method is called when the timer runs out
+    private  void abortTurn() {
+        timer.cancel();
+        drawCardFromStack(currentPlayer, 1);
+        turnIsRunning = false;
+        changePlayer();
+    }
+
+    public void startTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                abortTurn();
+            }
+        };
+        timer.schedule(timerTask, milliseconds);
     }
 
 }

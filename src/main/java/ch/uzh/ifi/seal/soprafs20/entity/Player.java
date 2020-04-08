@@ -85,9 +85,11 @@ public class Player implements Serializable {
         return hand.pop(index);
     }
 
+    /*
     public void pushCardToHand(Card card) {
         this.hand.push(card);
     }
+     */
 
     public boolean isBlocked() {
         return blocked;
