@@ -5,5 +5,5 @@ public class RobinHoodEvent implements Event {
         return "robin-hood";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Some call him a hero, some call him a thief! The player with the least cards has to swap cards with the player holding the most!";};
 }

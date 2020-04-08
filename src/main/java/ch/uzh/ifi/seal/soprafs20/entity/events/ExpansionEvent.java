@@ -5,5 +5,6 @@ public class ExpansionEvent implements Event {
         return "expansion";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    //TODO: make it dynamic
+    public String getMessage() {return "One, Two, Three, ... Since you are the 3rd to draw, you have to draw 3 cards!";};
 }

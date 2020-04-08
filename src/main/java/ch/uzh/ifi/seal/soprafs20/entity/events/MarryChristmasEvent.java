@@ -5,5 +5,5 @@ public class MarryChristmasEvent implements Event {
         return "merry-christmas";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Merry christmas everyone! It's that time of the year again. Give presents to your loved ones!";};
 }

@@ -5,5 +5,5 @@ public class FinishLineEvent implements Event {
         return "finish-line";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Looks like the round is over! Count your points!";};
 }

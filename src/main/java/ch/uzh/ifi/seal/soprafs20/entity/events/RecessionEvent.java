@@ -5,5 +5,6 @@ public class RecessionEvent implements Event {
         return "recession";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    //TODO: make it dynamic
+    public String getMessage() {return "One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!";};
 }

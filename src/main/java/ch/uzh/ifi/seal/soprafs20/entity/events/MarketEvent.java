@@ -5,5 +5,5 @@ public class MarketEvent implements Event {
         return "market";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Choose one of these incredibly awesome cards for the great price of only 0$!";};
 }

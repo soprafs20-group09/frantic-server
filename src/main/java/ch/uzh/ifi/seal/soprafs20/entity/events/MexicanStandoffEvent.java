@@ -5,5 +5,5 @@ public class MexicanStandoffEvent implements Event {
         return "mexican-standoff";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Show your skills off! Everyone gets rid of their cards and gets three new ones! Who can finish first?";};
 }

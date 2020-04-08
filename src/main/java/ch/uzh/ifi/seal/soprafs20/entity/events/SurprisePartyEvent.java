@@ -5,5 +5,5 @@ public class SurprisePartyEvent implements Event {
         return "surprise-party";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Surprise another player by gifting them one of your cards!";};
 }

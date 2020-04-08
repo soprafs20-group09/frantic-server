@@ -5,5 +5,5 @@ public class DoomsdayEvent implements Event {
         return "doomsday";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Rest in peace, everyone is dead. Well, not really, since it's just a game. The round is over and everyone's points increase by 50.";};
 }

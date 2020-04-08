@@ -5,5 +5,5 @@ public class EarthquakeEvent implements Event {
         return "earthquake";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Oh no! Everything is shaken up! Good luck with your new cards!";};
 }

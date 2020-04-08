@@ -5,5 +5,5 @@ public class TornadoEvent implements Event {
         return "tornado";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Oh no! A tornado whirled all the cards around! Looks like we have to redistribute them!";};
 }

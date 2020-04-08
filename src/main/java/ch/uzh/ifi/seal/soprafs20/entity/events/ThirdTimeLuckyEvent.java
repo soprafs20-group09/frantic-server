@@ -5,5 +5,5 @@ public class ThirdTimeLuckyEvent implements Event {
         return "third-time-lucky";
     };
     public void performEvent() {};
-    public String getMessage() {return "";};
+    public String getMessage() {return "Three cards for everyone!";};
 }

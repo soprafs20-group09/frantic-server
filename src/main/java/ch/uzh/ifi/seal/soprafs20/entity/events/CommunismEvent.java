@@ -5,5 +5,5 @@ public class CommunismEvent implements Event {
         return "communism";
     };
     public void performEvent() {};
-    public String getMessage() { return "";};
+    public String getMessage() { return "Everybody is equal, now isn't that great?";};
 }
