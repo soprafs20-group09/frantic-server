@@ -6,7 +6,7 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.EndRoundDTO;
 
 import java.util.*;
 
-public class Game implements Runnable {
+public class Game {
 
     private GameRound currentGameRound;
 
@@ -29,7 +29,6 @@ public class Game implements Runnable {
         this.maxPoints = calculateMaxPoints();
     }
 
-    @Override
     public void startGame() {
         initEvents();
         StartNewGameRound();
