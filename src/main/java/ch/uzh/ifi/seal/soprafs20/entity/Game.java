@@ -95,7 +95,6 @@ public class Game implements Runnable {
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();
         Event doomsday = new DoomsdayEvent();
-        Event doubleTaxation = new DoubleTaxationEvent();
         Event earthquake = new EarthquakeEvent();
         Event expansion = new ExpansionEvent();
         Event finishLine = new FinishLineEvent();
@@ -118,7 +117,6 @@ public class Game implements Runnable {
         this.events.add(charity);
         this.events.add(communism);
         this.events.add(doomsday);
-        this.events.add(doubleTaxation);
         this.events.add(earthquake);
         this.events.add(expansion);
         this.events.add(finishLine);

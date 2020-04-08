@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 public class TheAllSeeingEyeEvent implements Event {
-    public int getId(){
-        return 17;
+    public String getName(){
+        return "the-all-seeing-eye";
     };
     public void performEvent() {};
-    public void getMessage() {};
+    public String getMessage() {return "";};
 }

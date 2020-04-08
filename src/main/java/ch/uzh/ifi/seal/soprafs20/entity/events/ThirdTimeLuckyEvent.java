@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 public class ThirdTimeLuckyEvent implements Event {
-    public int getId(){
-        return 18;
+    public String getName(){
+        return "third-time-lucky";
     };
     public void performEvent() {};
-    public void getMessage() {};
+    public String getMessage() {return "";};
 }
