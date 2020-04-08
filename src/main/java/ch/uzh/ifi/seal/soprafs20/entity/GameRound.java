@@ -51,6 +51,12 @@ public class GameRound {
         startTurn();
     }
 
+    private void prepareNewTurn() {
+        changePlayer();
+        sendGameState();
+        startTurn();
+    }
+
     private void startTurn() {
         if (!isRoundOver()) {
             //TODO: send start turn package with this.currentPlayer as content
@@ -60,14 +66,12 @@ public class GameRound {
         } else {
             onRoundOver();
         }
-
     }
 
     private void finishTurn() {
         timer.cancel();
         this.turnIsRunning = false;
-        changePlayer();
-        startTurn();
+        prepareNewTurn();
     }
 
     //this method is called when the timer runs out
@@ -75,8 +79,7 @@ public class GameRound {
         timer.cancel();
         drawCardFromStack(currentPlayer, 1);
         turnIsRunning = false;
-        changePlayer();
-        startTurn();
+        prepareNewTurn();
     }
 
     public void startTimer(int seconds) {
@@ -109,8 +112,9 @@ public class GameRound {
     // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i<=amount; i++) {
-            //player.pushCardToHand(drawStack.pop());
+            //player.pushCardToHand(drawStack.pop())/
         }
+        //TODO: Send new Hand state to player
     }
 
     private boolean moveCardFromPlayerToDiscardPile(Player player, Card card) {
@@ -147,18 +151,18 @@ public class GameRound {
 
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
-    private boolean isRoundOver() {
-        return (getHandSizes().containsValue(0) || remainingTurns == 0);
-    }
+    private boolean isRoundOver() { return (getHandSizes().containsValue(0) || remainingTurns == 0); }
 
     private void onRoundOver() {
-        calculatePoints();
+        updatePoints();
         removeCardsFromHands();
-        //TODO: Send end of round package or end of game package
+        //TODO: Send end of round package or end of game package (Here or in Game-class, what is better..?)
     }
 
-    private void calculatePoints() {
-        //goes through cards of each player and adds up the points
+    private void updatePoints() {
+        for (Player player : listOfPlayers) {
+            //player.calculatePoints
+        }
     }
 
     private void removeCardsFromHands() {
