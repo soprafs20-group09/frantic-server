@@ -1,21 +1,13 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Stack;
+import java.util.*;
 
 public abstract class Pile<E> extends Stack<E> {
     private ArrayList<E> elements;
 
 
-    public Pile(){
+    public Pile() {
         this.elements = new ArrayList<E>();
-    }
-
-    public Pile(E[] list){
-        this.elements = new ArrayList<E>();
-        Collections.addAll(this.elements, list);
     }
 
     public Object[] getCards() {
@@ -43,5 +35,9 @@ public abstract class Pile<E> extends Stack<E> {
 
     public synchronized int size() {
         return this.elements.size();
+    }
+
+    public void shuffle() {
+        Collections.shuffle(elements);
     }
 }

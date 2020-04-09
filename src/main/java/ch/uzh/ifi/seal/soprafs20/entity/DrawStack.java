@@ -1,15 +1,23 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import java.util.Stack;
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
 
-public class DrawStack extends Pile<Card>{
+import java.util.Collections;
+import java.util.EnumSet;
 
-    public DrawStack(Card[] cards){
-        super(cards);
-    }
 
-    public DrawStack(){
+public class DrawStack extends Pile<Card> {
+
+    public DrawStack() {
         super();
+        for (Color c : EnumSet.complementOf(EnumSet.of(Color.MULTICOLOR))) {
+            // Create and add numbered Cards for all colors except MULTICOLOR
+            for (int i = 1; i <= 9; i++) {
+                this.push(new NumberCard(c, i));
+            }
+        }
+        this.shuffle();
     }
 
 }

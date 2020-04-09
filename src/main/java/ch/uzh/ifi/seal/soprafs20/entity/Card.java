@@ -37,5 +37,8 @@ public abstract class Card {
         return this.getColor() == other.getColor() || this.getValue() == other.getValue();
     }
 
+    public String toString(){
+        return "Card: " + this.color.toString() + ", " + this.value.toString() + ", " + this.type.toString();
+    }
 
 }
