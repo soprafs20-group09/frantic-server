@@ -2,10 +2,12 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
+import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,6 +49,9 @@ public class RESTControllerTest {
 
     @MockBean
     private PlayerService playerService;
+
+    @MockBean
+    private RegisterService registerService;
 
     @Test
     public void getLobbies_returnsLobbyList() throws Exception {
@@ -75,11 +81,12 @@ public class RESTControllerTest {
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");
 
-        Player player = new Player();
-        player.setId(1L);
-        player.setUsername("foo");
+        LobbyJoinDTO lobbyJoinDTO = new LobbyJoinDTO();
+        lobbyJoinDTO.setName("foo's lobby");
+        lobbyJoinDTO.setUsername("foo");
 
-        given(playerService.createPlayer(Mockito.any(), Mockito.any())).willReturn(player);
+        doNothing().when(lobbyService).checkLobbyCreate(Mockito.any());
+        given(registerService.prepareLobby(Mockito.any())).willReturn(lobbyJoinDTO);
 
         // when
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
@@ -87,8 +94,8 @@ public class RESTControllerTest {
                 .content(asJsonString(username));
         // then
         mockMvc.perform(postRequest).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name", is(player.getUsername() + "'s lobby")))
-                .andExpect(jsonPath("$.username", is(player.getUsername())));
+                .andExpect(jsonPath("$.name", is(lobbyJoinDTO.getName())))
+                .andExpect(jsonPath("$.username", is(lobbyJoinDTO.getUsername())));
     }
 
     @Test()
@@ -138,7 +145,12 @@ public class RESTControllerTest {
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");
 
-        given(lobbyService.isUsernameAlreadyInLobby(Mockito.any(), Mockito.any())).willReturn(false);
+        LobbyJoinDTO lobbyJoinDTO = new LobbyJoinDTO();
+        lobbyJoinDTO.setName("foo's lobby");
+        lobbyJoinDTO.setUsername("foo");
+
+        doNothing().when(lobbyService).checkLobbyJoin(Mockito.any(), Mockito.any());
+        given(registerService.prepareLobby(Mockito.any(), Mockito.any())).willReturn(lobbyJoinDTO);
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
@@ -146,8 +158,8 @@ public class RESTControllerTest {
                 .content(asJsonString(username));
         // then
         mockMvc.perform(putRequest).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name", is(username.getUsername() + "'s lobby")))
-                .andExpect(jsonPath("$.username", is(username.getUsername())));
+                .andExpect(jsonPath("$.name", is(lobbyJoinDTO.getName())))
+                .andExpect(jsonPath("$.username", is(lobbyJoinDTO.getUsername())));
     }
 
     @Test

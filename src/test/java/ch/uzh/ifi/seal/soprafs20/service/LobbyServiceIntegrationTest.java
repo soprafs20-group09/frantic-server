@@ -7,11 +7,12 @@ import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
@@ -28,6 +29,9 @@ public class LobbyServiceIntegrationTest {
     @Autowired
     private PlayerRepository playerRepository;
 
+    @MockBean
+    private WebSocketService webSocketService;
+
     @Autowired
     private LobbyService lobbyService;
 
@@ -37,6 +41,9 @@ public class LobbyServiceIntegrationTest {
 
     @BeforeEach
     public void setup() {
+        Mockito.doNothing().when(webSocketService).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.when(webSocketService.checkSender(Mockito.any(), Mockito.any())).thenReturn(true);
+
         lobbyRepository.deleteAll();
         playerRepository.deleteAll();
 
@@ -134,7 +141,7 @@ public class LobbyServiceIntegrationTest {
         assertEquals(GameLength.MEDIUM, reference.getGameDuration());
         assertTrue(reference.isPublic());
 
-        lobbyService.updateLobbySettings(lobbyId, newSettings);
+        lobbyService.updateLobbySettings(lobbyId, "abc", newSettings);
 
         //after
         reference = lobbyRepository.findByLobbyId(lobbyId);

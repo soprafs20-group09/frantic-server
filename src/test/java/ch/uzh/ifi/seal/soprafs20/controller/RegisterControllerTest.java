@@ -32,7 +32,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @Disabled("Disabled, functional, but needs addtional work")
@@ -48,7 +47,7 @@ public class RegisterControllerTest {
     @MockBean
     private LobbyService lobbyService;
 
-    @SpyBean private RegisterController registerController;
+    @SpyBean private WebSocketController webSocketController;
 
     WebSocketStompClient stompClient;
 
@@ -68,7 +67,7 @@ public class RegisterControllerTest {
         registered.setUsername("player");
 
         // mocks
-        doReturn("player").when(registerController).checkAuthentication(Mockito.nullable(String.class));
+        //doReturn("player").when(webSocketController).checkAuthentication(Mockito.nullable(String.class));
         when(playerService.createPlayer(Mockito.any(), Mockito.any())).thenReturn(player);
         when(lobbyService.createLobby(Mockito.any())).thenReturn("lobby");
         when(playerService.registerPlayer(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(registered);
