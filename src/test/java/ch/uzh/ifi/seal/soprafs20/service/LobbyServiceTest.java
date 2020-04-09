@@ -31,6 +31,8 @@ public class LobbyServiceTest {
     private Player testPlayer;
     @InjectMocks
     private LobbyService lobbyService;
+    @Mock
+    private WebSocketService webSocketService;
     @InjectMocks
     private Lobby testLobby;
     @InjectMocks
@@ -54,6 +56,8 @@ public class LobbyServiceTest {
         testLobby.addPlayer(testPlayer);
 
         // when -> any object is being save in the userRepository -> return the dummy testUser
+        Mockito.doNothing().when(webSocketService).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.when(webSocketService.checkSender(Mockito.any(), Mockito.any())).thenReturn(true);
         Mockito.when(lobbyRepository.save(Mockito.any())).thenReturn(testLobby);
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(testLobby);
         Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
@@ -176,7 +180,8 @@ public class LobbyServiceTest {
         testSettings.setPublicLobby(false);
         testState.setSettings(testSettings);
 
-        LobbyStateDTO response = lobbyService.updateLobbySettings( "abc", testSettings);
+        lobbyService.updateLobbySettings( "abc", "abc", testSettings);
+        LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
         assertEquals(testSettings.getDuration(), response.getSettings().getDuration());
         assertEquals(testSettings.getLobbyName(), response.getSettings().getLobbyName());

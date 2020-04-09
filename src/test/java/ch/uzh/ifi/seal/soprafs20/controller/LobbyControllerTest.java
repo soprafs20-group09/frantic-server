@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,8 +33,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @Disabled("Disabled, needs additional work")
 @ExtendWith(SpringExtension.class)
@@ -60,8 +57,7 @@ public class LobbyControllerTest {
                 Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()))));
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        doReturn(true).when(lobbyController)
-                .checkSender(Mockito.nullable(String.class), Mockito.nullable(String.class));
+        //doReturn(true).when(lobbyController).checkSender(Mockito.nullable(String.class), Mockito.nullable(String.class));
     }
 
     @Test
@@ -71,7 +67,7 @@ public class LobbyControllerTest {
         LobbySettingsDTO lobbySettings = generateLobbySettings();
         LobbyStateDTO lobbyState = generateLobbyState();
 
-        when(lobbyService.updateLobbySettings(Mockito.any(), Mockito.any())).thenReturn(lobbyState);
+        //when(lobbyService.updateLobbySettings(Mockito.any(), Mockito.any())).thenReturn(lobbyState);
 
         StompSession session = stompClient
                 .connect("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {})

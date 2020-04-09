@@ -2,10 +2,14 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.slf4j.Logger;
@@ -30,12 +34,18 @@ public class LobbyService {
 
     private final Logger log = LoggerFactory.getLogger(LobbyService.class);
 
+    private final WebSocketService webSocketService;
+    private final PlayerService playerService;
+
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
-    public LobbyService(@Qualifier("playerRepository") PlayerRepository playerRepository,
+    public LobbyService(WebSocketService webSocketService, PlayerService playerService,
+                        @Qualifier("playerRepository") PlayerRepository playerRepository,
                         @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+        this.webSocketService = webSocketService;
+        this.playerService = playerService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
     }
@@ -91,6 +101,45 @@ public class LobbyService {
                 player.getUsername(), lobby.getName(), lobby.getLobbyId()));
     }
 
+    public void kickPlayer(String lobbyId, String identity, KickDTO kick) {
+
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Player admin = playerRepository.findByIdentity(identity);
+            if (!admin.isAdmin()) {
+                throw new PlayerServiceException("Invalid action. Not admin.");
+            }
+
+            Player toKick = playerRepository.findByUsernameAndLobbyId(kick.getUsername(), lobbyId);
+            DisconnectDTO disconnectDTO = new DisconnectDTO();
+            disconnectDTO.setReason("You were kicked out of the Lobby.");
+            webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
+            playerService.removePlayer(toKick);
+
+            webSocketService.sendChatPlayerNotification(lobbyId, toKick.getUsername() + " was kicked!", toKick.getUsername());
+            webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+        }
+    }
+
+    public void handleDisconnect(String identity) {
+
+        Player player = playerRepository.findByIdentity(identity);
+
+        if (player != null) {
+            String lobbyId = playerService.removePlayer(player);
+            if (lobbyId != null) {
+                webSocketService.sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+                if (player.isAdmin()) {
+                    DisconnectDTO message = new DisconnectDTO();
+                    message.setReason("Host left the lobby.");
+                    webSocketService.sendDisconnectToLobby(lobbyId, message);
+                    closeLobby(lobbyId);
+                } else {
+                    webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+                }
+            }
+        }
+    }
+
     public void closeLobby(String lobbyId) {
 
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
@@ -105,21 +154,23 @@ public class LobbyService {
         log.debug(String.format("Lobby '%s' with ID '%s' was closed", lobby.getName(), lobby.getLobbyId()));
     }
 
-    public LobbyStateDTO updateLobbySettings(String lobbyId, LobbySettingsDTO newSettings) {
+    public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO newSettings) {
 
-        Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
-        if (newSettings.getLobbyName() != null && !newSettings.getLobbyName().matches("^\\s*$")) {
-            lobbyToUpdate.setName(newSettings.getLobbyName());
-        }
-        if (newSettings.getDuration() != null) {
-            lobbyToUpdate.setGameDuration(newSettings.getDuration());
-        }
-        if (newSettings.getPublicLobby() != null) {
-            lobbyToUpdate.setIsPublic(newSettings.getPublicLobby());
-        }
-        lobbyRepository.flush();
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
+            if (newSettings.getLobbyName() != null && !newSettings.getLobbyName().matches("^\\s*$")) {
+                lobbyToUpdate.setName(newSettings.getLobbyName());
+            }
+            if (newSettings.getDuration() != null) {
+                lobbyToUpdate.setGameDuration(newSettings.getDuration());
+            }
+            if (newSettings.getPublicLobby() != null) {
+                lobbyToUpdate.setIsPublic(newSettings.getPublicLobby());
+            }
+            lobbyRepository.flush();
 
-        return getLobbyState(lobbyToUpdate.getLobbyId());
+            webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+        }
     }
 
     public LobbyStateDTO getLobbyState(String lobbyId) {
@@ -143,8 +194,21 @@ public class LobbyService {
         settings.setDuration(lobby.getGameDuration());
         settings.setPublicLobby(lobby.isPublic());
         response.setSettings(settings);
-
         return response;
+    }
+
+    public void sendChatMessage(String lobbyId, String identity, ChatDTO chat) {
+
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            if (chat.getMessage() != null && !chat.getMessage().matches("^\\s*$")) {
+                Player sender = this.playerRepository.findByIdentity(identity);
+
+                chat.setType("msg");
+                chat.setUsername(sender.getUsername());
+
+                webSocketService.sendToLobby(lobbyId, "/chat", chat);
+            }
+        }
     }
 
     public boolean isUsernameAlreadyInLobby(String lobbyId, String username) {
