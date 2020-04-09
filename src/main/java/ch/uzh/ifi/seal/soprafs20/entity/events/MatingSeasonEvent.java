@@ -5,5 +5,5 @@ public class MatingSeasonEvent implements Event {
         return "mating-season";
     };
     public void performEvent() {};
-    public String getMessage() {return "It's valentines day! Well, at least for your cards!";};
+    public String getMessage() {return "It's valentines day! Well, at least for your cards! Discard numeral pairs, triples and so on.";};
 }

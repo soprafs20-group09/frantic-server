@@ -101,8 +101,8 @@ public class Game {
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
         Event gamblingMan = new GamblingManEvent();
         Event market = new MarketEvent();
-        Event marryChristmas = new MarryChristmasEvent();
         Event matingSeason = new MatingSeasonEvent();
+        Event merryChristmas = new MerryChristmasEvent();
         Event mexicanStandoff = new MexicanStandoffEvent();
         Event recession = new RecessionEvent();
         Event robinHood = new RobinHoodEvent();
@@ -123,7 +123,7 @@ public class Game {
         this.events.add(fridayTheThirteenth);
         this.events.add(gamblingMan);
         this.events.add(market);
-        this.events.add(marryChristmas);
+        this.events.add(merryChristmas);
         this.events.add(matingSeason);
         this.events.add(mexicanStandoff);
         this.events.add(recession);

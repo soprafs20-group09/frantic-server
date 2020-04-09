@@ -21,6 +21,7 @@ public class Hand {
         for (Card handCard : cards){
             if (card.getOrderKey() < handCard.getOrderKey()){
                 this.cards.add(counter, card);
+                break;
             }
             counter++;
         }
