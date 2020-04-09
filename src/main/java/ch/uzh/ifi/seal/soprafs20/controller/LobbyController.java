@@ -1,83 +1,41 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
-import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
-import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
-import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
-import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class LobbyController extends WebSocketController {
+public class LobbyController {
 
-    public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
-                           @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
-        super(lobbyService, playerService, playerRepository, lobbyRepository);
+    private final LobbyService lobbyService;
+
+    public LobbyController(LobbyService lobbyService) {
+        this.lobbyService = lobbyService;
     }
 
     @MessageMapping("/lobby/{lobbyId}/settings")
     public void changeLobbySettings(@DestinationVariable String lobbyId,
                                     SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) throws Exception {
         String identity = sha.getUser().getName();
-        if (checkSender(identity, lobbyId)) {
-            LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyId, lobbySettingsDTO);
-
-            sendToLobby(lobbyId, base, "/lobby-state", newLobbyState);
-        }
+        lobbyService.updateLobbySettings(lobbyId, identity, lobbySettingsDTO);
     }
 
     @MessageMapping("/lobby/{lobbyId}/kick")
     public void kickPlayer(@DestinationVariable String lobbyId,
                            SimpMessageHeaderAccessor sha, KickDTO kickDTO) throws Exception {
         String identity = sha.getUser().getName();
-        if (checkSender(identity, lobbyId)) {
-            Player admin = playerRepository.findByIdentity(identity);
-            if (!admin.isAdmin()) {
-                throw new PlayerServiceException("Invalid action. Not admin.");
-            }
-
-            Player player = playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = new DisconnectDTO();
-            disconnectDTO.setReason("You were kicked out of the Lobby.");
-            simp.convertAndSendToUser(player.getIdentity(),
-                    "/queue/disconnect", disconnectDTO);
-            playerService.removePlayer(player);
-
-            sendChatPlayerNotification(lobbyId, player.getUsername() + " was kicked!", player.getUsername());
-            sendToLobby(lobbyId, base, "/lobby-state", lobbyService.getLobbyState(lobbyId));
-        }
+        lobbyService.kickPlayer(lobbyId, identity, kickDTO);
     }
 
     @MessageMapping("/lobby/{lobbyId}/chat")
     public void newChatMessage(@DestinationVariable String lobbyId,
                                SimpMessageHeaderAccessor sha, ChatDTO chatDTO) throws Exception {
-        if (chatDTO.getMessage() != null && !chatDTO.getMessage().matches("^\\s*$")) {
-            String identity = sha.getUser().getName();
-            if (checkSender(identity, lobbyId)) {
-                Player sender = this.playerRepository.findByIdentity(identity);
-
-                chatDTO.setType("msg");
-                chatDTO.setUsername(sender.getUsername());
-
-                sendToLobby(lobbyId, base, "/chat", chatDTO);
-            }
-        }
-    }
-
-    @MessageMapping("/chat")
-    public void newChatMessage(ChatDTO chatDTO) throws Exception {
-        if (playerRepository.findByIdentity("xxx") != null) {
-            simp.convertAndSend("/topic/chat", chatDTO);
-        }
+        String identity = sha.getUser().getName();
+        lobbyService.sendChatMessage(lobbyId, identity, chatDTO);
     }
 }
