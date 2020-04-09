@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
 public class RegisterController extends WebSocketController {
 
     public RegisterController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
-                           @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+                              @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         super(lobbyService, playerService, playerRepository, lobbyRepository);
     }
 
@@ -32,7 +32,8 @@ public class RegisterController extends WebSocketController {
         String lobbyId = RESTController.getLobbyIdFromAuthToken(registerDTO.getToken());
         if (lobbyId == null) {
             lobbyId = lobbyService.createLobby(player);
-        } else {
+        }
+        else {
             lobbyService.joinLobby(lobbyId, player);
         }
         RegisteredDTO registeredDTO = playerService.registerPlayer(identity, player, lobbyId);
@@ -48,7 +49,7 @@ public class RegisterController extends WebSocketController {
         sendChatPlayerNotification(lobbyId, player.getUsername() + " joined the lobby.", player.getUsername());
     }
 
-    private String checkAuthentication(String authToken) {
+    public String checkAuthentication(String authToken) {
         String username = RESTController.getUsernameFromAuthToken(authToken);
         if (username == null) {
             throw new PlayerServiceException("Player not authenticated.");

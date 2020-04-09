@@ -39,7 +39,7 @@ public class RESTController {
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
 
-        log.debug(q==null ? "GET /lobbies" : "GET /lobbies?q=" + q);
+        log.debug(q == null ? "GET /lobbies" : "GET /lobbies?q=" + q);
 
         List<LobbyListElementDTO> ret = new ArrayList<>();
         List<Lobby> l = lobbyService.getLobbies(q);
@@ -100,12 +100,20 @@ public class RESTController {
     }
 
     public static String getUsernameFromAuthToken(String authToken) {
-        return authMap.get(authToken)[0];
+        if (authMap.size() > 0) {
+            return authMap.get(authToken)[0];
+        }
+        else {
+            return null;
+        }
     }
 
     public static String getLobbyIdFromAuthToken(String authToken) {
-        if (authMap.get(authToken).length > 1) {
-            return authMap.get(authToken)[1];
+        if (authMap.containsKey(authToken)) {
+            if (authMap.get(authToken).length > 1) {
+                return authMap.get(authToken)[1];
+            }
+            return null;
         }
         return null;
     }

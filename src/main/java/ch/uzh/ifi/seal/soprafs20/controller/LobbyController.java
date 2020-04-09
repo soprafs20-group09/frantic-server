@@ -11,19 +11,14 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class LobbyController extends WebSocketController {
-
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     public LobbyController(LobbyService lobbyService, PlayerService playerService, @Qualifier("playerRepository") PlayerRepository playerRepository,
                            @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -37,7 +32,7 @@ public class LobbyController extends WebSocketController {
         if (checkSender(identity, lobbyId)) {
             LobbyStateDTO newLobbyState = lobbyService.updateLobbySettings(lobbyId, lobbySettingsDTO);
 
-            sendToLobby(lobbyId, base,"/lobby-state", newLobbyState);
+            sendToLobby(lobbyId, base, "/lobby-state", newLobbyState);
         }
     }
 
@@ -51,15 +46,15 @@ public class LobbyController extends WebSocketController {
                 throw new PlayerServiceException("Invalid action. Not admin.");
             }
 
-            Player player = this.playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
+            Player player = playerRepository.findByUsernameAndLobbyId(kickDTO.getUsername(), lobbyId);
             DisconnectDTO disconnectDTO = new DisconnectDTO();
             disconnectDTO.setReason("You were kicked out of the Lobby.");
-            simpMessagingTemplate.convertAndSendToUser(player.getIdentity(),
+            simp.convertAndSendToUser(player.getIdentity(),
                     "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(player);
 
             sendChatPlayerNotification(lobbyId, player.getUsername() + " was kicked!", player.getUsername());
-            sendToLobby(lobbyId, base,"/lobby-state", this.lobbyService.getLobbyState(lobbyId));
+            sendToLobby(lobbyId, base, "/lobby-state", lobbyService.getLobbyState(lobbyId));
         }
     }
 
@@ -74,8 +69,15 @@ public class LobbyController extends WebSocketController {
                 chatDTO.setType("msg");
                 chatDTO.setUsername(sender.getUsername());
 
-                sendToLobby(lobbyId, base,"/chat", chatDTO);
+                sendToLobby(lobbyId, base, "/chat", chatDTO);
             }
+        }
+    }
+
+    @MessageMapping("/chat")
+    public void newChatMessage(ChatDTO chatDTO) throws Exception {
+        if (playerRepository.findByIdentity("xxx") != null) {
+            simp.convertAndSend("/topic/chat", chatDTO);
         }
     }
 }
