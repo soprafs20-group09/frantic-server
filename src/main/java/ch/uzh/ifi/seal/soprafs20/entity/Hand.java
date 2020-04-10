@@ -3,7 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hand {
+public class Hand implements Cloneable {
     //private attributes
     private List<Card> cards;
 
@@ -38,5 +38,9 @@ public class Hand {
 
     public void clearHand() {
         this.cards.removeAll(cards);
+    }
+
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

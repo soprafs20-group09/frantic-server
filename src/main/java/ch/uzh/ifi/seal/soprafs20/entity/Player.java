@@ -35,7 +35,6 @@ public class Player implements Serializable {
     @Column
     private boolean admin;
 
-    // necessary to check if a username is already taken inside of a lobby.
     @Column
     private String lobbyId;
 
@@ -91,11 +90,9 @@ public class Player implements Serializable {
         return hand.pop(index);
     }
 
-    /*
     public void pushCardToHand(Card card) {
         this.hand.push(card);
     }
-     */
 
     public boolean isBlocked() {
         return blocked;
@@ -112,8 +109,8 @@ public class Player implements Serializable {
         return true;
     }
 
-    public Hand getCards() {
-        return hand;
+    public Hand getCards() throws CloneNotSupportedException {
+        return (Hand) hand.clone();
     }
 
     public int getHandSize() {return hand.size(); }
@@ -126,7 +123,7 @@ public class Player implements Serializable {
         this.admin = admin;
     }
 
-    public List<Integer> hasNiceTry() {
+    public List<Integer> hasNiceTry() throws CloneNotSupportedException {
         List<Integer> result = new ArrayList<>();
         Hand hand = this.getCards();
         for (int i = 0; i < hand.size(); i++) {
@@ -140,7 +137,7 @@ public class Player implements Serializable {
         return result;
     }
 
-    public List<Integer> hasCounterAttack() {
+    public List<Integer> hasCounterAttack() throws CloneNotSupportedException {
         List<Integer> result = new ArrayList<>();
         Hand hand = this.getCards();
         for (int i = 0; i < hand.size(); i++) {
@@ -151,5 +148,26 @@ public class Player implements Serializable {
             hand.push(card);
         }
         return result;
+    }
+
+    public int calculatePoints() throws CloneNotSupportedException {
+        int handPoints = 0;
+        Hand hand = this.getCards();
+        for (int i = 0; i < hand.size(); i++) {
+            Card card = hand.pop(i);
+            if (card.getValue().ordinal() < 9) {
+                handPoints += card.getValue().ordinal();
+            } else if (card.getValue().ordinal() < 17){
+                handPoints += 7;
+            } else {
+                handPoints += 42;
+            }
+            hand.push(card);
+        }
+        return handPoints;
+    }
+
+    public void clearHand() {
+        this.hand.clearHand();
     }
 }
