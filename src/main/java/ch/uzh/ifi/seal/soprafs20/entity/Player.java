@@ -97,15 +97,12 @@ public class Player implements Serializable {
         this.blocked = blocked;
     }
 
+    //TODO:
     public boolean isValidChoose(int index) {
         //get card from hand
         //compare to Discard Pile
         //return true/false
         return true;
-    }
-
-    public Hand getCards() throws CloneNotSupportedException {
-        return (Hand) hand.clone();
     }
 
     public int getHandSize() {return hand.size(); }
@@ -118,9 +115,8 @@ public class Player implements Serializable {
         this.admin = admin;
     }
 
-    public List<Integer> hasNiceTry() throws CloneNotSupportedException {
+    public List<Integer> hasNiceTry() {
         List<Integer> result = new ArrayList<>();
-        Hand hand = this.getCards();
         for (int i = 0; i < hand.size(); i++) {
             Card card = hand.pop(i);
             if (card.value == Value.NICETRY) {
@@ -132,9 +128,8 @@ public class Player implements Serializable {
         return result;
     }
 
-    public List<Integer> hasCounterAttack() throws CloneNotSupportedException {
+    public List<Integer> hasCounterAttack() {
         List<Integer> result = new ArrayList<>();
-        Hand hand = this.getCards();
         for (int i = 0; i < hand.size(); i++) {
             Card card = hand.pop(i);
             if (card.value == Value.COUNTERATTACK) {
@@ -145,9 +140,8 @@ public class Player implements Serializable {
         return result;
     }
 
-    public int calculatePoints() throws CloneNotSupportedException {
+    public int calculatePoints(){
         int handPoints = 0;
-        Hand hand = this.getCards();
         for (int i = 0; i < hand.size(); i++) {
             Card card = hand.pop(i);
             if (card.getValue().ordinal() < 9) {

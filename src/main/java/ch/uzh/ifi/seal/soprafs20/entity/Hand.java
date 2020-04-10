@@ -3,12 +3,16 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hand implements Cloneable {
+public class Hand {
     //private attributes
     private List<Card> cards;
 
     public Hand(){
         this.cards = new ArrayList<>();
+    }
+
+    public List<Card> getCards() {
+        return cards;
     }
 
     public Card pop(int index) {
@@ -40,7 +44,5 @@ public class Hand implements Cloneable {
         this.cards.removeAll(cards);
     }
 
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
+
 }
