@@ -171,4 +171,11 @@ public class GameRound {
         }
         listOfPlayers.remove(player);
     }
+
+    public boolean isValidChoose(int index) {
+        //get card from hand
+        //compare to Discard Pile
+        //return true/false
+        return true;
+    }
 }

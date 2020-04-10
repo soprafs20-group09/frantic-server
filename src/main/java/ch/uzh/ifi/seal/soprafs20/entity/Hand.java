@@ -47,4 +47,7 @@ public class Hand {
     }
 
 
+    public Card peek(int index) {
+        return cards.get(index);
+    }
 }

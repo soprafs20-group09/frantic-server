@@ -89,20 +89,16 @@ public class Player implements Serializable {
         this.hand.push(card);
     }
 
+    public Card peekCard(int index) {
+        return hand.peek(index);
+    }
+
     public boolean isBlocked() {
         return blocked;
     }
 
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
-    }
-
-    //TODO:
-    public boolean isValidChoose(int index) {
-        //get card from hand
-        //compare to Discard Pile
-        //return true/false
-        return true;
     }
 
     public int getHandSize() {return hand.size(); }
