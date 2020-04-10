@@ -9,18 +9,13 @@ import java.util.*;
 public class Game {
 
     private GameRound currentGameRound;
-
     private GameLength gameDuration;
-
     private List<Player> listOfPlayers;
-
     private int maxPoints;
-
     private Player firstPlayer;
-
     private List<Player> winners;
-
     private List<Event> events; //to pop elements use: events.remove(events.size() - 1);
+    private Timer timer;
 
     public Game(GameLength gameDuration, List<Player> listOfPlayers) {
         this.gameDuration = gameDuration;
@@ -44,11 +39,11 @@ public class Game {
     public void endGameRound() {
         if (!gameOver()) {
             //TODO: Send end of round package
-            //TODO: Wait some time
             changeFirstPlayer();
-            startNewGameRound();
+            startTimer(15, false);
         } else {
             //TODO: Send end of game package
+            startTimer(15, true);
         }
     }
 
@@ -104,6 +99,22 @@ public class Game {
     //If a player loses connection he/she is removed from the listOfPlayers
     public void playerLostConnection(Player player) {
         listOfPlayers.remove(player);
+    }
+
+    public void startTimer(int seconds, boolean gameOver) {
+        int milliseconds = seconds * 1000;
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (gameOver) {
+                    //TODO: End all Websocket connections of a lobby
+                } else {
+                    startNewGameRound();
+                }
+            }
+        };
+        timer.schedule(timerTask, milliseconds);
     }
 
     private void shuffleEvents() {

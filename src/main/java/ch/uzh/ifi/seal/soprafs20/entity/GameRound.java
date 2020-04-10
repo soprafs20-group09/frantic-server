@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
+import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 
 import java.util.*;
 
@@ -68,7 +69,6 @@ public class GameRound {
         //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
         startTimer(30);
         this.turnIsRunning = true;
-
     }
 
     private void finishTurn() {
@@ -112,10 +112,6 @@ public class GameRound {
          */
     }
 
-    private void performEvent() {
-        //performs event
-    }
-
     // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i<=amount; i++) {
@@ -125,8 +121,17 @@ public class GameRound {
     }
 
     private Card takeRandomCard(Player player) {
-        // takes random card from pile and returns it. Do not remove card
-        return new NumberCard(Color.BLACK, 5); //just a random example
+        Random r = new Random();
+        int handSize = player.getHandSize();
+        int index = r.nextInt(handSize);
+        //return player.removeCard(index)
+        return new NumberCard(Color.BLACK, 3); //just a random example
+    }
+
+    private void performEvent() {
+        Event event = (Event)events.remove(0);
+        //TODO: Send event information to clients
+        event.performEvent();
     }
 
     private List<Integer> getPlayableCards (Player player) {
