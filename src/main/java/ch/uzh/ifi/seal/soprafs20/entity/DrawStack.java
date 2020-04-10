@@ -2,8 +2,6 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
-
-import java.util.Collections;
 import java.util.EnumSet;
 
 
@@ -24,5 +22,4 @@ public class DrawStack extends Pile<Card> {
         }
         this.shuffle();
     }
-
 }
