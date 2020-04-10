@@ -16,12 +16,6 @@ class PileTest {
      */
 
     @Test
-    public void createPile_getEmptyStack() {
-        DrawStack drawStack = new DrawStack();
-        assertEquals(0, drawStack.size());
-    }
-
-    @Test
     public void pushCardsintoStack() {
         NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
 
