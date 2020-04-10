@@ -19,21 +19,22 @@ public class Hand {
         return this.cards.remove(index);
     }
 
-    /*
     public void push(Card card) {
         int counter = 0;
-        for (Card handCard : cards){
-            if (card.getOrderKey() < handCard.getOrderKey()){
-                this.cards.add(counter, card);
-                break;
+        if (cards.isEmpty()) {
+            this.cards.add(card);
+        } else {
+            for (Card handCard : cards) {
+                if (card.getOrderKey() < handCard.getOrderKey()) {
+                    this.cards.add(counter, card);
+                    break;
+                } else if (card.getOrderKey() > handCard.getOrderKey() && counter == cards.size() - 1) {
+                    this.cards.add(card);
+                    break;
+                }
+                counter++;
             }
-            counter++;
         }
-    }
-     */
-
-    public void push(Card c) {
-        this.cards.add(c);
     }
 
     public int size() {
@@ -41,7 +42,8 @@ public class Hand {
     }
 
     public void clearHand() {
-        this.cards.removeAll(cards);
+        List<Card> toBeRemoved = this.cards;
+        this.cards.removeAll(toBeRemoved);
     }
 
 
