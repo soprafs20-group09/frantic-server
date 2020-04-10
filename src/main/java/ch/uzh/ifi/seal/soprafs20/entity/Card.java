@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.UUID;
 
@@ -13,14 +14,14 @@ public abstract class Card {
     protected Value value;
     protected final int orderKey;
     protected final String key;
+    protected boolean isCounterable;
 
     public Card(Color c, Type t, Value v, int orderKey) {
         this.type = t;
         this.color = c;
         this.value = v;
-        this.key = UUID.randomUUID().toString();
+        this.key = FranticUtils.generateId(8);
         this.orderKey = orderKey;
-
     }
 
     public Color getColor() {
@@ -39,6 +40,8 @@ public abstract class Card {
 
     public int getOrderKey() { return orderKey; }
 
+    public boolean isCounterable() { return isCounterable; }
+
 
     public abstract void performAction();
 
@@ -48,6 +51,10 @@ public abstract class Card {
 
     public String toString() {
         return "Card: " + this.color.toString() + ", " + this.value.toString() + ", " + this.type.toString();
+    }
+
+    public String keysToString(){
+        return "Card key of " + this.color + this.value + ": " + this.key + ", " + String.valueOf(this.orderKey);
     }
 
 }

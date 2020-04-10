@@ -10,7 +10,7 @@ class HandTest {
 
     @Test
     public void pushCardToHandAndPopCardFromHand() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1,1 );
 
         Hand hand = new Hand();
         hand.push(blue1);
@@ -26,7 +26,7 @@ class HandTest {
 
     @Test
     public void sizeOfHand() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
 
         Hand hand = new Hand();
         assertEquals(0, hand.size());
@@ -42,8 +42,8 @@ class HandTest {
 
     @Test
     public void clearAllCardsFromHand(){
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
-        NumberCard red2 = new NumberCard(Color.RED, 2);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
+        NumberCard red2 = new NumberCard(Color.RED, 2, 2 );
 
         Hand hand = new Hand();
         hand.push(blue1);

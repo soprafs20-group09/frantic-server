@@ -33,7 +33,7 @@ class PileTest {
 
     @Test
     public void pushCardsintoStack() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
 
         DrawStack drawStack = new DrawStack();
         drawStack.push(blue1);
@@ -43,7 +43,7 @@ class PileTest {
 
     @Test
     public void peek1stCard() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
 
         DrawStack drawStack = new DrawStack();
         drawStack.push(blue1);
@@ -68,8 +68,8 @@ class PileTest {
 
     /*@Test
     public void popCard() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
-        NumberCard red4 = new NumberCard(Color.RED, 4);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1,1);
+        NumberCard red4 = new NumberCard(Color.RED, 4, 2);
         Card[] cards = {blue1, red4};
 
         DrawStack drawStack = new DrawStack(cards);

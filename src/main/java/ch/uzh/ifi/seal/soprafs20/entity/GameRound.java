@@ -125,7 +125,7 @@ public class GameRound {
         int handSize = player.getHandSize();
         int index = r.nextInt(handSize);
         //return player.removeCard(index)
-        return new NumberCard(Color.BLACK, 3); //just a random example
+        return new NumberCard(Color.BLACK, 3, 1); //just a random example
     }
 
     private void performEvent() {

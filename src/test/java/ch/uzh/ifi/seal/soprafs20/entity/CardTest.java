@@ -10,7 +10,7 @@ class CardTest {
 
     @Test
     public void createCards_throwsException(){
-        Exception e = assertThrows(RuntimeException.class, () -> new NumberCard(Color.BLUE, 12));
+        Exception e = assertThrows(RuntimeException.class, () -> new NumberCard(Color.BLUE, 12, 1));
         String msg = e.getMessage();
         assertTrue(msg.contains("Invalid number"));
     }
@@ -20,9 +20,9 @@ class CardTest {
         /**
          tested using NumberCard as concrete implementation. -> update once more cards are implemented
          */
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1);
-        NumberCard red1 = new NumberCard(Color.RED, 1);
-        NumberCard blue4 = new NumberCard(Color.BLUE, 4);
+        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
+        NumberCard red1 = new NumberCard(Color.RED, 1, 2);
+        NumberCard blue4 = new NumberCard(Color.BLUE, 4, 3);
 
         assertTrue(blue1.isPlayable(red1));
         assertTrue(blue1.isPlayable(blue4));

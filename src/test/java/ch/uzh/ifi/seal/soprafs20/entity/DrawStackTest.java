@@ -11,6 +11,7 @@ class DrawStackTest {
         DrawStack drawStack = new DrawStack();
         // check if constructor works
         System.out.println(drawStack.peek().toString());
+        System.out.println((drawStack.peek().keysToString()));
 
         // dummy test
         assertEquals(DrawStack.class, drawStack.getClass());

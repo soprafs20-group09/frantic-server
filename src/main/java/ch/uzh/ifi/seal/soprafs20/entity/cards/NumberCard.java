@@ -13,6 +13,7 @@ public class NumberCard extends Card {
         if (value > 10) {
             throw new RuntimeException("Invalid number");
         }
+        this.isCounterable = false;
     }
 
     public void performAction() {
