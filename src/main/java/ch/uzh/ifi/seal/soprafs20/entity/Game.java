@@ -37,13 +37,37 @@ public class Game {
     }
 
     public void endGameRound() {
+        //updatePoints();
+        removeCardsFromHands();
         if (!gameOver()) {
             //TODO: Send end of round package
-            changeFirstPlayer();
             startTimer(15, false);
         } else {
             //TODO: Send end of game package
             startTimer(15, true);
+        }
+    }
+
+    /*
+    private void updatePoints() {
+        int maxPoints = 0;
+        Player playerWithMaxPoints;
+        for (Player player : listOfPlayers) {
+            int playersPoints = player.calculatePoints();
+            player.setPoints(player.getPoints() + playersPoints);
+            if (playersPoints >= maxPoints) {
+                maxPoints = playersPoints;
+                playerWithMaxPoints = player;
+            }
+        }
+        setFirstPlayer(playerWithMaxPoints);
+    }
+     */
+
+    //Removes all cards from the players hands
+    private void removeCardsFromHands() {
+        for (Player player : listOfPlayers) {
+            player.clearHand();
         }
     }
 
@@ -77,8 +101,9 @@ public class Game {
         }
     }
 
-    private void changeFirstPlayer() {
-        int playersIndex = this.listOfPlayers.indexOf(this.firstPlayer);
+    //The first player is the player to the right of the player who shuffles the cards
+    private void setFirstPlayer(Player playerWhoShuffleCards) {
+        int playersIndex = this.listOfPlayers.indexOf(playerWhoShuffleCards);
         playersIndex = (playersIndex + 1)%listOfPlayers.size();
         this.firstPlayer = listOfPlayers.get(playersIndex);
     }

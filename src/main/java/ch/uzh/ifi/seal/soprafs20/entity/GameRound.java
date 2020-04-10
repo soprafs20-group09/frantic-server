@@ -159,22 +159,7 @@ public class GameRound {
     private boolean isRoundOver() { return (getHandSizes().containsValue(0) || remainingTurns == 0); }
 
     private void onRoundOver() {
-        updatePoints();
-        removeCardsFromHands();
         //TODO: Somehow call endGameRound in Game class
-    }
-
-    private void updatePoints() {
-        for (Player player : listOfPlayers) {
-            //player.calculatePoints
-        }
-    }
-
-    //Removes all cards from the players hands
-    private void removeCardsFromHands() {
-        for (Player player : listOfPlayers) {
-            //player.clearHand
-        }
     }
 
     //If a player loses connection he/she is removed from the listOfPlayers
