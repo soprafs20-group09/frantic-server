@@ -1,20 +1,15 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Internal User Representation
- * This class composes the internal representation of the user and defines how the user is stored in the database.
- * Every variable will be mapped into a database field with the @Column annotation
- * - nullable = false -> this cannot be left empty
- * - unique = true -> this value must be unqiue across the database -> composes the primary key
+ * Internal Player Representation
+ * This class composes the internal representation of the player and defines how the player is stored in the database.
  */
 @Entity
 @Table(name = "Player")

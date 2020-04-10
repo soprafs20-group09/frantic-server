@@ -1,25 +1,20 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
- * Internal User Representation
- * This class composes the internal representation of the user and defines how the user is stored in the database.
- * Every variable will be mapped into a database field with the @Column annotation
- * - nullable = false -> this cannot be left empty
- * - unique = true -> this value must be unqiue across the database -> composes the primary key
+ * Internal Lobby Representation
+ * This class composes the internal representation of the lobby and defines how the lobby is stored in the database.
  */
 @Entity
 @Table(name = "Lobby")
 public class Lobby implements Serializable {
-
-    private Random random = new Random();
 
     private static final long serialVersionUID = 1L;
 
@@ -55,22 +50,12 @@ public class Lobby implements Serializable {
 
 
     public Lobby() {
-        this.lobbyId = generateLobbyId();
+        this.lobbyId = FranticUtils.generateId(8);
         this.gameDuration = GameLength.MEDIUM;
         this.isPublic = true;
         this.listOfPlayers = new ArrayList<>();
         this.playerRepresentations = new ArrayList<>();
         this.isPlaying = false;
-    }
-
-    private String generateLobbyId() {
-        StringBuilder s = new StringBuilder();
-        String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        for (int i = 0; i < 8; i++) {
-            int idx = random.nextInt(chars.length());
-            s.append(chars.charAt(idx));
-        }
-        return s.toString();
     }
 
     public String getLobbyId() {
