@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
+import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 
 import java.util.*;
 
@@ -34,7 +35,9 @@ public class GameRound {
 
         //move 7 initial cards to player hands
         for (Player player : listOfPlayers) {
-            drawCardFromStack(player, 7);
+            for (int i = 1; i<=7; i++) {
+                //player.pushCardToHand(drawStack.pop())/
+            }
         }
         //move initial card to discardPile
         this.discardPile.push(this.drawStack.pop());
@@ -52,20 +55,20 @@ public class GameRound {
     }
 
     private void prepareNewTurn() {
-        changePlayer();
-        sendGameState();
-        startTurn();
-    }
-
-    private void startTurn() {
         if (!isRoundOver()) {
-            //TODO: send start turn package with this.currentPlayer as content
-            //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
-            startTimer(30);
-            this.turnIsRunning = true;
+            changePlayer();
+            sendGameState();
+            startTurn();
         } else {
             onRoundOver();
         }
+    }
+
+    private void startTurn() {
+        //TODO: send start turn package with this.currentPlayer as content
+        //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
+        startTimer(30);
+        this.turnIsRunning = true;
     }
 
     private void finishTurn() {
@@ -94,19 +97,19 @@ public class GameRound {
         timer.schedule(timerTask, milliseconds);
     }
 
-    private void playCard(Player player, Card card) {
+    private void playCard(Player player, int index) {
+        /*
         Card uppermostCard = (Card)discardPile.peek();
-        if (player == currentPlayer) {
-            if (card.isPlayable(uppermostCard) && moveCardFromPlayerToDiscardPile(player, card)) {
+        Card cardToPlay = player.peekCard(index);
+        if (player == currentPlayer && cardToPlay != null) {
+            if (cardToPlay.isPlayable(uppermostCard) {
+                discardPile.push(player.removeCard(index);
                 finishTurn();
             }
         } else {
             // needed later for special cards
         }
-    }
-
-    private void performEvent() {
-        //performs event
+         */
     }
 
     // moves #amount cards from Stack to players hand
@@ -117,21 +120,23 @@ public class GameRound {
         //TODO: Send new Hand state to player
     }
 
-    private boolean moveCardFromPlayerToDiscardPile(Player player, Card card) {
-        // moves card from Players hand to discardPile
-        // return true if possible
-        return true;
+    private Card takeRandomCard(Player player) {
+        Random r = new Random();
+        int handSize = player.getHandSize();
+        int index = r.nextInt(handSize);
+        //return player.removeCard(index)
+        return new NumberCard(Color.BLACK, 3); //just a random example
     }
 
-    private Card takeRandomCard(Pile pile) {
-        // takes random card from pile and returns it. Do not remove card
-        return new NumberCard(Color.BLACK, 5); //just a random example
+    private void performEvent() {
+        Event event = (Event)events.remove(0);
+        //TODO: Send event information to clients
+        event.performEvent();
     }
 
     private List<Integer> getPlayableCards (Player player) {
-        List playableCards = new ArrayList();
-        //player.getPlayableCards(this.discardPile.peek())
-        return playableCards;
+        //List playableCards = player.getPlayableCards(this.discardPile.peek())
+        return new ArrayList<>();
     }
 
     private Map<Player, Integer> getHandSizes() {
@@ -156,7 +161,7 @@ public class GameRound {
     private void onRoundOver() {
         updatePoints();
         removeCardsFromHands();
-        //TODO: Send end of round package or end of game package (Here or in Game-class, what is better..?)
+        //TODO: Somehow call endGameRound in Game class
     }
 
     private void updatePoints() {
@@ -165,8 +170,20 @@ public class GameRound {
         }
     }
 
+    //Removes all cards from the players hands
     private void removeCardsFromHands() {
-        // makes sure, that after each round, all players have 0 cards
+        for (Player player : listOfPlayers) {
+            //player.clearHand
+        }
     }
 
+    //If a player loses connection he/she is removed from the listOfPlayers
+    public void playerLostConnection(Player player) {
+        if (player == currentPlayer) {
+            timer.cancel();
+            turnIsRunning = false;
+            prepareNewTurn();
+        }
+        listOfPlayers.remove(player);
+    }
 }

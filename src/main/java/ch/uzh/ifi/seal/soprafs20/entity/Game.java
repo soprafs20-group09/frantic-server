@@ -9,35 +9,41 @@ import java.util.*;
 public class Game {
 
     private GameRound currentGameRound;
-
     private GameLength gameDuration;
-
     private List<Player> listOfPlayers;
-
     private int maxPoints;
-
     private Player firstPlayer;
-
     private List<Player> winners;
-
     private List<Event> events; //to pop elements use: events.remove(events.size() - 1);
+    private Timer timer;
 
     public Game(GameLength gameDuration, List<Player> listOfPlayers) {
         this.gameDuration = gameDuration;
         this.listOfPlayers = listOfPlayers;
         this.firstPlayer = listOfPlayers.get(0);
         this.maxPoints = calculateMaxPoints();
+        this.events = new ArrayList<>();
     }
 
     public void startGame() {
         initEvents();
-        StartNewGameRound();
+        startNewGameRound();
     }
 
-    private void StartNewGameRound() {
+    private void startNewGameRound() {
+        shuffleEvents();
+        this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
+        currentGameRound.startGameRound();
+    }
+
+    public void endGameRound() {
         if (!gameOver()) {
-            this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
-            currentGameRound.startGameRound();
+            //TODO: Send end of round package
+            changeFirstPlayer();
+            startTimer(15, false);
+        } else {
+            //TODO: Send end of game package
+            startTimer(15, true);
         }
     }
 
@@ -90,7 +96,32 @@ public class Game {
         }
     }
 
-    private List<Event> initEvents() {
+    //If a player loses connection he/she is removed from the listOfPlayers
+    public void playerLostConnection(Player player) {
+        listOfPlayers.remove(player);
+    }
+
+    public void startTimer(int seconds, boolean gameOver) {
+        int milliseconds = seconds * 1000;
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (gameOver) {
+                    //TODO: End all Websocket connections of a lobby
+                } else {
+                    startNewGameRound();
+                }
+            }
+        };
+        timer.schedule(timerTask, milliseconds);
+    }
+
+    private void shuffleEvents() {
+        Collections.shuffle(this.events);
+    }
+
+    private void initEvents() {
         //initialize all Events
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();
@@ -101,8 +132,8 @@ public class Game {
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
         Event gamblingMan = new GamblingManEvent();
         Event market = new MarketEvent();
-        Event marryChristmas = new MarryChristmasEvent();
         Event matingSeason = new MatingSeasonEvent();
+        Event merryChristmas = new MerryChristmasEvent();
         Event mexicanStandoff = new MexicanStandoffEvent();
         Event recession = new RecessionEvent();
         Event robinHood = new RobinHoodEvent();
@@ -123,7 +154,7 @@ public class Game {
         this.events.add(fridayTheThirteenth);
         this.events.add(gamblingMan);
         this.events.add(market);
-        this.events.add(marryChristmas);
+        this.events.add(merryChristmas);
         this.events.add(matingSeason);
         this.events.add(mexicanStandoff);
         this.events.add(recession);
@@ -134,9 +165,5 @@ public class Game {
         this.events.add(timeBomb);
         this.events.add(tornado);
         this.events.add(vandalism);
-
-        //shuffle the list of Events
-        Collections.shuffle(this.events);
-        return this.events;
     }
 }
