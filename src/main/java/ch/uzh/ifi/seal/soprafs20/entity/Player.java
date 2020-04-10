@@ -1,7 +1,13 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
+
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Internal User Representation
@@ -118,5 +124,32 @@ public class Player implements Serializable {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public List<Integer> hasNiceTry() {
+        List<Integer> result = new ArrayList<>();
+        Hand hand = this.getCards();
+        for (int i = 0; i < hand.size(); i++) {
+            Card card = hand.pop(i);
+            if (card.value == Value.NICETRY) {
+                result.add(i);
+                return result;
+            };
+            hand.push(card);
+        }
+        return result;
+    }
+
+    public List<Integer> hasCounterAttack() {
+        List<Integer> result = new ArrayList<>();
+        Hand hand = this.getCards();
+        for (int i = 0; i < hand.size(); i++) {
+            Card card = hand.pop(i);
+            if (card.value == Value.COUNTERATTACK) {
+                result.add(i);
+            }
+            hand.push(card);
+        }
+        return result;
     }
 }
