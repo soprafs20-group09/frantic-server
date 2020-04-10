@@ -27,17 +27,28 @@ public class Game {
         this.listOfPlayers = listOfPlayers;
         this.firstPlayer = listOfPlayers.get(0);
         this.maxPoints = calculateMaxPoints();
+        this.events = new ArrayList<>();
     }
 
     public void startGame() {
         initEvents();
-        StartNewGameRound();
+        startNewGameRound();
     }
 
-    private void StartNewGameRound() {
+    private void startNewGameRound() {
+        shuffleEvents();
+        this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
+        currentGameRound.startGameRound();
+    }
+
+    public void endGameRound() {
         if (!gameOver()) {
-            this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
-            currentGameRound.startGameRound();
+            //TODO: Send end of round package
+            //TODO: Wait some time
+            changeFirstPlayer();
+            startNewGameRound();
+        } else {
+            //TODO: Send end of game package
         }
     }
 
@@ -90,7 +101,16 @@ public class Game {
         }
     }
 
-    private List<Event> initEvents() {
+    //If a player loses connection he/she is removed from the listOfPlayers
+    public void playerLostConnection(Player player) {
+        listOfPlayers.remove(player);
+    }
+
+    private void shuffleEvents() {
+        Collections.shuffle(this.events);
+    }
+
+    private void initEvents() {
         //initialize all Events
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();
@@ -134,9 +154,5 @@ public class Game {
         this.events.add(timeBomb);
         this.events.add(tornado);
         this.events.add(vandalism);
-
-        //shuffle the list of Events
-        Collections.shuffle(this.events);
-        return this.events;
     }
 }
