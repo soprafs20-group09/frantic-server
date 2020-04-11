@@ -2,12 +2,13 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.entity.events.*;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.EndRoundDTO;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.*;
 
 public class Game {
 
+    private String lobbyId;
     private GameRound currentGameRound;
     private GameLength gameDuration;
     private List<Player> listOfPlayers;
@@ -17,10 +18,14 @@ public class Game {
     private List<Event> events; //to pop elements use: events.remove(events.size() - 1);
     private Timer timer;
 
-    public Game(GameLength gameDuration, List<Player> listOfPlayers) {
+    private final GameService gameService;
+
+    public Game(String lobbyId, GameLength gameDuration, List<Player> listOfPlayers, GameService gameService) {
+        this.lobbyId = lobbyId;
         this.gameDuration = gameDuration;
         this.listOfPlayers = listOfPlayers;
         this.firstPlayer = listOfPlayers.get(0);
+        this.gameService = gameService;
         this.maxPoints = calculateMaxPoints();
         this.events = new ArrayList<>();
     }
@@ -32,7 +37,7 @@ public class Game {
 
     private void startNewGameRound() {
         shuffleEvents();
-        this.currentGameRound = new GameRound(listOfPlayers, firstPlayer, events);
+        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events, gameService);
         currentGameRound.startGameRound();
     }
 
