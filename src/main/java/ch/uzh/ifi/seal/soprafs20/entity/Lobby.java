@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import javax.persistence.*;
@@ -123,12 +124,12 @@ public class Lobby implements Serializable {
         return listOfPlayers;
     }
 
-    public void startGame() {
+    public void startGame(GameService gameService) {
         //The game can only be started if there are more than one player in the lobby
         if (this.players < 2) {
             return;
         }
-        this.game = new Game(gameDuration, playerRepresentations);
+        this.game = new Game(lobbyId, gameDuration, playerRepresentations, gameService);
         this.game.startGame();
         this.isPlaying = true;
     }

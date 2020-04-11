@@ -9,10 +9,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.StartGameDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.GameStateDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.HandDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.PlayableCardsDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.StartGameRoundDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +36,8 @@ public class GameService {
     public void startGame(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            lobby.startGame();
+            sendStartGame(lobbyId);
+            lobby.startGame(this);
         }
     }
 
@@ -69,7 +67,7 @@ public class GameService {
         webSocketService.sendToLobby(lobbyId, "/start-round", new StartGameRoundDTO());
     }
 
-    public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
+    public void sendGameState(String lobbyId, Card[] discardPile, List<Player> players) {
         GameStateDTO gameState = new GameStateDTO();
         // transform to DTO
         webSocketService.sendToLobby(lobbyId, "/game-state", gameState);
@@ -79,6 +77,13 @@ public class GameService {
         HandDTO hand = new HandDTO();
         // transform to DTO
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", hand);
+    }
+
+    public void sendStartTurn(String lobbyId, String currentPlayer, int time) {
+        StartTurnDTO start = new StartTurnDTO();
+        start.setCurrentPlayer(currentPlayer);
+        start.setTime(time);
+        webSocketService.sendToLobby(lobbyId, "start-turn", start);
     }
 
     public void sendPlayableCards(String lobbyId, Player player, int[] playable) {
