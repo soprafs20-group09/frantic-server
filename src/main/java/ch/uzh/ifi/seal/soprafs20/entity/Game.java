@@ -30,6 +30,10 @@ public class Game {
         this.events = new ArrayList<>();
     }
 
+    public GameRound getCurrentGameRound() {
+        return currentGameRound;
+    }
+
     public void startGame() {
         initEvents();
         shuffleEvents();
