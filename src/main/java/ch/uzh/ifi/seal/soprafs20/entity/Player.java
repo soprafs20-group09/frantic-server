@@ -155,4 +155,16 @@ public class Player implements Serializable {
     public void clearHand() {
         this.hand.clearHand();
     }
+
+    public int[] getPlayableCards(Card peek) {
+        List<Integer> playable = new ArrayList<>();
+        List<Card> cards = hand.getCards();
+        for (int i = 0; i < hand.size(); i++) {
+            Card card = cards.get(i);
+            if (peek.isPlayable(card)) {
+                playable.add(i);
+            }
+        }
+        return playable.stream().mapToInt(i->i).toArray();
+    }
 }
