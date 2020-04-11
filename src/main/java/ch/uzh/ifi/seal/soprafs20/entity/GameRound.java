@@ -1,7 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import ch.uzh.ifi.seal.soprafs20.constant.Color;
-import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
@@ -50,7 +48,7 @@ public class GameRound {
     }
 
     private void sendGameState() {
-        gameService.sendGameState(lobbyId, (Card[]) discardPile.getCards(), listOfPlayers);
+        gameService.sendGameState(lobbyId,  discardPile.peek(), listOfPlayers);
         for (Player player : listOfPlayers) {
             gameService.sendHand(lobbyId, player);
         }
@@ -105,7 +103,7 @@ public class GameRound {
         timer.schedule(timerTask, milliseconds);
     }
 
-    private void playCard(Player player, int index) {
+    public void playCard(Player player, int index) {
         Card uppermostCard = (Card)discardPile.peek();
         Card cardToPlay = player.peekCard(index);
         if (player == currentPlayer && cardToPlay != null) {
@@ -119,7 +117,7 @@ public class GameRound {
     }
 
     // in a turn, the current player can choose to draw a card
-    private void currentPlayerDrawCard() {
+    public void currentPlayerDrawCard() {
         drawCardFromStack(currentPlayer, 1);
         this.currentPlayerDrewCard = true;
     }
