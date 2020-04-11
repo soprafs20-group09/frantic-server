@@ -53,10 +53,9 @@ public class Game {
         }
     }
 
-    /*
     private void updatePoints() {
         int maxPoints = 0;
-        Player playerWithMaxPoints;
+        Player playerWithMaxPoints = firstPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
             player.setPoints(player.getPoints() + playersPoints);
@@ -67,7 +66,6 @@ public class Game {
         }
         setFirstPlayer(playerWithMaxPoints);
     }
-     */
 
     //Removes all cards from the players hands
     private void removeCardsFromHands() {
