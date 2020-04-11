@@ -1,12 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.StartGameDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
@@ -35,9 +34,11 @@ public class GameService {
 
     public void startGame(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
-            Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            sendStartGame(lobbyId);
-            lobby.startGame(this);
+            if (playerRepository.findByIdentity(identity).isAdmin()) {
+                Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+                sendStartGame(lobbyId);
+                lobby.startGame(this);
+            }
         }
     }
 
@@ -45,17 +46,15 @@ public class GameService {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Player player = playerRepository.findByIdentity(identity);
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            Game game = lobby.getGame();
-            // game.getGameRound().playCard(player, play.getIndex())
+            lobby.getGame().getCurrentGameRound().playCard(player, play.getIndex());
         }
     }
 
-    public void drawCard(String lobbyId, String identity, DrawDTO draw) {
+    public void drawCard(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Player player = playerRepository.findByIdentity(identity);
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            Game game = lobby.getGame();
-            // game.getGameRound().drawCardsFromStack(player, draw.getAmount())
+            lobby.getGame().getCurrentGameRound().currentPlayerDrawCard();
         }
     }
 
@@ -67,15 +66,21 @@ public class GameService {
         webSocketService.sendToLobby(lobbyId, "/start-round", new StartGameRoundDTO());
     }
 
-    public void sendGameState(String lobbyId, Card[] discardPile, List<Player> players) {
+    public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
         GameStateDTO gameState = new GameStateDTO();
-        // transform to DTO
+        gameState.setDiscardPile(cardToDTO(discardPile));
+        gameState.setPlayers(playersToDTO(players));
         webSocketService.sendToLobby(lobbyId, "/game-state", gameState);
     }
 
     public void sendHand(String lobbyId, Player player) {
         HandDTO hand = new HandDTO();
-        // transform to DTO
+        CardDTO[] cards = new CardDTO[player.getHandSize()];
+        for (int i = 0; i < player.getHandSize(); i++) {
+            Card card = player.peekCard(i);
+            cards[i] = cardToDTO(card);
+        }
+        hand.setCards(cards);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", hand);
     }
 
@@ -90,5 +95,34 @@ public class GameService {
         PlayableCardsDTO playableCards = new PlayableCardsDTO();
         playableCards.setPlayable(playable);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", playableCards);
+    }
+
+    private CardDTO cardToDTO(Card card) {
+        CardDTO response = new CardDTO();
+        response.setColor(FranticUtils.getStringRepresentation(card.getColor()));
+        response.setKey(card.getKey());
+        response.setType(FranticUtils.getStringRepresentation(card.getType()));
+        response.setValue(FranticUtils.getStringRepresentation(card.getValue()));
+        return response;
+    }
+
+    private CardDTO[] generateCardBackDTO(int n) {
+        CardDTO[] response = new CardDTO[n];
+        for (int i = 0; i < n; i++) {
+            response[i].setType("back");
+        }
+        return response;
+    }
+
+    private PlayerStateDTO[] playersToDTO(List<Player> players) {
+        PlayerStateDTO[] response = new PlayerStateDTO[players.size()];
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            response[i].setUsername(p.getUsername());
+            response[i].setPoints(p.getPoints());
+            response[i].setSkipped(p.isBlocked());
+            response[i].setCards(generateCardBackDTO(p.getHandSize()));
+        }
+        return response;
     }
 }

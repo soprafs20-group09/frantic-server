@@ -36,6 +36,6 @@ public class GameController {
     public void newChatMessage(@DestinationVariable String lobbyId,
                                SimpMessageHeaderAccessor sha, DrawDTO drawDTO) throws Exception {
         String identity = sha.getUser().getName();
-        gameService.drawCard(lobbyId, identity, drawDTO);
+        gameService.drawCard(lobbyId, identity);
     }
 }
