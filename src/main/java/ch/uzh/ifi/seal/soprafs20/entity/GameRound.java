@@ -97,25 +97,25 @@ public class GameRound {
         timer.schedule(timerTask, milliseconds);
     }
 
+    /*
     private void playCard(Player player, int index) {
-        /*
         Card uppermostCard = (Card)discardPile.peek();
-        Card cardToPlay = player.peekCard(index);
+        Card cardToPlay = player.getHand().peek();
         if (player == currentPlayer && cardToPlay != null) {
             if (cardToPlay.isPlayable(uppermostCard) {
-                discardPile.push(player.removeCard(index);
+                discardPile.push(player.getHand().pop(index);
                 finishTurn();
             }
         } else {
             // needed later for special cards
         }
-         */
     }
+     */
 
     // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i<=amount; i++) {
-            //player.pushCardToHand(drawStack.pop())/
+            //player.getHand().push(drawStack.pop())/
         }
         //TODO: Send new Hand state to player
     }
@@ -124,7 +124,7 @@ public class GameRound {
         Random r = new Random();
         int handSize = player.getHandSize();
         int index = r.nextInt(handSize);
-        //return player.removeCard(index)
+        //return player.getHand().pop(index)
         return new NumberCard(Color.BLACK, 3, 1); //just a random example
     }
 
@@ -170,12 +170,5 @@ public class GameRound {
             prepareNewTurn();
         }
         listOfPlayers.remove(player);
-    }
-
-    public boolean isValidChoose(int index) {
-        //get card from hand
-        //compare to Discard Pile
-        //return true/false
-        return true;
     }
 }
