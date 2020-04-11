@@ -12,7 +12,7 @@ public class GameRound {
     private String lobbyId;
     private List<Player> listOfPlayers;
     private Player currentPlayer;
-    private boolean turnIsRunning;
+    private boolean currentPlayerDrewCard;
     private Timer timer;
     private boolean timebomb; // indicates if the timebomb-event is currently running
     private int remainingTurns;
@@ -42,7 +42,7 @@ public class GameRound {
         //move 7 initial cards to player hands
         for (Player player : listOfPlayers) {
             for (int i = 1; i<=7; i++) {
-                //player.pushCardToHand(drawStack.pop())/
+                player.pushCardToHand(drawStack.pop());
             }
         }
         //move initial card to discardPile
@@ -74,24 +74,23 @@ public class GameRound {
     }
 
     private void startTurn() {
-
         gameService.sendStartTurn(lobbyId, currentPlayer.getUsername(), 30);
         gameService.sendPlayableCards(lobbyId, currentPlayer, getPlayableCards(currentPlayer));
         startTimer(30);
-        this.turnIsRunning = true;
+        this.currentPlayerDrewCard = false;
     }
 
     private void finishTurn() {
         timer.cancel();
-        this.turnIsRunning = false;
         prepareNewTurn();
     }
 
     //this method is called when the timer runs out
     private  void abortTurn() {
         timer.cancel();
-        drawCardFromStack(currentPlayer, 1);
-        turnIsRunning = false;
+        if (!currentPlayerDrewCard) {
+            drawCardFromStack(currentPlayer, 1);
+        }
         prepareNewTurn();
     }
 
@@ -107,28 +106,39 @@ public class GameRound {
         timer.schedule(timerTask, milliseconds);
     }
 
-    /*
     private void playCard(Player player, int index) {
         Card uppermostCard = (Card)discardPile.peek();
-        Card cardToPlay = player.getHand().peek();
+        Card cardToPlay = player.peekCard(index);
         if (player == currentPlayer && cardToPlay != null) {
-            if (cardToPlay.isPlayable(uppermostCard) {
-                discardPile.push(player.getHand().pop(index);
+            if (cardToPlay.isPlayable(uppermostCard)) {
+                discardPile.push(player.popCard(index));
                 finishTurn();
             }
         } else {
             // needed later for special cards
         }
     }
-     */
+
+    // in a turn, the current player can choose to draw a card
+    private void currentPlayerDrawCard() {
+        drawCardFromStack(currentPlayer, 1);
+        this.currentPlayerDrewCard = true;
+    }
 
     // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i<=amount; i++) {
-            //player.getHand().push(drawStack.pop())/
+            player.pushCardToHand(drawStack.pop());
         }
         for (Player p : listOfPlayers) {
             gameService.sendHand(lobbyId, p);
+        }
+    }
+
+    //A player can finish a turn by clicking a button (if he drew a card before)
+    private void currentPlayerFinishTurn() {
+        if (currentPlayerDrewCard) {
+            finishTurn();
         }
     }
 
@@ -136,8 +146,7 @@ public class GameRound {
         Random r = new Random();
         int handSize = player.getHandSize();
         int index = r.nextInt(handSize);
-        //return player.getHand().pop(index)
-        return new NumberCard(Color.BLACK, 3, 1); //just a random example
+        return player.popCard(index);
     }
 
     private void performEvent() {
@@ -177,7 +186,6 @@ public class GameRound {
     public void playerLostConnection(Player player) {
         if (player == currentPlayer) {
             timer.cancel();
-            turnIsRunning = false;
             prepareNewTurn();
         }
         listOfPlayers.remove(player);

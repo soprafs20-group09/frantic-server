@@ -15,7 +15,7 @@ public class Game {
     private int maxPoints;
     private Player firstPlayer;
     private List<Player> winners;
-    private List<Event> events; //to pop elements use: events.remove(events.size() - 1);
+    private List<Event> events;
     private Timer timer;
 
     private final GameService gameService;
@@ -42,7 +42,7 @@ public class Game {
     }
 
     public void endGameRound() {
-        //updatePoints();
+        updatePoints();
         removeCardsFromHands();
         if (!gameOver()) {
             //TODO: Send end of round package
