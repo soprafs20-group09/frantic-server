@@ -3,11 +3,13 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.*;
 
 public class GameRound {
 
+    private String lobbyId;
     private List<Player> listOfPlayers;
     private Player currentPlayer;
     private boolean turnIsRunning;
@@ -16,13 +18,17 @@ public class GameRound {
     private int remainingTurns;
     private List events;
     private ActionStack actionStack;
-    private Pile drawStack;
-    private Pile discardPile;
+    private Pile<Card> drawStack;
+    private Pile<Card> discardPile;
+
+    private final GameService gameService;
 
 
-    public GameRound(List<Player> listOfPlayers, Player firstPlayer, List events) {
+    public GameRound(String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events, GameService gameService) {
+        this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
+        this.gameService = gameService;
         this.actionStack = new ActionStack();
         this.remainingTurns = -1; //indicates that there is no limit
         this.events = events;
@@ -44,12 +50,15 @@ public class GameRound {
     }
 
     private void sendGameState() {
-        //TODO: send current Game state to all players
-        //TODO: send Hand to each player individually
+        gameService.sendGameState(lobbyId, (Card[]) discardPile.getCards(), listOfPlayers);
+        for (Player player : listOfPlayers) {
+            gameService.sendHand(lobbyId, player);
+        }
     }
 
     public void startGameRound() {
         initializeGameRound();
+        gameService.sendStartGameRound(lobbyId);
         sendGameState();
         startTurn();
     }
@@ -65,8 +74,9 @@ public class GameRound {
     }
 
     private void startTurn() {
-        //TODO: send start turn package with this.currentPlayer as content
-        //TODO: playableCards package to currentPlayer with getPlayableCards(currentPlayer) as content
+
+        gameService.sendStartTurn(lobbyId, currentPlayer.getUsername(), 30);
+        gameService.sendPlayableCards(lobbyId, currentPlayer, getPlayableCards(currentPlayer));
         startTimer(30);
         this.turnIsRunning = true;
     }
@@ -117,7 +127,9 @@ public class GameRound {
         for (int i = 1; i<=amount; i++) {
             //player.pushCardToHand(drawStack.pop())/
         }
-        //TODO: Send new Hand state to player
+        for (Player p : listOfPlayers) {
+            gameService.sendHand(lobbyId, p);
+        }
     }
 
     private Card takeRandomCard(Player player) {
@@ -134,9 +146,8 @@ public class GameRound {
         event.performEvent();
     }
 
-    private List<Integer> getPlayableCards (Player player) {
-        //List playableCards = player.getPlayableCards(this.discardPile.peek())
-        return new ArrayList<>();
+    private int[] getPlayableCards (Player player) {
+        return player.getPlayableCards(this.discardPile.peek());
     }
 
     private Map<Player, Integer> getHandSizes() {
