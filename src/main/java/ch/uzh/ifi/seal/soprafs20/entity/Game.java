@@ -32,11 +32,14 @@ public class Game {
 
     public void startGame() {
         initEvents();
-        startNewGameRound();
+        shuffleEvents();
+        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events, gameService);
+        currentGameRound.startGameRound();
     }
 
     private void startNewGameRound() {
         shuffleEvents();
+        gameService.sendStartGameRound(lobbyId);
         this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events, gameService);
         currentGameRound.startGameRound();
     }

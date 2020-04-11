@@ -58,7 +58,6 @@ public class GameRound {
 
     public void startGameRound() {
         initializeGameRound();
-        gameService.sendStartGameRound(lobbyId);
         sendGameState();
         startTurn();
     }
