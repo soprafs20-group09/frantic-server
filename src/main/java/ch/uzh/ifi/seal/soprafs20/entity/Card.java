@@ -46,6 +46,9 @@ public abstract class Card {
     public abstract void performAction();
 
     public boolean isPlayable(Card other) {
+        if (this.getColor() == Color.BLACK) {
+            return this.getValue() == other.getValue();
+        }
         return this.getColor() == other.getColor() || this.getValue() == other.getValue();
     }
 
