@@ -38,9 +38,9 @@ public class GameRound {
         this.discardPile = new DiscardPile();
 
         //move 7 initial cards to player hands
-        for (Player player : listOfPlayers) {
-            for (int i = 1; i<=7; i++) {
-                Card card = drawStack.pop();
+        for (Player player : this.listOfPlayers) {
+            for (int i = 1; i <= 7; i++) {
+                Card card = this.drawStack.pop();
                 player.pushCardToHand(card);
             }
         }
@@ -49,9 +49,9 @@ public class GameRound {
     }
 
     private void sendGameState() {
-        gameService.sendGameState(lobbyId,  discardPile.peek(), listOfPlayers);
-        for (Player player : listOfPlayers) {
-            gameService.sendHand(lobbyId, player);
+        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
+        for (Player player : this.listOfPlayers) {
+            this.gameService.sendHand(this.lobbyId, player);
         }
     }
 
@@ -66,74 +66,76 @@ public class GameRound {
             changePlayer();
             sendGameState();
             startTurn();
-        } else {
+        }
+        else {
             onRoundOver();
         }
     }
 
     private void startTurn() {
-        gameService.sendStartTurn(lobbyId, currentPlayer.getUsername(), 30);
-        gameService.sendPlayableCards(lobbyId, currentPlayer, getPlayableCards(currentPlayer));
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30);
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
         startTimer(30);
         this.currentPlayerDrewCard = false;
     }
 
     private void finishTurn() {
-        timer.cancel();
+        this.timer.cancel();
         prepareNewTurn();
     }
 
     //this method is called when the timer runs out
-    private  void abortTurn() {
-        timer.cancel();
-        if (!currentPlayerDrewCard) {
-            drawCardFromStack(currentPlayer, 1);
+    private void abortTurn() {
+        this.timer.cancel();
+        if (!this.currentPlayerDrewCard) {
+            drawCardFromStack(this.currentPlayer, 1);
         }
         prepareNewTurn();
     }
 
     public void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
-        timer = new Timer();
+        this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 abortTurn();
             }
         };
-        timer.schedule(timerTask, milliseconds);
+        this.timer.schedule(timerTask, milliseconds);
     }
 
     public void playCard(Player player, int index) {
-        Card uppermostCard = (Card)discardPile.peek();
+        Card uppermostCard = this.discardPile.peek();
         Card cardToPlay = player.peekCard(index);
-        if (player == currentPlayer && cardToPlay != null) {
+        if (player == this.currentPlayer && cardToPlay != null) {
             if (cardToPlay.isPlayable(uppermostCard)) {
-                discardPile.push(player.popCard(index));
+                this.discardPile.push(player.popCard(index));
                 finishTurn();
             }
-        } else {
+        }
+        else {
             // needed later for special cards
         }
     }
 
     // in a turn, the current player can choose to draw a card
     public void currentPlayerDrawCard() {
-        drawCardFromStack(currentPlayer, 1);
+        drawCardFromStack(this.currentPlayer, 1);
         this.currentPlayerDrewCard = true;
     }
 
     // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
-        for (int i = 1; i<=amount; i++) {
-            player.pushCardToHand(drawStack.pop());
+        for (int i = 1; i <= amount; i++) {
+            player.pushCardToHand(this.drawStack.pop());
         }
-        gameService.sendHand(lobbyId, player);
+        this.gameService.sendHand(this.lobbyId, player);
     }
 
     //A player can finish a turn by clicking a button (if he drew a card before)
     private void currentPlayerFinishTurn() {
-        if (currentPlayerDrewCard) {
+        if (this.currentPlayerDrewCard) {
             finishTurn();
         }
     }
@@ -146,18 +148,18 @@ public class GameRound {
     }
 
     private void performEvent() {
-        Event event = (Event)events.remove(0);
+        Event event = (Event) this.events.remove(0);
         //TODO: Send event information to clients
         event.performEvent();
     }
 
-    private int[] getPlayableCards (Player player) {
+    private int[] getPlayableCards(Player player) {
         return player.getPlayableCards(this.discardPile.peek());
     }
 
     private Map<Player, Integer> getHandSizes() {
         Map<Player, Integer> mappedPlayers = new HashMap<>();
-        for (Player player : listOfPlayers) {
+        for (Player player : this.listOfPlayers) {
             int handSize = player.getHandSize();
             mappedPlayers.put(player, handSize);
         }
@@ -166,13 +168,15 @@ public class GameRound {
 
     private void changePlayer() {
         int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
-        playersIndex = (playersIndex + 1)%listOfPlayers.size();
-        this.currentPlayer = listOfPlayers.get(playersIndex);
+        playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
+        this.currentPlayer = this.listOfPlayers.get(playersIndex);
     }
 
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
-    private boolean isRoundOver() { return (getHandSizes().containsValue(0) || remainingTurns == 0); }
+    private boolean isRoundOver() {
+        return (getHandSizes().containsValue(0) || this.remainingTurns == 0);
+    }
 
     private void onRoundOver() {
         //TODO: Somehow call endGameRound in Game class
@@ -180,10 +184,10 @@ public class GameRound {
 
     //If a player loses connection he/she is removed from the listOfPlayers
     public void playerLostConnection(Player player) {
-        if (player == currentPlayer) {
-            timer.cancel();
+        if (player == this.currentPlayer) {
+            this.timer.cancel();
             prepareNewTurn();
         }
-        listOfPlayers.remove(player);
+        this.listOfPlayers.remove(player);
     }
 }

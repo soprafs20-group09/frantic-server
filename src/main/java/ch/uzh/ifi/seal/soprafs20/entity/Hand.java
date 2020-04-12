@@ -7,7 +7,7 @@ public class Hand {
     //private attributes
     private List<Card> cards;
 
-    public Hand(){
+    public Hand() {
         this.cards = new ArrayList<>();
     }
 
@@ -23,12 +23,14 @@ public class Hand {
         int counter = 0;
         if (cards.isEmpty()) {
             this.cards.add(card);
-        } else {
+        }
+        else {
             for (Card handCard : cards) {
                 if (card.getOrderKey() < handCard.getOrderKey()) {
                     this.cards.add(counter, card);
                     break;
-                } else if (card.getOrderKey() > handCard.getOrderKey() && counter == cards.size() - 1) {
+                }
+                else if (card.getOrderKey() > handCard.getOrderKey() && counter == cards.size() - 1) {
                     this.cards.add(card);
                     break;
                 }

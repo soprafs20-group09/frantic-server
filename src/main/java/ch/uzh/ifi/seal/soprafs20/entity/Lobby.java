@@ -56,7 +56,7 @@ public class Lobby implements Serializable {
     }
 
     public String getLobbyId() {
-        return lobbyId;
+        return this.lobbyId;
     }
 
     public void setLobbyId(String lobbyId) {
@@ -64,7 +64,7 @@ public class Lobby implements Serializable {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -72,7 +72,7 @@ public class Lobby implements Serializable {
     }
 
     public String getCreator() {
-        return creator;
+        return this.creator;
     }
 
     public void setCreator(String creator) {
@@ -80,42 +80,50 @@ public class Lobby implements Serializable {
     }
 
     public int getPlayers() {
-        return players;
+        return this.players;
     }
 
     public void setPlayers(int players) {
         this.players = players;
     }
 
-    public GameLength getGameDuration() { return gameDuration; }
+    public GameLength getGameDuration() {
+        return this.gameDuration;
+    }
 
-    public void setGameDuration(GameLength gameDuration) { this.gameDuration = gameDuration; }
+    public void setGameDuration(GameLength gameDuration) {
+        this.gameDuration = gameDuration;
+    }
 
     public boolean isPublic() {
-        return isPublic;
+        return this.isPublic;
     }
 
-    public void setIsPublic(boolean isPublic) {this.isPublic = isPublic; }
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 
     public boolean isPlaying() {
-        return isPlaying;
+        return this.isPlaying;
     }
 
-    public Game getGame() {return game; }
+    public Game getGame() {
+        return this.game;
+    }
 
 
     public void addPlayer(Player player) {
-        listOfPlayers.add(player.getUsername());
+        this.listOfPlayers.add(player.getUsername());
         this.players = listOfPlayers.size();
     }
 
     public void removePlayer(Player player) {
-        listOfPlayers.remove(player.getUsername());
-        this.players = listOfPlayers.size();
+        this.listOfPlayers.remove(player.getUsername());
+        this.players = this.listOfPlayers.size();
     }
 
     public List<String> getListOfPlayers() {
-        return listOfPlayers;
+        return this.listOfPlayers;
     }
 
     public void startGame(GameService gameService) {
@@ -123,7 +131,7 @@ public class Lobby implements Serializable {
         if (this.players < 2) {
             return;
         }
-        this.game = new Game(lobbyId, gameDuration);
+        this.game = new Game(this.lobbyId, this.gameDuration);
         this.game.startGame();
         this.isPlaying = true;
     }

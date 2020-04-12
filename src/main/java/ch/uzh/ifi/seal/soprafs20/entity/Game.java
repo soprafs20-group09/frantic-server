@@ -32,21 +32,21 @@ public class Game {
     }
 
     public GameRound getCurrentGameRound() {
-        return currentGameRound;
+        return this.currentGameRound;
     }
 
     public void startGame() {
         initEvents();
         shuffleEvents();
-        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events);
-        currentGameRound.startGameRound();
+        this.currentGameRound = new GameRound(this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound.startGameRound();
     }
 
     private void startNewGameRound() {
         shuffleEvents();
-        gameService.sendStartGameRound(lobbyId);
-        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events);
-        currentGameRound.startGameRound();
+        this.gameService.sendStartGameRound(this.lobbyId);
+        this.currentGameRound = new GameRound(this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound.startGameRound();
     }
 
     public void endGameRound() {
@@ -55,7 +55,8 @@ public class Game {
         if (!gameOver()) {
             //TODO: Send end of round package
             startTimer(15, false);
-        } else {
+        }
+        else {
             //TODO: Send end of game package
             startTimer(15, true);
         }
@@ -63,8 +64,8 @@ public class Game {
 
     private void updatePoints() {
         int maxPoints = 0;
-        Player playerWithMaxPoints = firstPlayer; //to make sure playerWithMaxPoints is initialized in all cases
-        for (Player player : listOfPlayers) {
+        Player playerWithMaxPoints = this.firstPlayer; //to make sure playerWithMaxPoints is initialized in all cases
+        for (Player player : this.listOfPlayers) {
             int playersPoints = player.calculatePoints();
             player.setPoints(player.getPoints() + playersPoints);
             if (playersPoints >= maxPoints) {
@@ -77,14 +78,14 @@ public class Game {
 
     //Removes all cards from the players hands
     private void removeCardsFromHands() {
-        for (Player player : listOfPlayers) {
+        for (Player player : this.listOfPlayers) {
             player.clearHand();
         }
     }
 
     private Map<String, Integer> getScores() {
         Map<String, Integer> mappedPlayers = new HashMap<>();
-        for (Player player : listOfPlayers) {
+        for (Player player : this.listOfPlayers) {
             int points = player.getPoints();
             mappedPlayers.put(player.getUsername(), points);
         }
@@ -93,7 +94,7 @@ public class Game {
 
     private boolean gameOver() {
         Map<String, Integer> scores = getScores();
-        if (Collections.max(scores.values()) >= maxPoints) {
+        if (Collections.max(scores.values()) >= this.maxPoints) {
             calculateWinners(scores);
             return true;
         }
@@ -105,7 +106,7 @@ public class Game {
         int minPoints = Collections.min(scores.values());
 
         //Add all players with minPoints to winners-list
-        for (Player player : listOfPlayers) {
+        for (Player player : this.listOfPlayers) {
             if (player.getPoints() == minPoints) {
                 this.winners.add(player);
             }
@@ -115,42 +116,56 @@ public class Game {
     //The first player is the player to the right of the player who shuffles the cards
     private void setFirstPlayer(Player playerWhoShuffleCards) {
         int playersIndex = this.listOfPlayers.indexOf(playerWhoShuffleCards);
-        playersIndex = (playersIndex + 1)%listOfPlayers.size();
-        this.firstPlayer = listOfPlayers.get(playersIndex);
+        playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
+        this.firstPlayer = this.listOfPlayers.get(playersIndex);
     }
 
     private int calculateMaxPoints() {
         int numOfPlayers = this.listOfPlayers.size();
         if (numOfPlayers <= 4) {
-            if (gameDuration == GameLength.SHORT) { return 137;
-            } else if (gameDuration == GameLength.MEDIUM) { return 154;
-            } else { return 179; }
-        } else {
-            if (gameDuration == GameLength.SHORT) { return 113;
-            } else if (gameDuration == GameLength.MEDIUM) { return 137;
-            } else { return 154; }
+            if (this.gameDuration == GameLength.SHORT) {
+                return 137;
+            }
+            else if (this.gameDuration == GameLength.MEDIUM) {
+                return 154;
+            }
+            else {
+                return 179;
+            }
+        }
+        else {
+            if (this.gameDuration == GameLength.SHORT) {
+                return 113;
+            }
+            else if (this.gameDuration == GameLength.MEDIUM) {
+                return 137;
+            }
+            else {
+                return 154;
+            }
         }
     }
 
     //If a player loses connection he/she is removed from the listOfPlayers
     public void playerLostConnection(Player player) {
-        listOfPlayers.remove(player);
+        this.listOfPlayers.remove(player);
     }
 
     public void startTimer(int seconds, boolean gameOver) {
         int milliseconds = seconds * 1000;
-        timer = new Timer();
+        this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 if (gameOver) {
                     //TODO: End all Websocket connections of a lobby
-                } else {
+                }
+                else {
                     startNewGameRound();
                 }
             }
         };
-        timer.schedule(timerTask, milliseconds);
+        this.timer.schedule(timerTask, milliseconds);
     }
 
     private void shuffleEvents() {

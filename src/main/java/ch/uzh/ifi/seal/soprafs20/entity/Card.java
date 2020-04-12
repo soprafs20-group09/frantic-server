@@ -36,11 +36,17 @@ public abstract class Card {
         return type;
     }
 
-    public String getKey() { return key; }
+    public String getKey() {
+        return key;
+    }
 
-    public int getOrderKey() { return orderKey; }
+    public int getOrderKey() {
+        return orderKey;
+    }
 
-    public boolean isCounterable() { return isCounterable; }
+    public boolean isCounterable() {
+        return isCounterable;
+    }
 
 
     public abstract void performAction();
@@ -56,7 +62,7 @@ public abstract class Card {
         return "Card: " + this.color.toString() + ", " + this.value.toString() + ", " + this.type.toString();
     }
 
-    public String keysToString(){
+    public String keysToString() {
         return "Card key of " + this.color + this.value + ": " + this.key + ", " + String.valueOf(this.orderKey);
     }
 
