@@ -33,13 +33,20 @@ public class Player implements Serializable {
     @Column
     private String lobbyId;
 
+    @Transient
     private int points;
 
     @Transient
-    private Hand hand;
+    private final Hand hand;
 
     @Transient
     private boolean blocked;
+
+    public Player() {
+        this.hand = new Hand();
+        this.points = 0;
+        this.blocked = false;
+    }
 
     public Long getId() {
         return id;
@@ -101,7 +108,9 @@ public class Player implements Serializable {
         this.blocked = blocked;
     }
 
-    public int getHandSize() {return hand.size(); }
+    public int getHandSize() {
+        return hand.size();
+    }
 
     public boolean isAdmin() {
         return admin;
@@ -118,7 +127,8 @@ public class Player implements Serializable {
             if (card.value == Value.NICETRY) {
                 result.add(i);
                 return result;
-            };
+            }
+            ;
             hand.push(card);
         }
         return result;
@@ -136,15 +146,17 @@ public class Player implements Serializable {
         return result;
     }
 
-    public int calculatePoints(){
+    public int calculatePoints() {
         int handPoints = 0;
         for (int i = 0; i < hand.size(); i++) {
             Card card = hand.pop(i);
             if (card.getValue().ordinal() < 9) {
                 handPoints += card.getValue().ordinal();
-            } else if (card.getValue().ordinal() < 17){
+            }
+            else if (card.getValue().ordinal() < 17) {
                 handPoints += 7;
-            } else {
+            }
+            else {
                 handPoints += 42;
             }
             hand.push(card);
@@ -165,6 +177,6 @@ public class Player implements Serializable {
                 playable.add(i);
             }
         }
-        return playable.stream().mapToInt(i->i).toArray();
+        return playable.stream().mapToInt(i -> i).toArray();
     }
 }
