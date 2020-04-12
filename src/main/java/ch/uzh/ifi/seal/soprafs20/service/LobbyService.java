@@ -234,6 +234,9 @@ public class LobbyService {
         if (lobbyRepository.findByLobbyId(lobbyId).getPlayers() >= 8) {
             throw new ResponseStatusException(HttpStatus.GONE, "Lobby is full.");
         }
+        if (lobbyRepository.findByLobbyId(lobbyId).isPlaying()) {
+            throw new ResponseStatusException(HttpStatus.GONE, "The game has already started");
+        }
     }
 
     public void checkLobbyCreate(String username) {

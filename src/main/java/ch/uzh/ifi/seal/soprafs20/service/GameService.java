@@ -45,7 +45,7 @@ public class GameService {
             if (playerRepository.findByIdentity(identity).isAdmin()) {
                 Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
                 sendStartGame(lobbyId);
-                lobby.startGame(this);
+                lobby.startGame();
             }
         }
     }
