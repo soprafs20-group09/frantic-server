@@ -22,11 +22,11 @@ public class GameRound {
     private final GameService gameService;
 
 
-    public GameRound(String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events, GameService gameService) {
+    public GameRound(String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events) {
         this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
-        this.gameService = gameService;
+        this.gameService = GameService.getInstance();
         this.actionStack = new ActionStack();
         this.remainingTurns = -1; //indicates that there is no limit
         this.events = events;
@@ -40,7 +40,8 @@ public class GameRound {
         //move 7 initial cards to player hands
         for (Player player : listOfPlayers) {
             for (int i = 1; i<=7; i++) {
-                player.pushCardToHand(drawStack.pop());
+                Card card = drawStack.pop();
+                player.pushCardToHand(card);
             }
         }
         //move initial card to discardPile
@@ -127,9 +128,7 @@ public class GameRound {
         for (int i = 1; i<=amount; i++) {
             player.pushCardToHand(drawStack.pop());
         }
-        for (Player p : listOfPlayers) {
-            gameService.sendHand(lobbyId, p);
-        }
+        gameService.sendHand(lobbyId, player);
     }
 
     //A player can finish a turn by clicking a button (if he drew a card before)

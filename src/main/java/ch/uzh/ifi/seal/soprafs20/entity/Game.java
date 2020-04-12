@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.entity.events.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 
 import java.util.*;
 
@@ -18,14 +19,14 @@ public class Game {
     private List<Event> events;
     private Timer timer;
 
-    private final GameService gameService;
+    private GameService gameService;
 
-    public Game(String lobbyId, GameLength gameDuration, List<Player> listOfPlayers, GameService gameService) {
+    public Game(String lobbyId, GameLength gameDuration) {
+        this.gameService = GameService.getInstance();
         this.lobbyId = lobbyId;
         this.gameDuration = gameDuration;
-        this.listOfPlayers = listOfPlayers;
+        this.listOfPlayers = PlayerService.getInstance().getPlayersInLobby(lobbyId);
         this.firstPlayer = listOfPlayers.get(0);
-        this.gameService = gameService;
         this.maxPoints = calculateMaxPoints();
         this.events = new ArrayList<>();
     }
@@ -37,14 +38,14 @@ public class Game {
     public void startGame() {
         initEvents();
         shuffleEvents();
-        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events, gameService);
+        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events);
         currentGameRound.startGameRound();
     }
 
     private void startNewGameRound() {
         shuffleEvents();
         gameService.sendStartGameRound(lobbyId);
-        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events, gameService);
+        this.currentGameRound = new GameRound(lobbyId, listOfPlayers, firstPlayer, events);
         currentGameRound.startGameRound();
     }
 
