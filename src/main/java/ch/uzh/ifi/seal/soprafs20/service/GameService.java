@@ -6,9 +6,9 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.StartGameDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +24,20 @@ public class GameService {
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
+    private static GameService instance;
+
+    @Autowired
     public GameService(WebSocketService webSocketService,
                        @Qualifier("playerRepository") PlayerRepository playerRepository,
                        @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.webSocketService = webSocketService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
+        instance = this;
+    }
+
+    public static GameService getInstance() {
+        return instance;
     }
 
     public void startGame(String lobbyId, String identity) {
@@ -59,11 +67,11 @@ public class GameService {
     }
 
     public void sendStartGame(String lobbyId) {
-        webSocketService.sendToLobby(lobbyId, "/start-game", new StartGameDTO());
+        webSocketService.sendToLobby(lobbyId, "/start-game", "{}");
     }
 
     public void sendStartGameRound(String lobbyId) {
-        webSocketService.sendToLobby(lobbyId, "/start-round", new StartGameRoundDTO());
+        webSocketService.sendToLobby(lobbyId, "/start-round", "{}");
     }
 
     public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
@@ -109,6 +117,7 @@ public class GameService {
     private CardDTO[] generateCardBackDTO(int n) {
         CardDTO[] response = new CardDTO[n];
         for (int i = 0; i < n; i++) {
+            response[i] = new CardDTO();
             response[i].setType("back");
         }
         return response;
@@ -118,6 +127,7 @@ public class GameService {
         PlayerStateDTO[] response = new PlayerStateDTO[players.size()];
         for (int i = 0; i < players.size(); i++) {
             Player p = players.get(i);
+            response[i] = new PlayerStateDTO();
             response[i].setUsername(p.getUsername());
             response[i].setPoints(p.getPoints());
             response[i].setSkipped(p.isBlocked());
