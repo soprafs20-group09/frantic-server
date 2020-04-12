@@ -67,11 +67,11 @@ public class GameService {
     }
 
     public void sendStartGame(String lobbyId) {
-        webSocketService.sendToLobby(lobbyId, "/start-game", "{}");
+        webSocketService.sendToLobby(lobbyId, "/start-game");
     }
 
     public void sendStartGameRound(String lobbyId) {
-        webSocketService.sendToLobby(lobbyId, "/start-round", "{}");
+        webSocketService.sendToLobby(lobbyId, "/start-round");
     }
 
     public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
@@ -85,18 +85,18 @@ public class GameService {
         HandDTO hand = new HandDTO();
         CardDTO[] cards = new CardDTO[player.getHandSize()];
         for (int i = 0; i < player.getHandSize(); i++) {
-            Card card = player.peekCard(i);
-            cards[i] = cardToDTO(card);
+            cards[i] = cardToDTO(player.peekCard(i));
         }
         hand.setCards(cards);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", hand);
     }
 
-    public void sendStartTurn(String lobbyId, String currentPlayer, int time) {
+    public void sendStartTurn(String lobbyId, String currentPlayer, int time, int turn) {
         StartTurnDTO start = new StartTurnDTO();
         start.setCurrentPlayer(currentPlayer);
         start.setTime(time);
-        webSocketService.sendToLobby(lobbyId, "start-turn", start);
+        start.setTurn(turn);
+        webSocketService.sendToLobby(lobbyId, "/start-turn", start);
     }
 
     public void sendPlayableCards(String lobbyId, Player player, int[] playable) {
@@ -114,11 +114,12 @@ public class GameService {
         return response;
     }
 
-    private CardDTO[] generateCardBackDTO(int n) {
-        CardDTO[] response = new CardDTO[n];
-        for (int i = 0; i < n; i++) {
+    private CardDTO[] generateCardBackDTO(Player player) {
+        CardDTO[] response = new CardDTO[player.getHandSize()];
+        for (int i = 0; i < player.getHandSize(); i++) {
             response[i] = new CardDTO();
             response[i].setType("back");
+            response[i].setKey(player.peekCard(i).getKey());
         }
         return response;
     }
@@ -126,12 +127,12 @@ public class GameService {
     private PlayerStateDTO[] playersToDTO(List<Player> players) {
         PlayerStateDTO[] response = new PlayerStateDTO[players.size()];
         for (int i = 0; i < players.size(); i++) {
-            Player p = players.get(i);
+            Player player = players.get(i);
             response[i] = new PlayerStateDTO();
-            response[i].setUsername(p.getUsername());
-            response[i].setPoints(p.getPoints());
-            response[i].setSkipped(p.isBlocked());
-            response[i].setCards(generateCardBackDTO(p.getHandSize()));
+            response[i].setUsername(player.getUsername());
+            response[i].setPoints(player.getPoints());
+            response[i].setSkipped(player.isBlocked());
+            response[i].setCards(generateCardBackDTO(player));
         }
         return response;
     }
