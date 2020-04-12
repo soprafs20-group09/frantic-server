@@ -78,7 +78,7 @@ public class GameRound {
 
     private void startTurn() {
         this.turnNumber += 1;
-        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30);
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
         startTimer(30);
         this.currentPlayerDrewCard = false;

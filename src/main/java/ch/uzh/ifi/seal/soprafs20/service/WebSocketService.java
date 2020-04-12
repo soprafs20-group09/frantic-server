@@ -55,6 +55,10 @@ public class WebSocketService {
         simp.convertAndSendToUser(identity, "/queue/lobby/" + lobbyId + destination, dto);
     }
 
+    protected void sendToLobby(String lobbyId, String destination) {
+        sendToLobby(lobbyId, destination, "{}");
+    }
+
     protected void sendToLobby(String lobbyId, String destination, Object dto) {
         List<Player> lobby = playerRepository.findByLobbyId(lobbyId);
         for (Player player : lobby) {
