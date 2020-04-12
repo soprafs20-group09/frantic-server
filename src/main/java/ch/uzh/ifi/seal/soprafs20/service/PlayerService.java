@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * User Service
  * This class is the "worker" and responsible for all functionality related to the user
@@ -26,11 +28,18 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
+    private static PlayerService instance;
+
     @Autowired
     public PlayerService(@Qualifier("playerRepository") PlayerRepository playerRepository,
                          @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
+        instance = this;
+    }
+
+    public static PlayerService getInstance() {
+        return instance;
     }
 
     public Player createPlayer(String identity, String username) {
@@ -72,5 +81,9 @@ public class PlayerService {
             return null;
         }
         return currentLobby.getLobbyId();
+    }
+
+    public List<Player> getPlayersInLobby(String lobbyId) {
+        return playerRepository.findByLobbyId(lobbyId);
     }
 }
