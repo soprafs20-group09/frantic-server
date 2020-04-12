@@ -13,6 +13,7 @@ public class GameRound {
     private boolean currentPlayerDrewCard;
     private Timer timer;
     private boolean timebomb; // indicates if the timebomb-event is currently running
+    private int turnNumber;
     private int remainingTurns;
     private List events;
     private ActionStack actionStack;
@@ -28,6 +29,7 @@ public class GameRound {
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
         this.actionStack = new ActionStack();
+        this.turnNumber = 0;
         this.remainingTurns = -1; //indicates that there is no limit
         this.events = events;
     }
@@ -73,6 +75,7 @@ public class GameRound {
     }
 
     private void startTurn() {
+        this.turnNumber += 1;
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
         startTimer(30);
