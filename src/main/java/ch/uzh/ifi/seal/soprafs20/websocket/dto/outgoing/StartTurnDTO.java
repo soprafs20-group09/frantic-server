@@ -6,6 +6,8 @@ public class StartTurnDTO {
 
     private int time;
 
+    private int turn;
+
     public String getCurrentPlayer() {
         return currentPlayer;
     }
@@ -20,5 +22,13 @@ public class StartTurnDTO {
 
     public void setTime(int time) {
         this.time = time;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
     }
 }
