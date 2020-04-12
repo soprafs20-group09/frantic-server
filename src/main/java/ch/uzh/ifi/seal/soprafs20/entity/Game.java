@@ -148,6 +148,10 @@ public class Game {
 
     //If a player loses connection he/she is removed from the listOfPlayers
     public void playerLostConnection(Player player) {
+        //in case the connection is lost during initialization
+        if (this.currentGameRound != null) {
+            this.currentGameRound.playerLostConnection(player);
+        }
         this.listOfPlayers.remove(player);
     }
 

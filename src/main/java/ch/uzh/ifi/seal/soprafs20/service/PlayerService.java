@@ -74,10 +74,16 @@ public class PlayerService {
             currentLobby.removePlayer(player);
             lobbyRepository.flush();
 
+            //remove player from game
+            if (currentLobby.isPlaying()) {
+                currentLobby.getGame().playerLostConnection(player);
+            }
+
             //remove player from PlayerRepository
             playerRepository.delete(player);
             playerRepository.flush();
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e) {
             return null;
         }
         return currentLobby.getLobbyId();

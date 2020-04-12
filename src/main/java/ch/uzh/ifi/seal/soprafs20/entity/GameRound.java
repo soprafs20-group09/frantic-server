@@ -198,6 +198,5 @@ public class GameRound {
             this.timer.cancel();
             prepareNewTurn();
         }
-        this.listOfPlayers.remove(player);
     }
 }
