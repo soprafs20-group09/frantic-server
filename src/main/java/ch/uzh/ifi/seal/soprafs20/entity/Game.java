@@ -38,14 +38,14 @@ public class Game {
     public void startGame() {
         initEvents();
         shuffleEvents();
-        this.currentGameRound = new GameRound(this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
         this.currentGameRound.startGameRound();
     }
 
     private void startNewGameRound() {
         shuffleEvents();
         this.gameService.sendStartGameRound(this.lobbyId);
-        this.currentGameRound = new GameRound(this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
         this.currentGameRound.startGameRound();
     }
 

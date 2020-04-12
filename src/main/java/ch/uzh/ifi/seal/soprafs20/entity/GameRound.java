@@ -7,6 +7,7 @@ import java.util.*;
 
 public class GameRound {
 
+    private Game game;
     private String lobbyId;
     private List<Player> listOfPlayers;
     private Player currentPlayer;
@@ -23,7 +24,8 @@ public class GameRound {
     private final GameService gameService;
 
 
-    public GameRound(String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events) {
+    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events) {
+        this.game = game;
         this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
@@ -182,7 +184,7 @@ public class GameRound {
     }
 
     private void onRoundOver() {
-        //TODO: Somehow call endGameRound in Game class
+        this.game.endGameRound();
     }
 
     //If a player loses connection he/she is removed from the listOfPlayers
