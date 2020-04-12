@@ -60,4 +60,23 @@ public class LobbyTest {
         assertEquals(lobby.getListOfPlayers().get(0), testPlayer1.getUsername());
         assertEquals(lobby.getListOfPlayers().get(1), testPlayer2.getUsername());
     }
+
+    @Test
+    void startGame_unsuccessful() {
+        Lobby lobby = new Lobby();
+        Player testPlayer1 = new Player();
+        testPlayer1.setUsername("testPlayer1");
+        lobby.addPlayer(testPlayer1);
+
+        //before
+        assertNull(lobby.getGame());
+        assertFalse(lobby.isPlaying());
+        assertEquals(1, lobby.getPlayers());
+
+        lobby.startGame();
+
+        //after
+        assertNull(lobby.getGame());
+        assertFalse(lobby.isPlaying());
+    }
 }

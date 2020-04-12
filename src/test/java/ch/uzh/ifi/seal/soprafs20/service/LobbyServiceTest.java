@@ -180,7 +180,7 @@ public class LobbyServiceTest {
         testSettings.setPublicLobby(false);
         testState.setSettings(testSettings);
 
-        lobbyService.updateLobbySettings( "abc", "abc", testSettings);
+        lobbyService.updateLobbySettings("abc", "abc", testSettings);
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
         assertEquals(testSettings.getDuration(), response.getSettings().getDuration());
@@ -203,7 +203,8 @@ public class LobbyServiceTest {
     public void checkLobbyCreate_InputNull_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(null);
-        } catch (ResponseStatusException ex) {
+        }
+        catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.BAD_REQUEST);
             return;
         }
@@ -214,35 +215,41 @@ public class LobbyServiceTest {
     public void checkLobbyCreate_InputNotValid_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(" ");
-        } catch (ResponseStatusException ex) {
+        }
+        catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.BAD_REQUEST);
             return;
         }
         fail("ResponseStatusException expected");
     }
 
-    @Test void checkLobbyJoin_LobbyNotFound_throwResponseStatusException() {
+    @Test
+    void checkLobbyJoin_LobbyNotFound_throwResponseStatusException() {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(null);
         try {
             lobbyService.checkLobbyJoin("abc", "username");
-        } catch (ResponseStatusException ex) {
+        }
+        catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.NOT_FOUND);
             return;
         }
         fail("ResponseStatusException expected");
     }
 
-    @Test void checkLobbyJoin_UsernameAlreadyInLobby_throwResponseStatusException() {
+    @Test
+    void checkLobbyJoin_UsernameAlreadyInLobby_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyJoin("abc", "testPlayer");
-        } catch (ResponseStatusException ex) {
+        }
+        catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.CONFLICT);
             return;
         }
         fail("ResponseStatusException expected");
     }
 
-    @Test void checkLobbyJoin_LobbyFull_throwResponseStatusException() {
+    @Test
+    void checkLobbyJoin_LobbyFull_throwResponseStatusException() {
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
@@ -251,7 +258,21 @@ public class LobbyServiceTest {
         testLobby.addPlayer(testPlayer);
         try {
             lobbyService.checkLobbyJoin("abc", "username");
-        } catch (ResponseStatusException ex) {
+        }
+        catch (ResponseStatusException ex) {
+            assertEquals(ex.getStatus(), HttpStatus.GONE);
+            return;
+        }
+        fail("ResponseStatusException expected");
+    }
+
+    @Test
+    void checkLobbyJoin_GameAlreadyStarted_throwResponseStatusException() {
+        testLobby.setIsPlaying(true);
+        try {
+            lobbyService.checkLobbyJoin("abc", "username");
+        }
+        catch (ResponseStatusException ex) {
             assertEquals(ex.getStatus(), HttpStatus.GONE);
             return;
         }

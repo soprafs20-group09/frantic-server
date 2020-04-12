@@ -107,6 +107,10 @@ public class Lobby implements Serializable {
         return this.isPlaying;
     }
 
+    public void setIsPlaying(boolean isPlaying) {
+        this.isPlaying = isPlaying;
+    }
+
     public Game getGame() {
         return this.game;
     }
@@ -126,7 +130,7 @@ public class Lobby implements Serializable {
         return this.listOfPlayers;
     }
 
-    public void startGame(GameService gameService) {
+    public void startGame() {
         //The game can only be started if there are more than one player in the lobby
         if (this.players < 2) {
             return;
