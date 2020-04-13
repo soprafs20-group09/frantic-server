@@ -69,6 +69,7 @@ public class GameRound {
         if (!isRoundOver()) {
             changePlayer();
             sendGameState();
+            this.currentPlayerDrewCard = false;
             startTurn();
         }
         else {
@@ -81,20 +82,13 @@ public class GameRound {
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
         startTimer(30);
-        this.currentPlayerDrewCard = false;
     }
 
     private void finishTurn() {
-        this.timer.cancel();
-        prepareNewTurn();
-    }
-
-    //this method is called when the timer runs out
-    private void abortTurn() {
-        this.timer.cancel();
         if (!this.currentPlayerDrewCard) {
             drawCardFromStack(this.currentPlayer, 1);
         }
+        this.timer.cancel();
         prepareNewTurn();
     }
 
@@ -104,7 +98,7 @@ public class GameRound {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                abortTurn();
+                finishTurn();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
@@ -113,14 +107,15 @@ public class GameRound {
     public void playCard(Player player, int index) {
         Card uppermostCard = this.discardPile.peek();
         Card cardToPlay = player.peekCard(index);
-        if (player == this.currentPlayer && cardToPlay != null) {
-            if (cardToPlay.isPlayable(uppermostCard)) {
-                this.discardPile.push(player.popCard(index));
-                finishTurn();
-            }
+        if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
+            return;
+        }
+        if (player == this.currentPlayer) {
+            this.discardPile.push(player.popCard(index));
+            finishTurn();
         }
         else {
-            // needed later for special cards
+            // needed later for Counter attack & nice try
         }
     }
 
@@ -141,13 +136,6 @@ public class GameRound {
             player.pushCardToHand(this.drawStack.pop());
         }
         this.gameService.sendHand(this.lobbyId, player);
-    }
-
-    //A player can finish a turn by clicking a button (if he drew a card before)
-    private void currentPlayerFinishTurn() {
-        if (this.currentPlayerDrewCard) {
-            finishTurn();
-        }
     }
 
     private Card takeRandomCard(Player player) {
@@ -180,6 +168,21 @@ public class GameRound {
         int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
         playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
         this.currentPlayer = this.listOfPlayers.get(playersIndex);
+
+        //go to the next player, if the current player is skipped
+        if (this.currentPlayer.isBlocked()) {
+            this.currentPlayer.setBlocked(false);
+            changePlayer();
+        }
+    }
+
+    //A player can only be skipped, if he/she was not skipped before
+    public boolean skip(Player player) {
+        if (player.isBlocked()) {
+            return false;
+        }
+        player.setBlocked(true);
+        return true;
     }
 
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
@@ -192,11 +195,11 @@ public class GameRound {
         this.game.endGameRound();
     }
 
-    //If a player loses connection he/she is removed from the listOfPlayers
     public void playerLostConnection(Player player) {
         if (player == this.currentPlayer) {
             this.timer.cancel();
             prepareNewTurn();
         }
+        sendGameState();
     }
 }
