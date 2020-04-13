@@ -3,8 +3,11 @@ package ch.uzh.ifi.seal.soprafs20.service;
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +36,17 @@ public class LobbyServiceTest {
     private LobbyService lobbyService;
     @Mock
     private WebSocketService webSocketService;
+    @Mock
+    private PlayerService playerService;
     @InjectMocks
     private Lobby testLobby;
     @InjectMocks
     private LobbySettingsDTO testSettings;
     @InjectMocks
     private LobbyStateDTO testState;
+    @InjectMocks
+    private ChatDTO chat;
+
 
     @BeforeEach
     public void setup() {
@@ -61,6 +69,7 @@ public class LobbyServiceTest {
         Mockito.when(lobbyRepository.save(Mockito.any())).thenReturn(testLobby);
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(testLobby);
         Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
+        Mockito.when(playerRepository.findByIdentity(Mockito.any())).thenReturn(testPlayer);
         Mockito.when(playerRepository.findByUsernameAndLobbyId(Mockito.any(), Mockito.any())).thenReturn(testPlayer);
     }
 
@@ -146,7 +155,6 @@ public class LobbyServiceTest {
 
     @Test
     public void joinLobby_addPlayer() {
-        Mockito.when(playerRepository.findByIdentity(Mockito.any())).thenReturn(testPlayer);
         lobbyService.joinLobby("abc", testPlayer);
 
         Mockito.verify(lobbyRepository, Mockito.times(1)).findByLobbyId(Mockito.any());
@@ -200,7 +208,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void checkLobbyCreate_InputNull_throwResponseStatusException() {
+    public void checkLobbyCreate_inputNull_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(null);
         }
@@ -212,7 +220,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void checkLobbyCreate_InputNotValid_throwResponseStatusException() {
+    public void checkLobbyCreate_inputNotValid_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(" ");
         }
@@ -224,7 +232,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void checkLobbyJoin_LobbyNotFound_throwResponseStatusException() {
+    void checkLobbyJoin_lobbyNotFound_throwResponseStatusException() {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(null);
         try {
             lobbyService.checkLobbyJoin("abc", "username");
@@ -237,7 +245,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void checkLobbyJoin_UsernameAlreadyInLobby_throwResponseStatusException() {
+    void checkLobbyJoin_usernameAlreadyInLobby_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyJoin("abc", "testPlayer");
         }
@@ -249,7 +257,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void checkLobbyJoin_LobbyFull_throwResponseStatusException() {
+    void checkLobbyJoin_lobbyFull_throwResponseStatusException() {
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
@@ -267,7 +275,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void checkLobbyJoin_GameAlreadyStarted_throwResponseStatusException() {
+    void checkLobbyJoin_gameAlreadyStarted_throwResponseStatusException() {
         testLobby.setIsPlaying(true);
         try {
             lobbyService.checkLobbyJoin("abc", "username");
@@ -277,5 +285,53 @@ public class LobbyServiceTest {
             return;
         }
         fail("ResponseStatusException expected");
+    }
+
+    @Test
+    void kickPlayer_notAdmin_throwResponseStatusException() {
+        KickDTO kick = new KickDTO();
+        try {
+            lobbyService.kickPlayer("abc", "identity", kick);
+        }
+        catch (PlayerServiceException ex) {
+            assertEquals("Invalid action. Not admin.", ex.getMessage());
+        }
+    }
+
+    @Test
+    void handleDisconnect_notAdmin_sendToLobby() {
+        Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
+
+        lobbyService.handleDisconnect("abc");
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/lobby-state"), Mockito.any());
+    }
+
+    @Test
+    void handleDisconnect_admin_sendDisconnectToLobby() {
+        testPlayer.setAdmin(true);
+        Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
+
+        lobbyService.handleDisconnect("abc");
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendDisconnectToLobby(Mockito.matches("lobbyId"), Mockito.any());
+    }
+
+    @Test
+    void sendChatMessage_invalidContent_notSendToLobby() {
+        this.chat.setMessage(" ");
+
+        lobbyService.sendChatMessage("lobbyId", "identity", this.chat);
+
+        Mockito.verify(webSocketService, Mockito.times(0)).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void sendChatMessage_validContent_SendToLobby() {
+        this.chat.setMessage("message");
+
+        lobbyService.sendChatMessage("lobbyId", "identity", this.chat);
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/chat"), Mockito.any());
     }
 }
