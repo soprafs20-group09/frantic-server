@@ -288,7 +288,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void kickPlayer_notAdmin_throwResponseStatusException() {
+    void kickPlayer_notAdmin_throwPlayerServiceException() {
         KickDTO kick = new KickDTO();
         try {
             lobbyService.kickPlayer("abc", "identity", kick);
