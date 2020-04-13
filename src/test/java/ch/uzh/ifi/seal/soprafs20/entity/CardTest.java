@@ -23,8 +23,13 @@ class CardTest {
         NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
         NumberCard red1 = new NumberCard(Color.RED, 1, 2);
         NumberCard blue4 = new NumberCard(Color.BLUE, 4, 3);
+        NumberCard black5 = new NumberCard(Color.BLACK, 5, 4);
+        NumberCard blue8 = new NumberCard(Color.BLUE, 8, 5);
+        NumberCard blue9 = new NumberCard(Color.BLUE, 9, 6);
 
         assertTrue(blue1.isPlayable(red1));
         assertTrue(blue1.isPlayable(blue4));
+        assertFalse(black5.isPlayable(blue1));
+        assertTrue(blue9.isPlayable(blue8));
     }
 }

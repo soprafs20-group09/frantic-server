@@ -55,7 +55,9 @@ public abstract class Card {
         if (this.getColor() == Color.BLACK) {
             return this.getValue() == other.getValue();
         }
-        return this.getColor() == other.getColor() || this.getValue() == other.getValue();
+        else {
+            return (this.getColor() == other.getColor() || this.getValue() == other.getValue());
+        }
     }
 
     public String toString() {
