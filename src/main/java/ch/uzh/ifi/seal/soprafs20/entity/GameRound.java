@@ -11,7 +11,7 @@ public class GameRound {
     private String lobbyId;
     private List<Player> listOfPlayers;
     private Player currentPlayer;
-    private boolean currentPlayerDrewCard;
+    private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
     private boolean timebomb; // indicates if the timebomb-event is currently running
     private int turnNumber;
@@ -53,10 +53,10 @@ public class GameRound {
     }
 
     private void sendGameState() {
-        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
         for (Player player : this.listOfPlayers) {
             this.gameService.sendHand(this.lobbyId, player);
         }
+        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
     }
 
     public void startGameRound() {
@@ -69,7 +69,7 @@ public class GameRound {
         if (!isRoundOver()) {
             changePlayer();
             sendGameState();
-            this.currentPlayerDrewCard = false;
+            this.hasCurrentPlayerMadeMove = false;
             startTurn();
         }
         else {
@@ -85,7 +85,7 @@ public class GameRound {
     }
 
     private void finishTurn() {
-        if (!this.currentPlayerDrewCard) {
+        if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
         this.timer.cancel();
@@ -106,7 +106,8 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void playCard(Player player, int index) {
+    public void playCard(String identity, int index) {
+        Player player = getPlayerByIdentity(identity);
         Card uppermostCard = this.discardPile.peek();
         Card cardToPlay = player.peekCard(index);
         if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
@@ -114,6 +115,7 @@ public class GameRound {
         }
         if (player == this.currentPlayer) {
             this.discardPile.push(player.popCard(index));
+            this.hasCurrentPlayerMadeMove = true;
             finishTurn();
         }
         else {
@@ -122,12 +124,13 @@ public class GameRound {
     }
 
     // in a turn, the current player can choose to draw a card
+
     public void currentPlayerDrawCard() {
         drawCardFromStack(this.currentPlayer, 1);
-        this.currentPlayerDrewCard = true;
+        this.hasCurrentPlayerMadeMove = true;
     }
-
     // moves #amount cards from Stack to players hand
+
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
@@ -138,8 +141,8 @@ public class GameRound {
             player.pushCardToHand(this.drawStack.pop());
         }
         this.gameService.sendHand(this.lobbyId, player);
+        this.gameService.sendPlayableCards(this.lobbyId, player, getPlayableCards(player));
     }
-
     private Card takeRandomCard(Player player) {
         Random r = new Random();
         int handSize = player.getHandSize();
@@ -179,6 +182,7 @@ public class GameRound {
     }
 
     //A player can only be skipped, if he/she was not skipped before
+
     public boolean skip(Player player) {
         if (player.isBlocked()) {
             return false;
@@ -186,13 +190,12 @@ public class GameRound {
         player.setBlocked(true);
         return true;
     }
-
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
+
     private boolean isRoundOver() {
         return (getHandSizes().containsValue(0) || this.remainingTurns == 0);
     }
-
     private void onRoundOver() {
         this.game.endGameRound();
     }
@@ -203,5 +206,14 @@ public class GameRound {
             prepareNewTurn();
         }
         sendGameState();
+    }
+
+    private Player getPlayerByIdentity(String identity) {
+        for (Player p : listOfPlayers) {
+            if (p.getIdentity().equals(identity)) {
+                return p;
+            }
+        }
+        return null;
     }
 }

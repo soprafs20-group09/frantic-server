@@ -28,6 +28,7 @@ public class Game {
         this.listOfPlayers = PlayerService.getInstance().getPlayersInLobby(lobbyId);
         this.firstPlayer = listOfPlayers.get(0);
         this.maxPoints = calculateMaxPoints();
+        this.winners = new ArrayList<>();
         this.events = new ArrayList<>();
     }
 

@@ -1,8 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
@@ -52,17 +51,15 @@ public class GameService {
 
     public void playCard(String lobbyId, String identity, PlayCardDTO play) {
         if (webSocketService.checkSender(lobbyId, identity)) {
-            Player player = playerRepository.findByIdentity(identity);
-            Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            lobby.getGame().getCurrentGameRound().playCard(player, play.getIndex());
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().playCard(identity, play.getIndex());
         }
     }
 
     public void drawCard(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
-            Player player = playerRepository.findByIdentity(identity);
-            Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-            lobby.getGame().getCurrentGameRound().currentPlayerDrawCard();
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().currentPlayerDrawCard();
         }
     }
 
