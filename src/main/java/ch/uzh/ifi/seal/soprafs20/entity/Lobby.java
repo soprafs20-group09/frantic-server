@@ -1,7 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
-import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import javax.persistence.*;
@@ -42,10 +42,6 @@ public class Lobby implements Serializable {
 
     @Transient
     private boolean isPlaying;
-
-    @Transient
-    private Game game;
-
 
     public Lobby() {
         this.lobbyId = FranticUtils.generateId(8);
@@ -111,11 +107,6 @@ public class Lobby implements Serializable {
         this.isPlaying = isPlaying;
     }
 
-    public Game getGame() {
-        return this.game;
-    }
-
-
     public void addPlayer(Player player) {
         this.listOfPlayers.add(player.getUsername());
         this.players = listOfPlayers.size();
@@ -135,8 +126,9 @@ public class Lobby implements Serializable {
         if (this.players < 2) {
             return;
         }
-        this.game = new Game(this.lobbyId, this.gameDuration);
-        this.game.startGame();
+        Game game = new Game(this.lobbyId, this.gameDuration);
+        GameRepository.addGame(this.lobbyId, game);
+        game.startGame();
         this.isPlaying = true;
     }
 }

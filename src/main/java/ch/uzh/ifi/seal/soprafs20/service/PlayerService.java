@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
@@ -76,7 +77,7 @@ public class PlayerService {
 
             //remove player from game
             if (currentLobby.isPlaying()) {
-                currentLobby.getGame().playerLostConnection(player);
+                GameRepository.findByLobbyId(currentLobby.getLobbyId()).playerLostConnection(player);
             }
 
             //remove player from PlayerRepository
