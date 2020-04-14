@@ -89,6 +89,8 @@ public class GameRound {
             drawCardFromStack(this.currentPlayer, 1);
         }
         this.timer.cancel();
+        //return empty playable cards after turn finished
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         prepareNewTurn();
     }
 
