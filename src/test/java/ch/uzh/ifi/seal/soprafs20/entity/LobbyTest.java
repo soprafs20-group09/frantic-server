@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,14 +70,14 @@ public class LobbyTest {
         lobby.addPlayer(testPlayer1);
 
         //before
-        assertNull(lobby.getGame());
+        assertNull(GameRepository.findByLobbyId(lobby.getLobbyId()));
         assertFalse(lobby.isPlaying());
         assertEquals(1, lobby.getPlayers());
 
         lobby.startGame();
 
         //after
-        assertNull(lobby.getGame());
+        assertNull(GameRepository.findByLobbyId(lobby.getLobbyId()));
         assertFalse(lobby.isPlaying());
     }
 }
