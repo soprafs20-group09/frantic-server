@@ -133,6 +133,7 @@ public class GameRound {
             if (player == this.currentPlayer) {
                 cardToPlay = player.popCard(index);
                 this.discardPile.push(cardToPlay);
+                this.gameService.sendHand(this.lobbyId, player);
                 this.hasCurrentPlayerMadeMove = true;
 
                 if (cardToPlay.getType() == Type.NUMBER) {
@@ -152,7 +153,6 @@ public class GameRound {
             else {
                 // needed later for Counter attack & nice try
             }
-            this.gameService.sendHand(this.lobbyId, player);
         }
     }
 
