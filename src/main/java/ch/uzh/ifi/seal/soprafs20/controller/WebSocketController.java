@@ -22,7 +22,6 @@ public class WebSocketController {
 
     @MessageMapping("/register")
     public void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO registerDTO) throws Exception {
-
         String identity = sha.getUser().getName();
         registerService.joinLobby(identity, registerDTO);
     }

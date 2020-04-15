@@ -162,7 +162,7 @@ public class GameRound {
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.size() <= 0) {
+            if (this.drawStack.isEmpty()) {
                 this.timer.cancel();
                 onRoundOver();
             }
@@ -178,7 +178,7 @@ public class GameRound {
     }
 
     private void performEvent() {
-        Event event = (Event) this.events.remove(0);
+        Event event = this.events.remove(0);
         //TODO: Send event information to clients
         event.performEvent();
     }

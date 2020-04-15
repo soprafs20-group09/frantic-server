@@ -21,28 +21,28 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/start-game")
     public void startGame(@DestinationVariable String lobbyId,
-                                    SimpMessageHeaderAccessor sha, StartGameDTO startGameDTO) throws Exception {
+                                    SimpMessageHeaderAccessor sha, StartGameDTO startGameDTO) {
         String identity = sha.getUser().getName();
         gameService.startGame(lobbyId, identity);
     }
 
     @MessageMapping("/lobby/{lobbyId}/play")
     public void playCard(@DestinationVariable String lobbyId,
-                           SimpMessageHeaderAccessor sha, PlayCardDTO playCardDTO) throws Exception {
+                           SimpMessageHeaderAccessor sha, PlayCardDTO playCardDTO) {
         String identity = sha.getUser().getName();
         gameService.playCard(lobbyId, identity, playCardDTO);
     }
 
     @MessageMapping("/lobby/{lobbyId}/draw")
     public void newChatMessage(@DestinationVariable String lobbyId,
-                               SimpMessageHeaderAccessor sha, DrawDTO drawDTO) throws Exception {
+                               SimpMessageHeaderAccessor sha, DrawDTO drawDTO) {
         String identity = sha.getUser().getName();
         gameService.drawCard(lobbyId, identity);
     }
 
     @MessageMapping("/lobby/{lobbyId}/end-turn")
     public void endTurn(@DestinationVariable String lobbyId,
-                        SimpMessageHeaderAccessor sha, EndTurnDTO endTurnDTO) throws Exception {
+                        SimpMessageHeaderAccessor sha, EndTurnDTO endTurnDTO) {
         String identity = sha.getUser().getName();
         gameService.endTurn(lobbyId, identity);
     }

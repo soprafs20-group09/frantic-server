@@ -41,7 +41,7 @@ public class RESTController {
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
 
-        log.debug(q == null ? "GET /lobbies" : "GET /lobbies?q=" + q);
+        log.debug(q == null ? "GET /lobbies" : "GET /lobbies?q={}", q);
 
         List<Lobby> lobbies = lobbyService.getLobbies(q);
         List<LobbyListElementDTO> response = new ArrayList<>();
@@ -56,7 +56,7 @@ public class RESTController {
     @ResponseBody
     public List<PlayerScoreDTO> getAllPlayerScores(@PathVariable String id) {
 
-        log.debug("GET /lobbies/" + id);
+        log.debug("GET /lobbies/{}", id);
 
         return lobbyService.getScores(id);
     }
@@ -67,7 +67,7 @@ public class RESTController {
     public LobbyJoinDTO createLobby(@Valid @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
         String username = clean(playerUsernameDTO.getUsername());
-        log.debug("POST /lobbies, body: " + playerUsernameDTO.toString());
+        log.debug("POST /lobbies, body: {}", playerUsernameDTO.toString());
 
         lobbyService.checkLobbyCreate(username);
         return registerService.prepareLobby(username);
@@ -79,7 +79,7 @@ public class RESTController {
     public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
 
         String username = clean(playerUsernameDTO.getUsername());
-        log.debug("PUT /lobbies/" + id + ", body: " + playerUsernameDTO.toString());
+        log.debug("PUT /lobbies/{}, body: {}", id, playerUsernameDTO.toString());
 
         lobbyService.checkLobbyJoin(id, username);
         return registerService.prepareLobby(id, username);
