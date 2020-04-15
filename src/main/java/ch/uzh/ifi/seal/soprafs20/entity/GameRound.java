@@ -151,7 +151,6 @@ public class GameRound {
         }
     }
 
-
     // in a turn, the current player can choose to draw a card
     public void currentPlayerDrawCard() {
         if (!this.hasCurrentPlayerMadeMove) {
@@ -166,7 +165,7 @@ public class GameRound {
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.isEmpty()) {
+            if (this.drawStack.size() <= 0) {
                 this.timer.cancel();
                 onRoundOver();
             }
