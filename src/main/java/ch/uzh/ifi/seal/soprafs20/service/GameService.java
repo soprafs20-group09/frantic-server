@@ -63,6 +63,21 @@ public class GameService {
         }
     }
 
+    public void endTurn(String lobbyId, String identity) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().finishTurn();
+        }
+    }
+
+    public void sendChatEventMessage(String lobbyId, String message) {
+        webSocketService.sendChatEventMessage(lobbyId, message);
+    }
+
+    public void sendChatPlayerMessage(String lobbyId, String message, String username) {
+        webSocketService.sendChatPlayerMessage(lobbyId, message, username);
+    }
+
     public void sendStartGame(String lobbyId) {
         webSocketService.sendToLobby(lobbyId, "/start-game");
     }

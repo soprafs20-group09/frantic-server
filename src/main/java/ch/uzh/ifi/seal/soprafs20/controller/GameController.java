@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.StartGameDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.EndTurnDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -37,5 +38,12 @@ public class GameController {
                                SimpMessageHeaderAccessor sha, DrawDTO drawDTO) throws Exception {
         String identity = sha.getUser().getName();
         gameService.drawCard(lobbyId, identity);
+    }
+
+    @MessageMapping("/lobby/{lobbyId}/end-turn")
+    public void endTurn(@DestinationVariable String lobbyId,
+                        SimpMessageHeaderAccessor sha, EndTurnDTO endTurnDTO) throws Exception {
+        String identity = sha.getUser().getName();
+        gameService.endTurn(lobbyId, identity);
     }
 }
