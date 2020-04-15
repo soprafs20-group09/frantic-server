@@ -40,7 +40,7 @@ public class WebSocketService {
     protected void sendChatPlayerMessage(String lobbyId, String message, String username) {
         ChatDTO chat = new ChatDTO();
         chat.setType("event");
-        chat.setMessage(message);
+        chat.setMessage(username + " " + message);
         chat.setIcon("avatar:" + username);
         sendToLobby(lobbyId, "/chat", chat);
     }
