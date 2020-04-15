@@ -71,7 +71,7 @@ public class Card {
     }
 
     public String keysToString() {
-        return "Card key of " + this.color + this.value + ": " + this.key + ", " + String.valueOf(this.orderKey);
+        return "Card key of " + this.color + this.value + ": " + this.key + ", " + this.orderKey;
     }
 
 }

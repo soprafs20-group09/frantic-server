@@ -120,32 +120,32 @@ public class GameRound {
 
     public void playCard(String identity, int index) {
         Player player = getPlayerByIdentity(identity);
-        Card uppermostCard = this.discardPile.peek();
-        Card cardToPlay = player.peekCard(index);
-        if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
-            return;
-        }
-        if (player == this.currentPlayer) {
-            cardToPlay = player.popCard(index);
-            this.discardPile.push(cardToPlay);
-            this.hasCurrentPlayerMadeMove = true;
-
-            if (cardToPlay.getType() == Type.NUMBER) {
-                this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
-                finishTurn();
+        if (player != null) {
+            Card uppermostCard = this.discardPile.peek();
+            Card cardToPlay = player.peekCard(index);
+            if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
+                return;
             }
-            else if (cardToPlay.getType() == Type.SPECIAL) {
-                this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
-                if (cardToPlay.getValue() == Value.SECONDCHANCE) {
-                    finishSecondChance();
+            if (player == this.currentPlayer) {
+                cardToPlay = player.popCard(index);
+                this.discardPile.push(cardToPlay);
+                this.hasCurrentPlayerMadeMove = true;
+
+                if (cardToPlay.getType() == Type.SPECIAL) {
+                    if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                        finishSecondChance();
+                    }
+                    else {
+                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                    }
                 }
                 else {
-                    this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                    finishTurn();
                 }
             }
-        }
-        else {
-            // needed later for Counter attack & nice try
+            else {
+                // needed later for Counter attack & nice try
+            }
         }
     }
 
@@ -164,7 +164,7 @@ public class GameRound {
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.size() <= 0) {
+            if (this.drawStack.isEmpty()) {
                 this.timer.cancel();
                 onRoundOver();
             }
@@ -174,14 +174,13 @@ public class GameRound {
     }
 
     private Card takeRandomCard(Player player) {
-        Random r = new Random();
         int handSize = player.getHandSize();
-        int index = r.nextInt(handSize);
+        int index = FranticUtils.random.nextInt(handSize);
         return player.popCard(index);
     }
 
     private void performEvent() {
-        Event event = (Event) this.events.remove(0);
+        Event event = this.events.remove(0);
         //TODO: Send event information to clients
         event.performEvent();
     }

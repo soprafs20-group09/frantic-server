@@ -13,7 +13,7 @@ import java.util.Random;
  */
 public class FranticUtils {
 
-    private static final Random random = new Random();
+    public static final Random random = new Random();
     private static final EnumMap<Value, String> valueMap = new EnumMap<>(Value.class);
     private static final EnumMap<Color, String> colorMap = new EnumMap<>(Color.class);
     private static final EnumMap<Type, String> typeMap = new EnumMap<>(Type.class);

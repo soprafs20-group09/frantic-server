@@ -20,21 +20,21 @@ public class LobbyController {
 
     @MessageMapping("/lobby/{lobbyId}/settings")
     public void changeLobbySettings(@DestinationVariable String lobbyId,
-                                    SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) throws Exception {
+                                    SimpMessageHeaderAccessor sha, LobbySettingsDTO lobbySettingsDTO) {
         String identity = sha.getUser().getName();
         lobbyService.updateLobbySettings(lobbyId, identity, lobbySettingsDTO);
     }
 
     @MessageMapping("/lobby/{lobbyId}/kick")
     public void kickPlayer(@DestinationVariable String lobbyId,
-                           SimpMessageHeaderAccessor sha, KickDTO kickDTO) throws Exception {
+                           SimpMessageHeaderAccessor sha, KickDTO kickDTO) {
         String identity = sha.getUser().getName();
         lobbyService.kickPlayer(lobbyId, identity, kickDTO);
     }
 
     @MessageMapping("/lobby/{lobbyId}/chat")
     public void newChatMessage(@DestinationVariable String lobbyId,
-                               SimpMessageHeaderAccessor sha, ChatDTO chatDTO) throws Exception {
+                               SimpMessageHeaderAccessor sha, ChatDTO chatDTO) {
         String identity = sha.getUser().getName();
         lobbyService.sendChatMessage(lobbyId, identity, chatDTO);
     }
