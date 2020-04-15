@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.Action;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.*;
 
@@ -118,30 +119,32 @@ public class GameRound {
 
     public void playCard(String identity, int index) {
         Player player = getPlayerByIdentity(identity);
-        Card uppermostCard = this.discardPile.peek();
-        Card cardToPlay = player.peekCard(index);
-        if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
-            return;
-        }
-        if (player == this.currentPlayer) {
-            cardToPlay = player.popCard(index);
-            this.discardPile.push(cardToPlay);
-            this.hasCurrentPlayerMadeMove = true;
+        if (player != null) {
+            Card uppermostCard = this.discardPile.peek();
+            Card cardToPlay = player.peekCard(index);
+            if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
+                return;
+            }
+            if (player == this.currentPlayer) {
+                cardToPlay = player.popCard(index);
+                this.discardPile.push(cardToPlay);
+                this.hasCurrentPlayerMadeMove = true;
 
-            if (cardToPlay.getType() == Type.SPECIAL) {
-                if (cardToPlay.getValue() == Value.SECONDCHANCE) {
-                    finishSecondChance();
+                if (cardToPlay.getType() == Type.SPECIAL) {
+                    if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                        finishSecondChance();
+                    }
+                    else {
+                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                    }
                 }
                 else {
-                    this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                    finishTurn();
                 }
             }
             else {
-                finishTurn();
+                // needed later for Counter attack & nice try
             }
-        }
-        else {
-            // needed later for Counter attack & nice try
         }
     }
 
@@ -169,9 +172,8 @@ public class GameRound {
     }
 
     private Card takeRandomCard(Player player) {
-        Random r = new Random();
         int handSize = player.getHandSize();
-        int index = r.nextInt(handSize);
+        int index = FranticUtils.random.nextInt(handSize);
         return player.popCard(index);
     }
 
