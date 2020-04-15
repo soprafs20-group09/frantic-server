@@ -59,6 +59,7 @@ public class LobbyService {
             allLobbies = lobbyRepository.findAll();
         }
         allLobbies.removeIf(lobby -> !lobby.isPublic());
+        allLobbies.removeIf(Lobby::isPlaying);
         log.debug(String.format("Retrieved list of lobbies that contain '%s'", q));
         return allLobbies;
     }
@@ -115,7 +116,7 @@ public class LobbyService {
             webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(toKick);
 
-            webSocketService.sendChatPlayerNotification(lobbyId, toKick.getUsername() + " was kicked!", toKick.getUsername());
+            webSocketService.sendChatPlayerMessage(lobbyId, toKick.getUsername() + " was kicked!", toKick.getUsername());
             webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
         }
     }
@@ -127,7 +128,7 @@ public class LobbyService {
         if (player != null) {
             String lobbyId = playerService.removePlayer(player);
             if (lobbyId != null) {
-                webSocketService.sendChatPlayerNotification(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+                webSocketService.sendChatPlayerMessage(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
                 if (player.isAdmin()) {
                     DisconnectDTO message = new DisconnectDTO();
                     message.setReason("Host left the lobby.");

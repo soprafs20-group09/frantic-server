@@ -30,14 +30,14 @@ public class WebSocketService {
         return toCheck.getLobbyId().equals(lobbyId);
     }
 
-    protected void sendChatNotification(String lobbyId, String message) {
+    protected void sendChatEventMessage(String lobbyId, String message) {
         ChatDTO chat = new ChatDTO();
         chat.setType("event");
         chat.setMessage(message);
         sendToLobby(lobbyId, "/chat", chat);
     }
 
-    protected void sendChatPlayerNotification(String lobbyId, String message, String username) {
+    protected void sendChatPlayerMessage(String lobbyId, String message, String username) {
         ChatDTO chat = new ChatDTO();
         chat.setType("event");
         chat.setMessage(message);

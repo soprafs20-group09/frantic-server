@@ -69,7 +69,7 @@ public class RegisterService {
         Thread.sleep(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
-        webSocketService.sendChatPlayerNotification(lobbyId, player.getUsername() + " joined the lobby.", player.getUsername());
+        webSocketService.sendChatPlayerMessage(lobbyId, player.getUsername() + " joined the lobby.", player.getUsername());
     }
 
     public String getUsernameFromAuthToken(String authToken) {
