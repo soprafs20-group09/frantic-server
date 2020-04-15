@@ -131,16 +131,18 @@ public class GameRound {
                 this.discardPile.push(cardToPlay);
                 this.hasCurrentPlayerMadeMove = true;
 
-                if (cardToPlay.getType() == Type.SPECIAL) {
+                if (cardToPlay.getType() == Type.NUMBER) {
+                    this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
+                    finishTurn();
+                }
+                else if (cardToPlay.getType() == Type.SPECIAL) {
+                    this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
                     if (cardToPlay.getValue() == Value.SECONDCHANCE) {
                         finishSecondChance();
                     }
                     else {
                         this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                     }
-                }
-                else {
-                    finishTurn();
                 }
             }
             else {
