@@ -180,12 +180,6 @@ public class GameRound {
         this.gameService.sendHand(this.lobbyId, player);
     }
 
-    private Card takeRandomCard(Player player) {
-        int handSize = player.getHandSize();
-        int index = FranticUtils.random.nextInt(handSize);
-        return player.popCard(index);
-    }
-
     private void performEvent() {
         Event event = this.events.remove(0);
         //TODO: Send event information to clients
@@ -217,18 +211,8 @@ public class GameRound {
         }
     }
 
-    //A player can only be skipped, if he/she was not skipped before
-
-    public boolean skip(Player player) {
-        if (player.isBlocked()) {
-            return false;
-        }
-        player.setBlocked(true);
-        return true;
-    }
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
-
     private boolean isRoundOver() {
         return (getHandSizes().containsValue(0) || this.remainingTurns == 0);
     }
