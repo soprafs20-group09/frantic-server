@@ -56,16 +56,20 @@ public class GameRound {
         this.discardPile.push(this.drawStack.pop());
     }
 
-    private void sendGameState() {
+    private void sendInitialGameState() {
         for (Player player : this.listOfPlayers) {
             this.gameService.sendHand(this.lobbyId, player);
         }
+        sendGameState();
+    }
+
+    private void sendGameState() {
         this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
     }
 
     public void startGameRound() {
         initializeGameRound();
-        sendGameState();
+        sendInitialGameState();
         startTurn();
     }
 
@@ -102,7 +106,7 @@ public class GameRound {
     private void finishSecondChance() {
         this.hasCurrentPlayerMadeMove = false;
         this.gameService.sendHand(this.lobbyId, this.currentPlayer);
-        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
+        sendGameState();
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, this.getPlayableCards(this.currentPlayer));
     }
 
@@ -148,6 +152,7 @@ public class GameRound {
             else {
                 // needed later for Counter attack & nice try
             }
+            this.gameService.sendHand(this.lobbyId, player);
         }
     }
 
