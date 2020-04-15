@@ -59,7 +59,7 @@ public class GameService {
     public void drawCard(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().currentPlayerDrawCard();
+            game.getCurrentGameRound().currentPlayerDrawCard(identity);
         }
     }
 
