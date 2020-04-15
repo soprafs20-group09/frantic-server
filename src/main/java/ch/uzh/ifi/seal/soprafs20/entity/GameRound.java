@@ -97,6 +97,13 @@ public class GameRound {
         prepareNewTurn();
     }
 
+    private void finishSecondChance() {
+        this.hasCurrentPlayerMadeMove = false;
+        this.gameService.sendHand(this.lobbyId, this.currentPlayer);
+        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, this.getPlayableCards(this.currentPlayer));
+    }
+
     public void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
@@ -117,14 +124,27 @@ public class GameRound {
             return;
         }
         if (player == this.currentPlayer) {
-            this.discardPile.push(player.popCard(index));
+            cardToPlay = player.popCard(index);
+            this.discardPile.push(cardToPlay);
             this.hasCurrentPlayerMadeMove = true;
-            finishTurn();
+
+            if (cardToPlay.getType() == Type.SPECIAL) {
+                if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                    finishSecondChance();
+                }
+                else {
+                    this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                }
+            }
+            else {
+                finishTurn();
+            }
         }
         else {
             // needed later for Counter attack & nice try
         }
     }
+
 
     // in a turn, the current player can choose to draw a card
     public void currentPlayerDrawCard() {
