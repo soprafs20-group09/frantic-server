@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.utils;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
 
 import java.util.EnumMap;
 import java.util.Random;
@@ -83,5 +84,15 @@ public class FranticUtils {
             fillTypeMap();
         }
         return typeMap.get(t);
+    }
+
+    public static String getStringRepresentationOfNumberCard(Card card) {
+        if (!colorMap.containsKey(card.getColor())) {
+            fillColorMap();
+        }
+        if (!valueMap.containsKey(card.getValue())) {
+            fillValueMap();
+        }
+        return colorMap.get(card.getColor()) + " " + valueMap.get(card.getValue());
     }
 }
