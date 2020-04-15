@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.Action;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.*;
 
@@ -90,6 +91,7 @@ public class GameRound {
     public void finishTurn() {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
+            this.gameService.sendChatPlayerMessage(this.lobbyId, "drew card", currentPlayer.getUsername());
         }
         this.timer.cancel();
         //return empty playable cards after turn finished
@@ -128,16 +130,18 @@ public class GameRound {
             this.discardPile.push(cardToPlay);
             this.hasCurrentPlayerMadeMove = true;
 
-            if (cardToPlay.getType() == Type.SPECIAL) {
+            if (cardToPlay.getType() == Type.NUMBER) {
+                this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
+                finishTurn();
+            }
+            else if (cardToPlay.getType() == Type.SPECIAL) {
+                this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
                 if (cardToPlay.getValue() == Value.SECONDCHANCE) {
                     finishSecondChance();
                 }
                 else {
                     this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                 }
-            }
-            else {
-                finishTurn();
             }
         }
         else {
@@ -150,6 +154,7 @@ public class GameRound {
     public void currentPlayerDrawCard() {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
+            this.gameService.sendChatPlayerMessage(this.lobbyId, "drew card", currentPlayer.getUsername());
             this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
             this.hasCurrentPlayerMadeMove = true;
         }
