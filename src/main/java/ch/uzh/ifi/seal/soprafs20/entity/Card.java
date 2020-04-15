@@ -7,12 +7,12 @@ import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 public class Card {
 
-    protected Color color;
-    protected Type type;
-    protected Value value;
-    protected final int orderKey;
-    protected final String key;
-    protected final boolean counterable;
+    private Color color;
+    private Type type;
+    private Value value;
+    private final int orderKey;
+    private final String key;
+    private final boolean counterable;
 
     public Card(Color c, int value, int orderKey) {
         this(c, Type.NUMBER, Value.values()[value-1], false, orderKey);

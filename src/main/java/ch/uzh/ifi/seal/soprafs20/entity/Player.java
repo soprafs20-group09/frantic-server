@@ -123,13 +123,10 @@ public class Player implements Serializable {
     public List<Integer> hasNiceTry() {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < hand.size(); i++) {
-            Card card = hand.pop(i);
-            if (card.value == Value.NICETRY) {
+            if (hand.peek(i).getValue() == Value.NICETRY) {
                 result.add(i);
                 return result;
             }
-            ;
-            hand.push(card);
         }
         return result;
     }
@@ -137,11 +134,9 @@ public class Player implements Serializable {
     public List<Integer> hasCounterAttack() {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < hand.size(); i++) {
-            Card card = hand.pop(i);
-            if (card.value == Value.COUNTERATTACK) {
+            if (hand.peek(i).getValue() == Value.COUNTERATTACK) {
                 result.add(i);
             }
-            hand.push(card);
         }
         return result;
     }
