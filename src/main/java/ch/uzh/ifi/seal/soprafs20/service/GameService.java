@@ -133,4 +133,10 @@ public class GameService {
         }
         return response;
     }
+
+    public void sendActionResponse(String lobbyId, Player player, Card card) {
+        ActionResponseDTO dto = new ActionResponseDTO();
+        dto.setAction(FranticUtils.getStringRepresentation(card.getValue()));
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
+    }
 }
