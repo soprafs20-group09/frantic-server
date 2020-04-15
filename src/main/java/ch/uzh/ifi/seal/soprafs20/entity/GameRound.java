@@ -125,7 +125,7 @@ public class GameRound {
     public void playCard(String identity, int index) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
-            Card uppermostCard = this.discardPile.peek();
+            Card uppermostCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
             if (cardToPlay == null || !cardToPlay.isPlayable(uppermostCard)) {
                 return;
@@ -180,6 +180,20 @@ public class GameRound {
         this.gameService.sendHand(this.lobbyId, player);
     }
 
+    //if the fuck-you card is the uppermost card, then the second card is considered to evaluate
+    private Card getRelevantCardOnDiscardPile() {
+        Card card = this.discardPile.peek();
+        if (card == null) {
+            return null;
+        }
+        if (card.getValue() == Value.FUCKYOU) {
+            return this.discardPile.peekSecond();
+        }
+        else {
+            return this.discardPile.peek();
+        }
+    }
+
     private void performEvent() {
         Event event = this.events.remove(0);
         //TODO: Send event information to clients
@@ -187,7 +201,7 @@ public class GameRound {
     }
 
     private int[] getPlayableCards(Player player) {
-        return player.getPlayableCards(this.discardPile.peek());
+        return player.getPlayableCards(getRelevantCardOnDiscardPile());
     }
 
     private Map<Player, Integer> getHandSizes() {
