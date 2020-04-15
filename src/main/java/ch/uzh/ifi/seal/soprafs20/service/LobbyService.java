@@ -102,7 +102,7 @@ public class LobbyService {
                 player.getUsername(), lobby.getName(), lobby.getLobbyId()));
     }
 
-    public void kickPlayer(String lobbyId, String identity, KickDTO kick) {
+    public void kickPlayer(String lobbyId, String identity, KickDTO dto) {
 
         if (webSocketService.checkSender(lobbyId, identity)) {
             Player admin = playerRepository.findByIdentity(identity);
@@ -110,13 +110,13 @@ public class LobbyService {
                 throw new PlayerServiceException("Invalid action. Not admin.");
             }
 
-            Player toKick = playerRepository.findByUsernameAndLobbyId(kick.getUsername(), lobbyId);
+            Player toKick = playerRepository.findByUsernameAndLobbyId(dto.getUsername(), lobbyId);
             DisconnectDTO disconnectDTO = new DisconnectDTO();
             disconnectDTO.setReason("You were kicked out of the Lobby.");
             webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(toKick);
 
-            webSocketService.sendChatPlayerMessage(lobbyId, toKick.getUsername() + " was kicked!", toKick.getUsername());
+            webSocketService.sendChatPlayerMessage(lobbyId, "was kicked!", toKick.getUsername());
             webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
         }
     }
@@ -128,7 +128,7 @@ public class LobbyService {
         if (player != null) {
             String lobbyId = playerService.removePlayer(player);
             if (lobbyId != null) {
-                webSocketService.sendChatPlayerMessage(lobbyId, player.getUsername() + " left the lobby.", player.getUsername());
+                webSocketService.sendChatPlayerMessage(lobbyId, "left the lobby.", player.getUsername());
                 if (player.isAdmin()) {
                     DisconnectDTO message = new DisconnectDTO();
                     message.setReason("Host left the lobby.");
@@ -155,18 +155,18 @@ public class LobbyService {
         log.debug(String.format("Lobby '%s' with ID '%s' was closed", lobby.getName(), lobby.getLobbyId()));
     }
 
-    public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO newSettings) {
+    public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO dto) {
 
         if (webSocketService.checkSender(lobbyId, identity)) {
             Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);
-            if (newSettings.getLobbyName() != null && !newSettings.getLobbyName().matches("^\\s*$")) {
-                lobbyToUpdate.setName(newSettings.getLobbyName());
+            if (dto.getLobbyName() != null && !dto.getLobbyName().matches("^\\s*$")) {
+                lobbyToUpdate.setName(dto.getLobbyName());
             }
-            if (newSettings.getDuration() != null) {
-                lobbyToUpdate.setGameDuration(newSettings.getDuration());
+            if (dto.getDuration() != null) {
+                lobbyToUpdate.setGameDuration(dto.getDuration());
             }
-            if (newSettings.getPublicLobby() != null) {
-                lobbyToUpdate.setIsPublic(newSettings.getPublicLobby());
+            if (dto.getPublicLobby() != null) {
+                lobbyToUpdate.setIsPublic(dto.getPublicLobby());
             }
             lobbyRepository.flush();
 
@@ -198,16 +198,16 @@ public class LobbyService {
         return response;
     }
 
-    public void sendChatMessage(String lobbyId, String identity, ChatDTO chat) {
+    public void sendChatMessage(String lobbyId, String identity, ChatDTO dto) {
 
         if (webSocketService.checkSender(lobbyId, identity)) {
-            if (chat.getMessage() != null && !chat.getMessage().matches("^\\s*$")) {
+            if (dto.getMessage() != null && !dto.getMessage().matches("^\\s*$")) {
                 Player sender = this.playerRepository.findByIdentity(identity);
 
-                chat.setType("msg");
-                chat.setUsername(sender.getUsername());
+                dto.setType("msg");
+                dto.setUsername(sender.getUsername());
 
-                webSocketService.sendToLobby(lobbyId, "/chat", chat);
+                webSocketService.sendToLobby(lobbyId, "/chat", dto);
             }
         }
     }
