@@ -153,7 +153,7 @@ public class Game {
         if (this.currentGameRound != null) {
             this.currentGameRound.playerLostConnection(player);
         }
-        this.listOfPlayers.remove(player);
+        this.removeFromPlayerList(player);
     }
 
     public void startTimer(int seconds, boolean gameOver) {
@@ -171,6 +171,10 @@ public class Game {
             }
         };
         this.timer.schedule(timerTask, milliseconds);
+    }
+
+    private void removeFromPlayerList(Player player) {
+        this.listOfPlayers.removeIf(p -> player.getIdentity().equals(p.getIdentity()));
     }
 
     private void shuffleEvents() {

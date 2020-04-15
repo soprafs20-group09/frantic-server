@@ -40,7 +40,7 @@ public class Lobby implements Serializable {
     @Column
     private boolean isPublic;
 
-    @Transient
+    @Column
     private boolean isPlaying;
 
     public Lobby() {

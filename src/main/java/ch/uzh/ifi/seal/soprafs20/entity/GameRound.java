@@ -87,7 +87,7 @@ public class GameRound {
         startTimer(30);
     }
 
-    private void finishTurn() {
+    public void finishTurn() {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
@@ -231,6 +231,7 @@ public class GameRound {
             this.timer.cancel();
             prepareNewTurn();
         }
+        this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
         sendGameState();
     }
 
