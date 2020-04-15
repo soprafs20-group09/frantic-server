@@ -1,5 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.entity.actions.Action;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
@@ -13,27 +16,27 @@ public class GameRound {
     private Player currentPlayer;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
-    private boolean timebomb; // indicates if the timebomb-event is currently running
+    private boolean timeBomb; // indicates if the timeBomb-event is currently running
     private int turnNumber;
     private int remainingTurns;
-    private List events;
-    private ActionStack actionStack;
+    private List<Event> events;
     private Pile<Card> drawStack;
     private Pile<Card> discardPile;
+    private Action currentAction;
 
     private final GameService gameService;
 
 
-    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List events) {
+    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List<Event> events) {
         this.game = game;
         this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
-        this.actionStack = new ActionStack();
         this.turnNumber = 0;
         this.remainingTurns = -1; //indicates that there is no limit
         this.events = events;
+        this.currentAction = null;
     }
 
     //creates Piles & player hands
