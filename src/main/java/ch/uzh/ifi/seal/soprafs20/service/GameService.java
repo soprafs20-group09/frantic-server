@@ -5,7 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -117,6 +117,12 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", playableCards);
     }
 
+    public void sendActionResponse(String lobbyId, Player player, Card card) {
+        ActionResponseDTO dto = new ActionResponseDTO();
+        dto.setAction(FranticUtils.getStringRepresentation(card.getValue()));
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
+    }
+
     private CardDTO cardToDTO(Card card) {
         CardDTO response = new CardDTO();
         response.setColor(FranticUtils.getStringRepresentation(card.getColor()));
@@ -147,11 +153,5 @@ public class GameService {
             response[i].setCards(generateCardBackDTO(player));
         }
         return response;
-    }
-
-    public void sendActionResponse(String lobbyId, Player player, Card card) {
-        ActionResponseDTO dto = new ActionResponseDTO();
-        dto.setAction(FranticUtils.getStringRepresentation(card.getValue()));
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
     }
 }

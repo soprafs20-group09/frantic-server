@@ -64,10 +64,10 @@ public class RESTController {
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyJoinDTO createLobby(@Valid @RequestBody PlayerUsernameDTO playerUsernameDTO) {
+    public LobbyJoinDTO createLobby(@Valid @RequestBody PlayerUsernameDTO dto) {
 
-        String username = clean(playerUsernameDTO.getUsername());
-        log.debug("POST /lobbies, body: {}", playerUsernameDTO.toString());
+        String username = clean(dto.getUsername());
+        log.debug("POST /lobbies, body: {}", dto.toString());
 
         lobbyService.checkLobbyCreate(username);
         return registerService.prepareLobby(username);
@@ -76,10 +76,10 @@ public class RESTController {
     @PutMapping("/lobbies/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO playerUsernameDTO) {
+    public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO dto) {
 
-        String username = clean(playerUsernameDTO.getUsername());
-        log.debug("PUT /lobbies/{}, body: {}", id, playerUsernameDTO.toString());
+        String username = clean(dto.getUsername());
+        log.debug("PUT /lobbies/{}, body: {}", id, dto.toString());
 
         lobbyService.checkLobbyJoin(id, username);
         return registerService.prepareLobby(id, username);

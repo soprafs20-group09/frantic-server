@@ -9,6 +9,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
+
 @Controller
 public class WebSocketController {
 
@@ -21,9 +23,9 @@ public class WebSocketController {
     }
 
     @MessageMapping("/register")
-    public void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO registerDTO) throws Exception {
+    public void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO dto) throws Exception {
         String identity = sha.getUser().getName();
-        registerService.joinLobby(identity, registerDTO);
+        registerService.joinLobby(identity, dto);
     }
 
     @EventListener
