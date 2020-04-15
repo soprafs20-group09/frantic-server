@@ -5,21 +5,26 @@ import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
-import java.util.UUID;
-
-public abstract class Card {
+public class Card {
 
     protected Color color;
     protected Type type;
     protected Value value;
     protected final int orderKey;
     protected final String key;
-    protected boolean isCounterable;
+    protected final boolean counterable;
 
-    public Card(Color c, Type t, Value v, int orderKey) {
+    public Card(Color c, int value, int orderKey) {
+        this(c, Type.NUMBER, Value.values()[value-1], false, orderKey);
+        if (value > 10) {
+            throw new RuntimeException("Invalid number");
+        }
+    }
+    public Card(Color c, Type t, Value v, boolean counterable, int orderKey) {
         this.type = t;
         this.color = c;
         this.value = v;
+        this.counterable = counterable;
         this.key = FranticUtils.generateId(8);
         this.orderKey = orderKey;
     }
@@ -45,18 +50,19 @@ public abstract class Card {
     }
 
     public boolean isCounterable() {
-        return isCounterable;
+        return counterable;
     }
 
-
-    public abstract void performAction();
-
     public boolean isPlayable(Card other) {
-        if (this.getColor() == Color.BLACK) {
-            return this.getValue() == other.getValue();
-        }
-        else {
-            return (this.getColor() == other.getColor() || this.getValue() == other.getValue());
+        switch (this.getColor()) {
+            case BLACK:
+                return this.getValue() == other.getValue();
+
+            case MULTICOLOR:
+                return true;
+
+            default:
+                return (this.getColor() == other.getColor() || this.getValue() == other.getValue());
         }
     }
 

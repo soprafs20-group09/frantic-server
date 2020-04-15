@@ -1,8 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import ch.uzh.ifi.seal.soprafs20.constant.Color;;
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
-import ch.uzh.ifi.seal.soprafs20.entity.cards.NumberCard;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +16,7 @@ class PileTest {
 
     @Test
     public void pushCardsintoStack() {
-        NumberCard blue1 = new NumberCard(Color.BLUE, 1, 1);
+        Card blue1 = new Card(Color.BLUE, 1, 1);
 
         DrawStack drawStack = new DrawStack();
         drawStack.push(blue1);
