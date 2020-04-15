@@ -124,13 +124,15 @@ public class GameRound {
     }
 
     // in a turn, the current player can choose to draw a card
-
     public void currentPlayerDrawCard() {
-        drawCardFromStack(this.currentPlayer, 1);
-        this.hasCurrentPlayerMadeMove = true;
+        if (!this.hasCurrentPlayerMadeMove) {
+            drawCardFromStack(this.currentPlayer, 1);
+            this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
+            this.hasCurrentPlayerMadeMove = true;
+        }
     }
-    // moves #amount cards from Stack to players hand
 
+    // moves #amount cards from Stack to players hand
     private void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
@@ -141,8 +143,8 @@ public class GameRound {
             player.pushCardToHand(this.drawStack.pop());
         }
         this.gameService.sendHand(this.lobbyId, player);
-        this.gameService.sendPlayableCards(this.lobbyId, player, getPlayableCards(player));
     }
+
     private Card takeRandomCard(Player player) {
         Random r = new Random();
         int handSize = player.getHandSize();
@@ -196,6 +198,7 @@ public class GameRound {
     private boolean isRoundOver() {
         return (getHandSizes().containsValue(0) || this.remainingTurns == 0);
     }
+
     private void onRoundOver() {
         this.game.endGameRound();
     }
