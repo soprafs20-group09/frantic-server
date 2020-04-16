@@ -242,7 +242,7 @@ public class LobbyService {
 
     public void checkLobbyCreate(String username) {
 
-        if (username == null || username.matches("^\\s*$")) {
+        if (username == null || !username.matches("^\\S{2,20}$")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username missing or invalid.");
         }
     }
