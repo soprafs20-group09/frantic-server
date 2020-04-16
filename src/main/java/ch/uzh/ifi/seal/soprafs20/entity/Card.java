@@ -29,6 +29,10 @@ public class Card {
         this.orderKey = orderKey;
     }
 
+    public Card(Color c, Type t, Value v){
+        this(c, t, v, false, -1);
+    }
+
     public Color getColor() {
         return color;
     }
