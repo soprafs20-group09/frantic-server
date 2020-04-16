@@ -18,6 +18,7 @@ class GiftActionTest {
     private Card blue1 = new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 0);
     private Card blue2 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 1);
     private Card blue3 = new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2);
+    private Card fuckYou = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FUCKYOU, false, 3);
 
     @BeforeEach
     public void setup() {
@@ -56,5 +57,17 @@ class GiftActionTest {
     @Test
     public void isCounterableTest(){
         assertTrue(giftAction.isCounterable());
+    }
+
+    @Test
+    public void fuckYouNotGiftableTest() {
+        this.initiator.popCard(0);
+        this.initiator.pushCardToHand(fuckYou);
+        giftAction.perform();
+        assertEquals(2, this.initiator.getHandSize());
+        assertEquals(1, this.target.getHandSize());
+        assertEquals(blue2, this.initiator.popCard(0));
+        assertEquals(fuckYou, this.initiator.popCard(0));
+        assertEquals(blue3, this.target.popCard(0));
     }
 }
