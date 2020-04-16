@@ -177,6 +177,7 @@ public class GameRound {
             }
             player.pushCardToHand(this.drawStack.pop());
         }
+        this.gameService.sendDrawAnimation(this.lobbyId, amount);
         this.gameService.sendHand(this.lobbyId, player);
     }
 

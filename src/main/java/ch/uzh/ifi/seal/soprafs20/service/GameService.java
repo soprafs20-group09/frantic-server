@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,12 @@ public class GameService {
         PlayableCardsDTO playableCards = new PlayableCardsDTO();
         playableCards.setPlayable(playable);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", playableCards);
+    }
+
+    public void sendDrawAnimation(String lobbyId, int amount) {
+        DrawDTO dto = new DrawDTO();
+        dto.setAmount(amount);
+        webSocketService.sendToLobby(lobbyId, "/draw", dto);
     }
 
     public void sendActionResponse(String lobbyId, Player player, Card card) {
