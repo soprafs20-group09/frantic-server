@@ -11,6 +11,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameServiceTest {
 
     @Mock
@@ -124,6 +127,17 @@ public class GameServiceTest {
 
     @Test
     public void sendGameStateTest() {
+        List<Player> players = new ArrayList<>();
+        players.add(player);
+        players.add(player);
+
+        gameService.sendGameState("testLobbyId", card, players);
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/game-state"), Mockito.any());
+    }
+
+    @Test
+    public void sendHandTest() {
         Mockito.when(player.getHandSize()).thenReturn(5);
         Mockito.when(player.peekCard(Mockito.anyInt())).thenReturn(card);
 

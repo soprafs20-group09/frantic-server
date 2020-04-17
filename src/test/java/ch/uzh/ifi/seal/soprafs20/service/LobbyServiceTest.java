@@ -56,6 +56,7 @@ public class LobbyServiceTest {
         testPlayer = new Player();
         testPlayer.setUsername("testPlayer");
         testPlayer.setAdmin(false);
+        testPlayer.setIdentity("testIdentity");
 
         testLobby = new Lobby();
         testLobby.setName("testLobby");
@@ -289,13 +290,25 @@ public class LobbyServiceTest {
 
     @Test
     void kickPlayer_notAdmin_throwPlayerServiceException() {
-        KickDTO kick = new KickDTO();
+        KickDTO kick = Mockito.mock(KickDTO.class);
         try {
             lobbyService.kickPlayer("abc", "identity", kick);
         }
         catch (PlayerServiceException ex) {
             assertEquals("Invalid action. Not admin.", ex.getMessage());
         }
+    }
+
+    @Test
+    void kickPlayer_admin_success() {
+        testPlayer.setAdmin(true);
+        KickDTO kick = Mockito.mock(KickDTO.class);
+
+        lobbyService.kickPlayer("abc", testPlayer.getIdentity(), kick);
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches(testPlayer.getIdentity()), Mockito.matches("/queue/disconnect"), Mockito.any());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendChatPlayerMessage("abc", "was kicked!", testPlayer.getUsername());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("abc"), Mockito.matches("/lobby-state"), Mockito.any());
     }
 
     @Test
