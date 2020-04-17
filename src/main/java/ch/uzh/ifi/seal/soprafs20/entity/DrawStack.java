@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
 
 import java.util.EnumSet;
 
@@ -19,7 +21,9 @@ public class DrawStack extends Pile<Card> {
                     this.push(new Card(c, i, orderNr++));
                 }
             }
+            this.push(new Card(c, Type.SPECIAL, Value.SECONDCHANCE, false, orderNr++));
         }
+        this.push(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, orderNr));
         this.shuffle();
     }
 }

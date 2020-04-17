@@ -29,6 +29,7 @@ public class Card {
         this.orderKey = orderKey;
     }
 
+    // constructor for wish card.
     public Card(Color c, Type t, Value v){
         this(c, t, v, false, -1);
     }
