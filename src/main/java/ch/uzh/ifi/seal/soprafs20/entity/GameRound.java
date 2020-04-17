@@ -90,7 +90,7 @@ public class GameRound {
         this.turnNumber += 1;
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
-        startTimer(30);
+        startTurnTimer(30);
     }
 
     public void finishTurn() {
@@ -109,18 +109,6 @@ public class GameRound {
         this.gameService.sendHand(this.lobbyId, this.currentPlayer);
         sendGameState();
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, this.getPlayableCards(this.currentPlayer));
-    }
-
-    public void startTimer(int seconds) {
-        int milliseconds = seconds * 1000;
-        this.timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                finishTurn();
-            }
-        };
-        this.timer.schedule(timerTask, milliseconds);
     }
 
     public void playCard(String identity, int index) {
@@ -198,18 +186,24 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new SkipAction(initiator, target);
+        timer.cancel();
+        prepareCounterAttack();
     }
 
     public void storeGiftAction(String identity, Integer[] cards, String username) {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new GiftAction(initiator, target, cards);
+        timer.cancel();
+        prepareCounterAttack();
     }
 
     public void storeExchangeAction(String identity, int[] cards, String username) {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new ExchangeAction(initiator, target, cards);
+        timer.cancel();
+        prepareCounterAttack();
     }
 
     public void storeFantasticAction(String identity, int value, Color color) {
@@ -220,16 +214,37 @@ public class GameRound {
         else {
             this.currentAction = new FantasticAction(initiator, color, (DiscardPile) this.discardPile);
         }
+        timer.cancel();
+        performAction();
     }
 
     public void storeFantasticFourAction(String identity) {
         //TODO: Look how package comes from GameService
+        timer.cancel();
+        prepareCounterAttack();
     }
 
     public void storeEqualityAction(String identity, Color color, String username) {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
-        this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack );
+        this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
+        timer.cancel();
+        prepareCounterAttack();
+    }
+
+    private void performAction() {
+        this.currentAction.perform();
+        finishTurn();
+    }
+
+    private void prepareCounterAttack() {
+        for (Player player : listOfPlayers) {
+            List<Integer> cards = player.hasCounterAttack();
+            if (!cards.isEmpty()) {
+                //TODO: Send counter attack opportunity
+            }
+        }
+        startCounterAttackTimer(5);
     }
 
     private void performEvent() {
@@ -280,6 +295,30 @@ public class GameRound {
         }
         this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
         sendGameState();
+    }
+
+    public void startTurnTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                finishTurn();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startCounterAttackTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                performAction();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
     }
 
     private Player getPlayerByIdentity(String identity) {
