@@ -1,8 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.actions.Action;
+import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
 import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
@@ -193,6 +194,44 @@ public class GameRound {
         return this.discardPile.peek();
     }
 
+    public void storeSkipAction(String identity, String username) {
+        Player initiator = getPlayerByIdentity(identity);
+        Player target = getPlayerByUsername(username);
+        this.currentAction = new SkipAction(initiator, target);
+    }
+
+    public void storeGiftAction(String identity, Integer[] cards, String username) {
+        Player initiator = getPlayerByIdentity(identity);
+        Player target = getPlayerByUsername(username);
+        this.currentAction = new GiftAction(initiator, target, cards);
+    }
+
+    public void storeExchangeAction(String identity, int[] cards, String username) {
+        Player initiator = getPlayerByIdentity(identity);
+        Player target = getPlayerByUsername(username);
+        this.currentAction = new ExchangeAction(initiator, target, cards);
+    }
+
+    public void storeFantasticAction(String identity, int value, Color color) {
+        Player initiator = getPlayerByIdentity(identity);
+        if (color == null) {
+            this.currentAction = new FantasticAction(initiator, value, (DiscardPile) this.discardPile);
+        }
+        else {
+            this.currentAction = new FantasticAction(initiator, color, (DiscardPile) this.discardPile);
+        }
+    }
+
+    public void storeFantasticFourAction(String identity) {
+        //TODO: Look how package comes from GameService
+    }
+
+    public void storeEqualityAction(String identity, Color color, String username) {
+        Player initiator = getPlayerByIdentity(identity);
+        Player target = getPlayerByUsername(username);
+        this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack );
+    }
+
     private void performEvent() {
         Event event = this.events.remove(0);
         //TODO: Send event information to clients
@@ -246,6 +285,15 @@ public class GameRound {
     private Player getPlayerByIdentity(String identity) {
         for (Player p : listOfPlayers) {
             if (p.getIdentity().equals(identity)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private Player getPlayerByUsername(String username) {
+        for (Player p : listOfPlayers) {
+            if (p.getUsername().equals(username)) {
                 return p;
             }
         }
