@@ -190,7 +190,7 @@ public class GameRound {
         prepareCounterAttack();
     }
 
-    public void storeGiftAction(String identity, Integer[] cards, String username) {
+    public void storeGiftAction(String identity, int[] cards, String username) {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new GiftAction(initiator, target, cards);
@@ -218,8 +218,20 @@ public class GameRound {
         performAction();
     }
 
-    public void storeFantasticFourAction(String identity) {
-        //TODO: Look how package comes from GameService
+    public void storeFantasticFourAction(String identity, int value, Color color, Map<String, Integer> players) {
+        Player initiator = getPlayerByIdentity(identity);
+        Map<Player, Integer> distribution = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : players.entrySet()) {
+            distribution.put(getPlayerByIdentity(entry.getKey()), entry.getValue());
+        }
+        if (color == null) {
+            this.currentAction = new FantasticFourAction(initiator, distribution, value,
+                    (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
+        }
+        else {
+            this.currentAction = new FantasticFourAction(initiator, distribution, color,
+                    (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
+        }
         timer.cancel();
         prepareCounterAttack();
     }
