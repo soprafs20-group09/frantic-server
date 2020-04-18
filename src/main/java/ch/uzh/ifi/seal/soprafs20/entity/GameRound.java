@@ -148,7 +148,7 @@ public class GameRound {
     // in a turn, the current player can choose to draw a card
     public void currentPlayerDrawCard(String identity) {
         Player player = getPlayerByIdentity(identity);
-        if (player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
+        if (player != null && player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
             this.gameService.sendChatPlayerMessage(this.lobbyId, "drew card", currentPlayer.getUsername());
             this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
