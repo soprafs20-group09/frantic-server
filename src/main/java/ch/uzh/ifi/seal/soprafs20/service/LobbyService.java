@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.service;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
@@ -152,6 +153,7 @@ public class LobbyService {
         }
         playerRepository.flush();
         lobbyRepository.delete(lobby);
+        GameRepository.removeGame(lobbyId);
         log.debug(String.format("Lobby '%s' with ID '%s' was closed", lobby.getName(), lobby.getLobbyId()));
     }
 

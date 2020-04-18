@@ -9,9 +9,9 @@ import java.util.Collections;
 public class GiftAction implements Action {
     private Player initiator;
     private Player target;
-    private Integer[] gifts;
+    private int[] gifts;
 
-    public GiftAction(Player initiator, Player target, Integer[] gifts) {
+    public GiftAction(Player initiator, Player target, int[] gifts) {
         this.initiator = initiator;
         this.target = target;
         this.gifts = gifts;
@@ -19,10 +19,9 @@ public class GiftAction implements Action {
 
     @Override
     public void perform() {
-        Arrays.sort(this.gifts, Collections.reverseOrder());
-        for (int gift : this.gifts) {
-            if (this.initiator.peekCard(gift).getValue() != Value.FUCKYOU) {
-                target.pushCardToHand(this.initiator.popCard(gift));
+        for (int i = this.gifts.length - 1; i >= 0; i--) {
+            if (this.initiator.peekCard(this.gifts[i]).getValue() != Value.FUCKYOU) {
+                target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
             }
         }
     }

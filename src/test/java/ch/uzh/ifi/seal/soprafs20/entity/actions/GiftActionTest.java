@@ -29,7 +29,7 @@ class GiftActionTest {
 
         this.target = new Player();
 
-        Integer[] gifts = new Integer[]{1, 2};
+        int[] gifts = new int[]{1, 2};
 
         this.giftAction = new GiftAction(initiator, target, gifts);
     }
