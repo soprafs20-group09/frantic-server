@@ -91,7 +91,7 @@ public class GameService {
     public void fantastic(String lobbyId, String identity, FantasticDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().storeFantasticAction(identity, dto.getNumber(), Color.valueOf(dto.getColor()));
+            game.getCurrentGameRound().storeFantasticAction(identity, dto.getNumber(), dto.getColor());
         }
     }
 
@@ -99,14 +99,14 @@ public class GameService {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
             game.getCurrentGameRound().storeFantasticFourAction(identity, dto.getNumber(),
-                    Color.valueOf(dto.getColor()), dto.getPlayers());
+                    dto.getColor(), dto.getPlayers());
         }
     }
 
     public void equality(String lobbyId, String identity, EqualityDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().storeEqualityAction(identity, Color.valueOf(dto.getColor()), dto.getTarget());
+            game.getCurrentGameRound().storeEqualityAction(identity, dto.getColor(), dto.getTarget());
         }
     }
 

@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+
 import java.util.Map;
 
 public class FantasticFourDTO {
 
     private Map<String, Integer> players;
 
-    private String color;
+    private Color color;
 
     private int number;
 
@@ -18,11 +20,11 @@ public class FantasticFourDTO {
         this.players = players;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
