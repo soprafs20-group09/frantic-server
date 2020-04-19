@@ -116,7 +116,7 @@ public class GameRound {
         if (player != null) {
             Card uppermostCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
-            if (uppermostCard == null || cardToPlay == null || (!cardToPlay.isPlayable(uppermostCard) && uppermostCard.getValue() != Value.FUCKYOU)) {
+            if (uppermostCard == null || cardToPlay == null || (!cardToPlay.isPlayable(uppermostCard) && (uppermostCard.getValue() != Value.FUCKYOU))) {
                 return;
             }
             if (player == this.currentPlayer) {
@@ -131,7 +131,10 @@ public class GameRound {
                 }
                 else if (cardToPlay.getType() == Type.SPECIAL) {
                     this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
-                    if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                    if (cardToPlay.getValue() == Value.FUCKYOU) {
+                        finishTurn();
+                    }
+                    else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
                         finishSecondChance();
                     }
                     else {

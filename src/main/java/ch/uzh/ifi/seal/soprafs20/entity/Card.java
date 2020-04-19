@@ -61,7 +61,7 @@ public class Card {
     public boolean isPlayable(Card other) {
         switch (this.getColor()) {
             case BLACK:
-                return this.getValue() == other.getValue();
+                return this.getValue() == Value.FUCKYOU || this.getValue() == other.getValue();
 
             case MULTICOLOR:
                 return true;
