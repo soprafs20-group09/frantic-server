@@ -1,18 +1,19 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.PlayCardDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class GameServiceTest {
 
@@ -88,6 +89,101 @@ public class GameServiceTest {
         gameService.drawCard("testLobbyId", "testIdentity");
 
         Mockito.verify(gameRound, Mockito.times(1)).currentPlayerDrawCard("testIdentity");
+    }
+
+    @Test
+    public void exchangeActionTest() {
+        ExchangeDTO exchangeDTO = Mockito.mock(ExchangeDTO.class);
+        Mockito.when(exchangeDTO.getCards()).thenReturn(new int[]{1,2});
+        Mockito.when(exchangeDTO.getTarget()).thenReturn("testTarget");
+
+        gameService.exchange("testLobbyId", "testIdentity", exchangeDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeExchangeAction("testIdentity",
+                exchangeDTO.getCards(), exchangeDTO.getTarget());
+    }
+
+    @Test
+    public void giftActionTest() {
+        GiftDTO giftDTO = Mockito.mock(GiftDTO.class);
+        Mockito.when(giftDTO.getCards()).thenReturn(new int[]{1,2});
+        Mockito.when(giftDTO.getTarget()).thenReturn("testTarget");
+
+        gameService.gift("testLobbyId", "testIdentity", giftDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeGiftAction("testIdentity",
+                giftDTO.getCards(), giftDTO.getTarget());
+    }
+
+    @Test
+    public void skipActionTest() {
+        SkipDTO skipDTO = Mockito.mock(SkipDTO.class);
+        Mockito.when(skipDTO.getTarget()).thenReturn("testTarget");
+
+        gameService.skip("testLobbyId", "testIdentity", skipDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeSkipAction("testIdentity",
+                skipDTO.getTarget());
+    }
+
+    @Test
+    public void fantasticColorActionTest() {
+        FantasticDTO fantasticDTO = Mockito.mock(FantasticDTO.class);
+        Mockito.when(fantasticDTO.getColor()).thenReturn(Color.BLUE);
+
+        gameService.fantastic("testLobbyId", "testIdentity", fantasticDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticAction("testIdentity",
+                fantasticDTO.getNumber(), fantasticDTO.getColor());
+    }
+
+    @Test
+    public void fantasticNumberActionTest() {
+        FantasticDTO fantasticDTO = Mockito.mock(FantasticDTO.class);
+        Mockito.when(fantasticDTO.getColor()).thenReturn(null);
+        Mockito.when(fantasticDTO.getNumber()).thenReturn(1);
+
+        gameService.fantastic("testLobbyId", "testIdentity", fantasticDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticAction("testIdentity",
+                fantasticDTO.getNumber(), fantasticDTO.getColor());
+    }
+
+    @Test
+    public void fantasticFourColorActionTest() {
+        FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
+        Mockito.when(fantasticFourDTO.getColor()).thenReturn(Color.RED);
+        Mockito.when(fantasticFourDTO.getPlayers()).thenReturn(Collections.singletonMap("testIdentity", 4));
+
+        gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
+                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getPlayers());
+    }
+
+    @Test
+    public void fantasticFourNumberActionTest() {
+        FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
+        Mockito.when(fantasticFourDTO.getColor()).thenReturn(null);
+        Mockito.when(fantasticFourDTO.getNumber()).thenReturn(1);
+        Mockito.when(fantasticFourDTO.getPlayers()).thenReturn(Collections.singletonMap("testIdentity", 4));
+
+        gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
+                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getPlayers());
+    }
+
+    @Test
+    public void equalityActionTest() {
+        EqualityDTO equalityDTO = Mockito.mock(EqualityDTO.class);
+        Mockito.when(equalityDTO.getColor()).thenReturn(Color.RED);
+        Mockito.when(equalityDTO.getTarget()).thenReturn("testTarget");
+
+        gameService.equality("testLobbyId", "testIdentity", equalityDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeEqualityAction("testIdentity",
+                equalityDTO.getColor(), equalityDTO.getTarget());
     }
 
     @Test
