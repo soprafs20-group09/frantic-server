@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,11 +54,10 @@ public class ExchangeAction implements Action {
         }
         else {
             // gernerate random cards to be pushed to the initiator
-            Random r = new Random();
-            int random1 = r.nextInt(target.getHandSize());
-            int random2 = r.nextInt(target.getHandSize());
+            int random1 = FranticUtils.random.nextInt(target.getHandSize());
+            int random2 = FranticUtils.random.nextInt(target.getHandSize());
             while (random1 == random2) {
-                random2 = r.nextInt(target.getHandSize());
+                random2 = FranticUtils.random.nextInt(target.getHandSize());
             }
 
             // remove card with bigger index first

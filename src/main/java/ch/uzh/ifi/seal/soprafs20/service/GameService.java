@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -61,6 +64,49 @@ public class GameService {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
             game.getCurrentGameRound().currentPlayerDrawCard(identity);
+        }
+    }
+
+    public void exchange(String lobbyId, String identity, ExchangeDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeExchangeAction(identity, dto.getCards(), dto.getTarget());
+        }
+    }
+
+    public void gift(String lobbyId, String identity, GiftDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeGiftAction(identity, dto.getCards(), dto.getTarget());
+        }
+    }
+
+    public void skip(String lobbyId, String identity, SkipDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeSkipAction(identity, dto.getTarget());
+        }
+    }
+
+    public void fantastic(String lobbyId, String identity, FantasticDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeFantasticAction(identity, dto.getNumber(), Color.valueOf(dto.getColor()));
+        }
+    }
+
+    public void fantasticFour(String lobbyId, String identity, FantasticFourDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeFantasticFourAction(identity, dto.getNumber(),
+                    Color.valueOf(dto.getColor()), dto.getPlayers());
+        }
+    }
+
+    public void equality(String lobbyId, String identity, EqualityDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeEqualityAction(identity, Color.valueOf(dto.getColor()), dto.getTarget());
         }
     }
 
@@ -130,35 +176,55 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
     }
 
+    public void sendEndRound(String lobbyId, List<Player> players) {
+        EndRoundDTO dto = new EndRoundDTO();
+        dto.setPlayers(generatePlayerScoreDTO(players));
+        webSocketService.sendToLobby(lobbyId, "/end-round", dto);
+    }
+
+    public void sendEndGame(String lobbyId, List<Player> players) {
+        EndGameDTO dto = new EndGameDTO();
+        dto.setPlayers(generatePlayerScoreDTO(players));
+        webSocketService.sendToLobby(lobbyId, "/end-game", dto);
+    }
+
     private CardDTO cardToDTO(Card card) {
-        CardDTO response = new CardDTO();
-        response.setColor(FranticUtils.getStringRepresentation(card.getColor()));
-        response.setKey(card.getKey());
-        response.setType(FranticUtils.getStringRepresentation(card.getType()));
-        response.setValue(FranticUtils.getStringRepresentation(card.getValue()));
-        return response;
+        CardDTO dto = new CardDTO();
+        dto.setColor(FranticUtils.getStringRepresentation(card.getColor()));
+        dto.setKey(card.getKey());
+        dto.setType(FranticUtils.getStringRepresentation(card.getType()));
+        dto.setValue(FranticUtils.getStringRepresentation(card.getValue()));
+        return dto;
     }
 
     private CardDTO[] generateCardBackDTO(Player player) {
-        CardDTO[] response = new CardDTO[player.getHandSize()];
+        CardDTO[] dto = new CardDTO[player.getHandSize()];
         for (int i = 0; i < player.getHandSize(); i++) {
-            response[i] = new CardDTO();
-            response[i].setType("back");
-            response[i].setKey(player.peekCard(i).getKey());
+            dto[i] = new CardDTO();
+            dto[i].setType("back");
+            dto[i].setKey(player.peekCard(i).getKey());
         }
-        return response;
+        return dto;
     }
 
     private PlayerStateDTO[] playersToDTO(List<Player> players) {
-        PlayerStateDTO[] response = new PlayerStateDTO[players.size()];
+        PlayerStateDTO[] dto = new PlayerStateDTO[players.size()];
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
-            response[i] = new PlayerStateDTO();
-            response[i].setUsername(player.getUsername());
-            response[i].setPoints(player.getPoints());
-            response[i].setSkipped(player.isBlocked());
-            response[i].setCards(generateCardBackDTO(player));
+            dto[i] = new PlayerStateDTO();
+            dto[i].setUsername(player.getUsername());
+            dto[i].setPoints(player.getPoints());
+            dto[i].setSkipped(player.isBlocked());
+            dto[i].setCards(generateCardBackDTO(player));
         }
-        return response;
+        return dto;
+    }
+
+    private Map<String, Integer> generatePlayerScoreDTO(List<Player> players) {
+        Map<String, Integer> dto = new HashMap<>();
+        for (Player player : players) {
+            dto.put(player.getUsername(), player.getPoints());
+        }
+        return dto;
     }
 }
