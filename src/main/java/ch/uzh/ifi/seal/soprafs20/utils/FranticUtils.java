@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -17,6 +18,7 @@ public class FranticUtils {
     private static final EnumMap<Value, String> valueMap = new EnumMap<>(Value.class);
     private static final EnumMap<Color, String> colorMap = new EnumMap<>(Color.class);
     private static final EnumMap<Type, String> typeMap = new EnumMap<>(Type.class);
+    private static final HashSet<String> existingIds = new HashSet<>();
 
     public static String generateId(int length) {
         StringBuilder s = new StringBuilder();
@@ -25,7 +27,14 @@ public class FranticUtils {
             int idx = random.nextInt(chars.length());
             s.append(chars.charAt(idx));
         }
-        return s.toString();
+
+        String result = s.toString();
+        while (existingIds.contains(result)) {
+            result = generateId(length);
+        }
+        existingIds.add(result);
+
+        return result;
     }
 
     private static void fillValueMap() {
