@@ -47,7 +47,7 @@ public class FranticUtils {
         valueMap.put(Value.SEVEN, "7");
         valueMap.put(Value.EIGHT, "8");
         valueMap.put(Value.NINE, "9");
-        valueMap.put(Value.SECONDCHANCE, "2nd-Chance");
+        valueMap.put(Value.SECONDCHANCE, "2nd-chance");
         valueMap.put(Value.SKIP, "skip");
         valueMap.put(Value.EXCHANGE, "exchange");
         valueMap.put(Value.FANTASTIC, "fantastic");
