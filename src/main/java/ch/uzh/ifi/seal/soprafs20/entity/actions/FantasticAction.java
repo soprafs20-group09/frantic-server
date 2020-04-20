@@ -18,7 +18,7 @@ public class FantasticAction implements Action {
     public FantasticAction(Player initiator, int value, DiscardPile pile){
         this.initiator = initiator;
         this.wishedValue = Value.values()[value-1];
-        this.wishedColor = Color.MULTICOLOR;
+        this.wishedColor = Color.NONE;
         this.discardPile = pile;
     }
 
@@ -27,7 +27,7 @@ public class FantasticAction implements Action {
         if (wishedColor != Color.BLACK) {
             this.wishedColor = wishedColor;
         }
-        this.wishedValue = Value.FANTASTIC;
+        this.wishedValue = Value.NONE;
         this.discardPile = pile;
     }
 
