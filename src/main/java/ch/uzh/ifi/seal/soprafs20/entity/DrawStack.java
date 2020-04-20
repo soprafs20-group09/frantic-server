@@ -12,7 +12,7 @@ public class DrawStack extends Pile<Card> {
     public DrawStack() {
         super();
         int orderNr = 0;
-        for (Color c : EnumSet.complementOf(EnumSet.of(Color.MULTICOLOR))) {
+        for (Color c : EnumSet.complementOf(EnumSet.of(Color.MULTICOLOR, Color.NONE))) {
             // Create and add numbered Cards for all colors except MULTICOLOR
             for (int i = 1; i <= 9; i++) {
                 this.push(new Card(c, i, orderNr++));
