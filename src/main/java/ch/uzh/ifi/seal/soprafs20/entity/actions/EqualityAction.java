@@ -25,8 +25,10 @@ public class EqualityAction implements Action {
 
     @Override
     public void perform() {
-        while (this.initiator.getHandSize() > this.target.getHandSize()) {
-            this.target.pushCardToHand(drawStack.pop());
+        if (this.target != null) {
+            while (this.initiator.getHandSize() > this.target.getHandSize()) {
+                this.target.pushCardToHand(drawStack.pop());
+            }
         }
         discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
