@@ -116,7 +116,7 @@ public class GameRound {
         if (player != null) {
             Card uppermostCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
-            if (uppermostCard == null || cardToPlay == null || (!cardToPlay.isPlayable(uppermostCard) && (uppermostCard.getValue() != Value.FUCKYOU))) {
+            if (uppermostCard == null || cardToPlay == null || (!cardToPlay.isPlayableOn(uppermostCard) && (uppermostCard.getValue() != Value.FUCKYOU))) {
                 return;
             }
             if (player == this.currentPlayer) {
@@ -249,6 +249,8 @@ public class GameRound {
 
     private void performAction() {
         this.currentAction.perform();
+        sendGameState();
+        this.gameService.sendHand(this.lobbyId, this.currentPlayer);
         finishTurn();
     }
 

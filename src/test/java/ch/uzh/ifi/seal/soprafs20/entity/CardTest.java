@@ -26,9 +26,9 @@ class CardTest {
         Card blue8 = new Card(Color.BLUE, 8, 5);
         Card blue9 = new Card(Color.BLUE, 9, 6);
 
-        assertTrue(blue1.isPlayable(red1));
-        assertTrue(blue1.isPlayable(blue4));
-        assertFalse(black5.isPlayable(blue1));
-        assertTrue(blue9.isPlayable(blue8));
+        assertTrue(blue1.isPlayableOn(red1));
+        assertTrue(blue1.isPlayableOn(blue4));
+        assertFalse(black5.isPlayableOn(blue1));
+        assertTrue(blue9.isPlayableOn(blue8));
     }
 }

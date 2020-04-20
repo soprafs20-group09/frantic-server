@@ -58,7 +58,7 @@ public class Card {
         return counterable;
     }
 
-    public boolean isPlayable(Card other) {
+    public boolean isPlayableOn(Card other) {
         switch (this.getColor()) {
             case BLACK:
                 return this.getValue() == Value.FUCKYOU || this.getValue() == other.getValue();

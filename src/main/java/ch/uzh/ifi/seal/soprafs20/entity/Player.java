@@ -172,7 +172,7 @@ public class Player implements Serializable {
                 playable.add(i);
             }
             else {
-                if (peek.isPlayable(card)) {
+                if (card.isPlayableOn(peek)) {
                     playable.add(i);
                 }
             }
