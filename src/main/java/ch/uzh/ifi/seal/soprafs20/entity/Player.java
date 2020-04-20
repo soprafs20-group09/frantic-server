@@ -120,15 +120,13 @@ public class Player implements Serializable {
         this.admin = admin;
     }
 
-    public List<Integer> hasNiceTry() {
-        List<Integer> result = new ArrayList<>();
+    public int hasNiceTry() {
         for (int i = 0; i < hand.size(); i++) {
             if (hand.peek(i).getValue() == Value.NICETRY) {
-                result.add(i);
-                return result;
+                return i;
             }
         }
-        return result;
+        return -1;
     }
 
     public List<Integer> hasCounterAttack() {
