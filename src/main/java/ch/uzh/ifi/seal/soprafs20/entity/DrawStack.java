@@ -21,7 +21,9 @@ public class DrawStack extends Pile<Card> {
                     this.push(new Card(c, i, orderNr++));
                 }
             }
-            this.push(new Card(c, Type.SPECIAL, Value.SECONDCHANCE, false, orderNr++));
+            if (c != Color.BLACK) {
+                this.push(new Card(c, Type.SPECIAL, Value.SECONDCHANCE, false, orderNr++));
+            }
         }
         this.push(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, orderNr));
         this.shuffle();
