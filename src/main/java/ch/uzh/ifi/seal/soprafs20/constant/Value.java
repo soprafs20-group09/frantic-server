@@ -21,5 +21,6 @@ public enum Value {
     FUCKYOU,
     GIFT,
     COLORWISH,
-    NUMBERWISH
+    NUMBERWISH,
+    NONE
 }

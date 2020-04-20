@@ -57,6 +57,7 @@ public class FranticUtils {
         valueMap.put(Value.NICETRY, "nice-try");
         valueMap.put(Value.FUCKYOU, "fuck-you");
         valueMap.put(Value.GIFT, "gift");
+        valueMap.put(Value.NONE, "none");
     }
 
     private static void fillColorMap() {
@@ -66,6 +67,7 @@ public class FranticUtils {
         colorMap.put(Color.RED, "red");
         colorMap.put(Color.BLACK, "black");
         colorMap.put(Color.MULTICOLOR, "multicolor");
+        colorMap.put(Color.NONE, "none");
     }
 
     private static void fillTypeMap() {
