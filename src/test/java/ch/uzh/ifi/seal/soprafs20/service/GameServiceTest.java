@@ -11,9 +11,7 @@ import org.mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 public class GameServiceTest {
 
@@ -153,12 +151,12 @@ public class GameServiceTest {
     public void fantasticFourColorActionTest() {
         FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
         Mockito.when(fantasticFourDTO.getColor()).thenReturn(Color.RED);
-        Mockito.when(fantasticFourDTO.getPlayers()).thenReturn(Collections.singletonMap("testIdentity", 4));
+        Mockito.when(fantasticFourDTO.getTargets()).thenReturn(Collections.singletonMap("testIdentity", 4));
 
         gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
 
         Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
-                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getPlayers());
+                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getTargets());
     }
 
     @Test
@@ -166,12 +164,12 @@ public class GameServiceTest {
         FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
         Mockito.when(fantasticFourDTO.getColor()).thenReturn(null);
         Mockito.when(fantasticFourDTO.getNumber()).thenReturn(1);
-        Mockito.when(fantasticFourDTO.getPlayers()).thenReturn(Collections.singletonMap("testIdentity", 4));
+        Mockito.when(fantasticFourDTO.getTargets()).thenReturn(Collections.singletonMap("testIdentity", 4));
 
         gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
 
         Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
-                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getPlayers());
+                fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getTargets());
     }
 
     @Test

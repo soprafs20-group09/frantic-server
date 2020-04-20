@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
-import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
@@ -99,7 +98,7 @@ public class GameService {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
             game.getCurrentGameRound().storeFantasticFourAction(identity, dto.getNumber(),
-                    dto.getColor(), dto.getPlayers());
+                    dto.getColor(), dto.getTargets());
         }
     }
 

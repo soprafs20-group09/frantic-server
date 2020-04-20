@@ -6,18 +6,18 @@ import java.util.Map;
 
 public class FantasticFourDTO {
 
-    private Map<String, Integer> players;
+    private Map<String, Integer> targets;
 
     private Color color;
 
     private int number;
 
-    public Map<String, Integer> getPlayers() {
-        return players;
+    public Map<String, Integer> getTargets() {
+        return targets;
     }
 
-    public void setPlayers(Map<String, Integer> players) {
-        this.players = players;
+    public void setTargets(Map<String, Integer> targets) {
+        this.targets = targets;
     }
 
     public Color getColor() {
