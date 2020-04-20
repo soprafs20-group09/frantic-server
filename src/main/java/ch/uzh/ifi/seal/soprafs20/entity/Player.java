@@ -168,14 +168,15 @@ public class Player implements Serializable {
         List<Card> cards = hand.getCards();
         for (int i = 0; i < hand.size(); i++) {
             Card card = cards.get(i);
-            if (card.getValue() == Value.FUCKYOU && this.hand.size() == 10) {
-                playable.add(i);
-            }
-            else {
-                if (card.isPlayableOn(peek)) {
+            if (card.getValue() == Value.FUCKYOU ) {
+                if (this.hand.size() == 10) {
                     playable.add(i);
                 }
             }
+            else if (card.isPlayableOn(peek)) {
+                playable.add(i);
+            }
+
         }
         return playable.stream().mapToInt(i -> i).toArray();
     }
