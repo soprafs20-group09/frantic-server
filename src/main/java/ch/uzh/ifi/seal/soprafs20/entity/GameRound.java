@@ -225,7 +225,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Map<Player, Integer> distribution = new HashMap<>();
         for (Map.Entry<String, Integer> entry : players.entrySet()) {
-            distribution.put(getPlayerByIdentity(entry.getKey()), entry.getValue());
+            distribution.put(getPlayerByUsername(entry.getKey()), entry.getValue());
         }
         if (color == null) {
             this.currentAction = new FantasticFourAction(initiator, distribution, value,
