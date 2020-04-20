@@ -19,6 +19,7 @@ public class GiftAction implements Action {
 
     @Override
     public void perform() {
+        Arrays.sort(gifts);
         for (int i = this.gifts.length - 1; i >= 0; i--) {
             if (this.initiator.peekCard(this.gifts[i]).getValue() != Value.FUCKYOU) {
                 target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
