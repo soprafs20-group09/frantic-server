@@ -82,7 +82,7 @@ public class GameRound {
             startTurn();
         }
         else {
-            onRoundOver();
+            prepareNiceTry();
         }
     }
 
@@ -142,8 +142,32 @@ public class GameRound {
                         }
                     }
                 }
-                else {
-                    // needed later for Counter attack & nice try
+                //counter attack case
+                else if (this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
+                    for (Player target : this.currentAction.getTargets()) {
+                        if (player.equals(target)) {
+                            this.discardPile.push(cardToPlay);
+                            this.gameService.sendHand(this.lobbyId, player);
+                            this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
+                            sendGameState();
+                            this.gameService.sendActionResponse(this.lobbyId, player, this.discardPile.peekSecond());
+                            this.timer.cancel();
+                            startCounterAttackTimer(30);
+                            break;
+                        }
+                    }
+                }
+                //nice try case
+                else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
+                    for (Player potentialWinner : this.listOfPlayers) {
+                        if (potentialWinner.getHandSize() == 0) {
+                            this.timer.cancel();
+                            drawCardFromStack(potentialWinner, 3);
+                            this.gameService.sendHand(this.lobbyId, potentialWinner);
+
+                        }
+                    }
+                    prepareNewTurn();
                 }
             }
         }
@@ -263,13 +287,22 @@ public class GameRound {
     }
 
     private void prepareCounterAttack() {
-        for (Player player : listOfPlayers) {
-            List<Integer> cards = player.hasCounterAttack();
+        for (Player target : this.currentAction.getTargets()) {
+            List<Integer> cards = target.hasCounterAttack();
             if (!cards.isEmpty()) {
                 //TODO: Send counter attack opportunity
             }
         }
         startCounterAttackTimer(5);
+    }
+
+    private void prepareNiceTry() {
+        for (Player player : this.listOfPlayers) {
+            if (player.hasNiceTry() != -1) {
+                //TODO: Send Nice Try opportunity
+            }
+        }
+        startNiceTryTimer(5);
     }
 
     private void performEvent() {
@@ -341,6 +374,18 @@ public class GameRound {
             @Override
             public void run() {
                 performAction();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startNiceTryTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                onRoundOver();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
