@@ -72,6 +72,7 @@ public class FranticUtils {
         typeMap.put(Type.BACK, "back");
         typeMap.put(Type.SPECIAL, "special");
         typeMap.put(Type.NUMBER, "number");
+        typeMap.put(Type.WISH, "wish");
     }
 
     public static String getStringRepresentation(Value v) {
