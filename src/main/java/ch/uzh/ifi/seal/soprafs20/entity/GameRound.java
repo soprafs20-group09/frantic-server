@@ -138,6 +138,7 @@ public class GameRound {
                         finishSecondChance();
                     }
                     else {
+                        sendGameState();
                         this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                     }
                 }
