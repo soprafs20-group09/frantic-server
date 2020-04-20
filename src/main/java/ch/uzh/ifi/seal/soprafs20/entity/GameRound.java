@@ -116,35 +116,35 @@ public class GameRound {
         if (player != null) {
             Card uppermostCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
-            if (uppermostCard == null || cardToPlay == null || (!cardToPlay.isPlayableOn(uppermostCard) && (uppermostCard.getValue() != Value.FUCKYOU))) {
-                return;
-            }
-            if (player == this.currentPlayer) {
-                cardToPlay = player.popCard(index);
-                this.discardPile.push(cardToPlay);
-                this.gameService.sendHand(this.lobbyId, player);
-                this.hasCurrentPlayerMadeMove = true;
+            if (uppermostCard != null && cardToPlay != null && cardToPlay.isPlayableOn(uppermostCard) &&
+                    (uppermostCard.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
+                if (player == this.currentPlayer) {
+                    cardToPlay = player.popCard(index);
+                    this.discardPile.push(cardToPlay);
+                    this.gameService.sendHand(this.lobbyId, player);
+                    this.hasCurrentPlayerMadeMove = true;
 
-                if (cardToPlay.getType() == Type.NUMBER) {
-                    this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
-                    finishTurn();
-                }
-                else if (cardToPlay.getType() == Type.SPECIAL) {
-                    this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
-                    if (cardToPlay.getValue() == Value.FUCKYOU) {
+                    if (cardToPlay.getType() == Type.NUMBER) {
+                        this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
                         finishTurn();
                     }
-                    else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
-                        finishSecondChance();
-                    }
-                    else {
-                        sendGameState();
-                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                    else if (cardToPlay.getType() == Type.SPECIAL) {
+                        this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()), player.getUsername());
+                        if (cardToPlay.getValue() == Value.FUCKYOU) {
+                            finishTurn();
+                        }
+                        else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                            finishSecondChance();
+                        }
+                        else {
+                            sendGameState();
+                            this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                        }
                     }
                 }
-            }
-            else {
-                // needed later for Counter attack & nice try
+                else {
+                    // needed later for Counter attack & nice try
+                }
             }
         }
     }
