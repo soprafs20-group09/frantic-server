@@ -254,8 +254,10 @@ public class GameRound {
         Player[] targets = currentAction.getTargets();
         sendGameState();
         this.gameService.sendHand(this.lobbyId, initiator);
-        for (Player target : targets) {
-            this.gameService.sendHand(this.lobbyId, target);
+        if (targets != null) {
+            for (Player target : targets) {
+                this.gameService.sendHand(this.lobbyId, target);
+            }
         }
         finishTurn();
     }
