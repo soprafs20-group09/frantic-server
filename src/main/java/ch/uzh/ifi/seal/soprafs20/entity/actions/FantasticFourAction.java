@@ -27,7 +27,7 @@ public class FantasticFourAction implements Action {
         this.cardDistribution  = distribution;
         this.targets = players.toArray(new Player[players.size()]);
         this.wishedValue = Value.values()[value-1];
-        this.wishedColor = Color.MULTICOLOR;
+        this.wishedColor = Color.NONE;
         this.discardPile = discardPile;
         this.drawStack = drawStack;
     }
@@ -37,7 +37,7 @@ public class FantasticFourAction implements Action {
         ArrayList<Player> players = new ArrayList<>(distribution.keySet());
         this.targets = players.toArray(new Player[players.size()]);
         this.cardDistribution  = distribution;
-        this.wishedValue = Value.FANTASTICFOUR;
+        this.wishedValue = Value.NONE;
         this.wishedColor = wishedColor;
         this.discardPile = discardPile;
         this.drawStack = drawStack;
