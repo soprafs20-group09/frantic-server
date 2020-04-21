@@ -39,12 +39,7 @@ public class ExchangeAction implements Action {
         return true;
     }
 
-    @Override
-    public Chat getChat() {
-        return null;
-    }
-
-    public void perform() {
+    public Chat perform() {
         ArrayList<Card> initiatorCards = new ArrayList<Card>();
         for (int i : exchangeCards) {
             Card toPush = this.initiator.peekCard(i);
@@ -85,5 +80,6 @@ public class ExchangeAction implements Action {
             this.target.pushCardToHand(c);
         }
 
+        return new Chat();
     }
 }

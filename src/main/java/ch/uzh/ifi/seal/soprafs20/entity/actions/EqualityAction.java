@@ -24,7 +24,7 @@ public class EqualityAction implements Action {
     }
 
     @Override
-    public void perform() {
+    public Chat perform() {
         if (this.target != null) {
             while (this.initiator.getHandSize() > this.target.getHandSize()) {
                 this.target.pushCardToHand(drawStack.pop());
@@ -33,6 +33,8 @@ public class EqualityAction implements Action {
         }
         discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
+        return new Chat("event", "equality", this.target.getUsername()
+                + " drew " + this.cardsDrawn + " cards.");
     }
 
     @Override
@@ -48,11 +50,5 @@ public class EqualityAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
-    }
-
-    @Override
-    public Chat getChat() {
-        return new Chat("event", "equality", this.target.getUsername()
-                + " drew " + this.cardsDrawn + " cards.");
     }
 }

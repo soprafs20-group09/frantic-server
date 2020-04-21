@@ -33,9 +33,10 @@ public class FantasticAction implements Action {
     }
 
     @Override
-    public void perform() {
+    public Chat perform() {
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
+        return new Chat();
     }
 
     @Override
@@ -51,10 +52,5 @@ public class FantasticAction implements Action {
     @Override
     public boolean isCounterable() {
         return false;
-    }
-
-    @Override
-    public Chat getChat() {
-        return null;
     }
 }

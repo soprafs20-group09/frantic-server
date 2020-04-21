@@ -19,8 +19,9 @@ public class CounterAttackAction implements Action {
     }
 
     @Override
-    public void perform() {
+    public Chat perform() {
         this.discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
+        return new Chat();
     }
 
     @Override
@@ -36,10 +37,5 @@ public class CounterAttackAction implements Action {
     @Override
     public boolean isCounterable() {
         return false;
-    }
-
-    @Override
-    public Chat getChat() {
-        return null;
     }
 }

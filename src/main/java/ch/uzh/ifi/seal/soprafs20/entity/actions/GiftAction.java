@@ -19,13 +19,15 @@ public class GiftAction implements Action {
     }
 
     @Override
-    public void perform() {
+    public Chat perform() {
         Arrays.sort(gifts);
         for (int i = this.gifts.length - 1; i >= 0; i--) {
             if (this.initiator.peekCard(this.gifts[i]).getValue() != Value.FUCKYOU) {
                 target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
             }
         }
+        return new Chat("event", "gift", this.initiator.getUsername()
+                + " gifted " + this.target.getUsername() + " 2 cards.");
     }
 
     @Override
@@ -41,11 +43,5 @@ public class GiftAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
-    }
-
-    @Override
-    public Chat getChat() {
-        return new Chat("event", "gift", this.initiator.getUsername()
-                + " gifted " + this.target.getUsername() + " 2 cards.");
     }
 }

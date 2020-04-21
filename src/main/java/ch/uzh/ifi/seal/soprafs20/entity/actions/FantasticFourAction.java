@@ -42,7 +42,7 @@ public class FantasticFourAction implements Action {
 
 
     @Override
-    public void perform() {
+    public Chat perform() {
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
             for (int i = 0; i < target.getValue(); i++){
@@ -53,7 +53,7 @@ public class FantasticFourAction implements Action {
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
-
+        return new Chat();
     }
 
     @Override
@@ -69,10 +69,5 @@ public class FantasticFourAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
-    }
-
-    @Override
-    public Chat getChat() {
-        return null;
     }
 }

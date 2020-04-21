@@ -14,10 +14,11 @@ public class SkipAction implements Action{
     }
 
     @Override
-    public void perform() {
+    public Chat perform() {
         if (!this.target.isBlocked()){
             this.target.setBlocked(true);
         }
+        return new Chat();
     }
 
     @Override
@@ -33,10 +34,5 @@ public class SkipAction implements Action{
     @Override
     public boolean isCounterable() {
         return true;
-    }
-
-    @Override
-    public Chat getChat() {
-        return null;
     }
 }
