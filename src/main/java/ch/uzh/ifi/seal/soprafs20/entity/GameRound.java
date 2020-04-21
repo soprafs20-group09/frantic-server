@@ -20,7 +20,7 @@ public class GameRound {
     private Timer timer;
     private int turnNumber;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
-    private HashMap<Player, Integer> map = new HashMap<Player, Integer>();
+    private HashMap<Player, Integer> map;
     private boolean exploded;
     private String timeBombState;
     private List<Player> roundWinners;
@@ -39,7 +39,7 @@ public class GameRound {
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
         this.turnNumber = 0;
-        this.remainingTurns = -1; //indicates that there is no limit
+        this.map = new HashMap<Player, Integer>();
         this.currentAction = null;
         this.events = new ArrayList<>();
     }
@@ -528,9 +528,5 @@ public class GameRound {
         this.events.add(vandalism);
 
         Collections.shuffle(this.events);
-    }
-
-    public List<Player> getListOfPlayers(){
-        return this.listOfPlayers;
     }
 }

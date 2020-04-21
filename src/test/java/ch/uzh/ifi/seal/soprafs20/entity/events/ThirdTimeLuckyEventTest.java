@@ -60,7 +60,7 @@ public class ThirdTimeLuckyEventTest {
     }
 
     /*@Test
-    public void perfromTest() {
+    public void performTest() {
          this.thirdTimeLucky.performEvent();
 
          assertEquals(3, p1.getHandSize());
