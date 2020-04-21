@@ -3,10 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DiscardPile;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +47,7 @@ class EqualityActionTest {
 
     @Test
     public void performTest(){
-        equalityAction.perform();
+        Chat resultChat = equalityAction.perform();
         assertEquals(3, this.initiator.getHandSize());
         assertEquals(3, this.target.getHandSize());
         assertEquals(blue1, this.initiator.popCard(0));
@@ -63,6 +60,10 @@ class EqualityActionTest {
         assertEquals(colorWishBlue.getColor(), popped.getColor());
         assertEquals(colorWishBlue.getType(), popped.getType());
         assertEquals(colorWishBlue.getValue(), popped.getValue());
+
+        assertEquals("event", resultChat.getType());
+        assertEquals("equality", resultChat.getIcon());
+        assertEquals("TripleOwner7 drew 3 cards.", resultChat.getMessage());
     }
 
     @Test
@@ -78,13 +79,5 @@ class EqualityActionTest {
     @Test
     public void isCounterableTest(){
         assertTrue(equalityAction.isCounterable());
-    }
-
-    @Test
-    public void getChatTest() {
-        assertEquals("event", equalityAction.getChat().getType());
-        assertEquals("equality", equalityAction.getChat().getIcon());
-        equalityAction.perform();
-        assertEquals("TripleOwner7 drew 3 cards.", equalityAction.getChat().getMessage());
     }
 }

@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,12 +39,16 @@ class GiftActionTest {
 
     @Test
     public void performTest(){
-        giftAction.perform();
+        Chat resultChat = giftAction.perform();
         assertEquals(1, this.initiator.getHandSize());
         assertEquals(2, this.target.getHandSize());
         assertEquals(blue1, this.initiator.popCard(0));
         assertEquals(blue2, this.target.popCard(0));
         assertEquals(blue3, this.target.popCard(0));
+
+        assertEquals("event", resultChat.getType());
+        assertEquals("gift", resultChat.getIcon());
+        assertEquals("GiftMaker gifted GiftTaker 2 cards.", resultChat.getMessage());
     }
 
     @Test
@@ -71,13 +76,5 @@ class GiftActionTest {
         assertEquals(blue2, this.initiator.popCard(0));
         assertEquals(fuckYou, this.initiator.popCard(0));
         assertEquals(blue3, this.target.popCard(0));
-    }
-
-    @Test
-    public void getChatTest() {
-        assertEquals("event", giftAction.getChat().getType());
-        assertEquals("gift", giftAction.getChat().getIcon());
-        giftAction.perform();
-        assertEquals("GiftMaker gifted GiftTaker 2 cards.", giftAction.getChat().getMessage());
     }
 }
