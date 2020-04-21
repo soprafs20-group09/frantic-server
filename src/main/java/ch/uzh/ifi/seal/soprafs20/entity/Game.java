@@ -45,8 +45,8 @@ public class Game {
         this.currentGameRound.startGameRound();
     }
 
-    public void endGameRound() {
-        updatePoints();
+    public void endGameRound(String timeBombState, List<Player> roundWinners) {
+        updatePoints(timeBombState, roundWinners);
         removeCardsFromHands();
         if (!gameOver()) {
             //TODO: Send end of round package
@@ -58,12 +58,25 @@ public class Game {
         }
     }
 
-    private void updatePoints() {
+    private void updatePoints(String timeBombState, List<Player> roundWinners) {
         int maxPoints = 0;
         Player playerWithMaxPoints = this.firstPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : this.listOfPlayers) {
             int playersPoints = player.calculatePoints();
-            player.setPoints(player.getPoints() + playersPoints);
+            switch (timeBombState) {
+                case "noTimeBomb":
+                    player.setPoints(player.getPoints() + playersPoints);
+                case "exploded":
+                    player.setPoints(player.getPoints() + 2 * playersPoints);
+                case "defused":
+                    for (Player winner : roundWinners) {
+                        if (player.getUsername().equals(winner.getUsername())) {
+                            player.setPoints(player.getPoints() - 10);
+                        } else {
+                            player.setPoints(player.getPoints() + playersPoints + 10);
+                        }
+                    }
+            }
             if (playersPoints >= maxPoints) {
                 maxPoints = playersPoints;
                 playerWithMaxPoints = player;

@@ -18,9 +18,12 @@ public class GameRound {
     private Player currentPlayer;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
-    private boolean timeBomb; // indicates if the timeBomb-event is currently running
     private int turnNumber;
-    private int remainingTurns;
+    private boolean timeBomb; // indicates if the timeBomb-event is currently running
+    private HashMap<Player, Integer> map = new HashMap<Player, Integer>();
+    private boolean exploded;
+    private String timeBombState;
+    private List<Player> roundWinners;
     private List<Event> events;
     private Pile<Card> drawStack;
     private Pile<Card> discardPile;
@@ -77,6 +80,9 @@ public class GameRound {
 
     private void prepareNewTurn() {
         if (!isRoundOver()) {
+            if (timeBomb) {
+                incrementCurrentPlayerMap(currentPlayer);
+            }
             changePlayer();
             sendGameState();
             this.hasCurrentPlayerMadeMove = false;
@@ -345,6 +351,18 @@ public class GameRound {
         return mappedPlayers;
     }
 
+    public void initMap(Player player, int i) {
+        map.put(player, i);
+    }
+
+    private void incrementCurrentPlayerMap(Player player) {
+        map.put(player, map.get(player) + 1);
+    }
+
+    public void setTimeBomb(boolean b) {
+        this.timeBomb = b;
+    }
+
     private void changePlayer() {
         int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
         playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
@@ -353,6 +371,7 @@ public class GameRound {
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
             this.currentPlayer.setBlocked(false);
+            incrementCurrentPlayerMap(this.currentPlayer);
             changePlayer();
         }
     }
@@ -360,11 +379,39 @@ public class GameRound {
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
     private boolean isRoundOver() {
-        return (getHandSizes().containsValue(0) || this.remainingTurns == 0);
+        return (getHandSizes().containsValue(0) || isTimeBombExploding());
+    }
+
+    private boolean isTimeBombExploding() {
+        this.exploded = true;
+        for (Player player : map.keySet()){
+            if (map.get(player) != 3) {
+                this.exploded = false;
+            }
+        }
+        if (!timeBomb) {
+            updateTimeBombState("noTimeBomb");
+        } else {
+            if (this.exploded){
+                updateTimeBombState("exploded");
+            } else {
+                updateTimeBombState("defused");
+            }
+        }
+        return this.exploded;
+    }
+
+    private void updateTimeBombState(String timeBombState) {
+        this.timeBombState = timeBombState;
     }
 
     private void onRoundOver() {
-        this.game.endGameRound();
+        for (Player player : listOfPlayers) {
+            if (player.getHandSize() == 0) {
+                roundWinners.add(player);
+            }
+        }
+        this.game.endGameRound(timeBombState, roundWinners);
     }
 
     public void playerLostConnection(Player player) {
@@ -372,6 +419,7 @@ public class GameRound {
             this.timer.cancel();
             prepareNewTurn();
         }
+        map.remove(player);
         this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
         sendGameState();
     }
@@ -428,6 +476,10 @@ public class GameRound {
             }
         }
         return null;
+    }
+
+    public List<Player> getListOfPlayers() {
+        return this.listOfPlayers;
     }
 
     private void initEvents() {
