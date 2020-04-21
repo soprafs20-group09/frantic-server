@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.actions;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 import java.util.Arrays;
@@ -40,5 +41,10 @@ public class GiftAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
+    }
+
+    public Chat getChat() {
+        return new Chat("event", "gift", this.initiator.getUsername()
+                + " gifted " + this.target.getUsername() + " 2 cards.");
     }
 }

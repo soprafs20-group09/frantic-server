@@ -3,10 +3,8 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DiscardPile;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 
 public class EqualityAction implements Action {
     private Player initiator;
@@ -14,6 +12,7 @@ public class EqualityAction implements Action {
     private Color color;
     private DiscardPile discardPile;
     private DrawStack drawStack;
+    private int cardsDrawn;
 
     public EqualityAction(Player initiator, Player target, Color color, DiscardPile discardPile, DrawStack drawStack) {
         this.initiator = initiator;
@@ -28,6 +27,7 @@ public class EqualityAction implements Action {
         if (this.target != null) {
             while (this.initiator.getHandSize() > this.target.getHandSize()) {
                 this.target.pushCardToHand(drawStack.pop());
+                this.cardsDrawn += 1;
             }
         }
         discardPile.pop();
@@ -47,5 +47,10 @@ public class EqualityAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
+    }
+
+    public Chat getChat() {
+        return new Chat("event", "equality", this.target.getUsername()
+                + " drew " + cardsDrawn + " cards.");
     }
 }
