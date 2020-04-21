@@ -285,7 +285,12 @@ public class GameRound {
         Player target = getPlayerByUsername(username);
         this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         timer.cancel();
-        prepareCounterAttack();
+        if (this.currentAction.getTargets() != null) {
+            prepareCounterAttack();
+        }
+        else {
+            performAction();
+        }
     }
 
     //Case where CounterAttack is played as color-wish
@@ -393,17 +398,19 @@ public class GameRound {
 
     private boolean isTimeBombExploding() {
         this.exploded = true;
-        for (Player player : map.keySet()){
+        for (Player player : map.keySet()) {
             if (map.get(player) != 3) {
                 this.exploded = false;
             }
         }
         if (!timeBomb) {
             updateTimeBombState("noTimeBomb");
-        } else {
-            if (this.exploded){
+        }
+        else {
+            if (this.exploded) {
                 updateTimeBombState("exploded");
-            } else {
+            }
+            else {
                 updateTimeBombState("defused");
             }
         }
@@ -433,7 +440,8 @@ public class GameRound {
                     for (Player winner : roundWinners) {
                         if (player.getUsername().equals(winner.getUsername())) {
                             player.setPoints(player.getPoints() - 10);
-                        } else {
+                        }
+                        else {
                             player.setPoints(player.getPoints() + playersPoints + 10);
                         }
                     }
