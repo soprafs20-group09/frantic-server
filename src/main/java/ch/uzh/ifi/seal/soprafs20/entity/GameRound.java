@@ -411,7 +411,30 @@ public class GameRound {
                 roundWinners.add(player);
             }
         }
-        this.game.endGameRound(timeBombState, roundWinners);
+        int maxPoints = 0;
+        Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
+        for (Player player : listOfPlayers) {
+            int playersPoints = player.calculatePoints();
+            switch (timeBombState) {
+                case "noTimeBomb":
+                    player.setPoints(player.getPoints() + playersPoints);
+                case "exploded":
+                    player.setPoints(player.getPoints() + 2 * playersPoints);
+                case "defused":
+                    for (Player winner : roundWinners) {
+                        if (player.getUsername().equals(winner.getUsername())) {
+                            player.setPoints(player.getPoints() - 10);
+                        } else {
+                            player.setPoints(player.getPoints() + playersPoints + 10);
+                        }
+                    }
+            }
+            if (playersPoints >= maxPoints) {
+                maxPoints = playersPoints;
+                playerWithMaxPoints = player;
+            }
+        }
+        this.game.endGameRound(playerWithMaxPoints);
     }
 
     public void playerLostConnection(Player player) {
