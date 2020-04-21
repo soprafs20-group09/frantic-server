@@ -46,42 +46,42 @@ public class GameController {
         gameService.endTurn(lobbyId, identity);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/exchange")
+    @MessageMapping("/lobby/{lobbyId}/action/exchange")
     public void exchange(@DestinationVariable String lobbyId,
                         SimpMessageHeaderAccessor sha, ExchangeDTO dto) {
         String identity = sha.getUser().getName();
         gameService.exchange(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/gift")
+    @MessageMapping("/lobby/{lobbyId}/action/gift")
     public void gift(@DestinationVariable String lobbyId,
                         SimpMessageHeaderAccessor sha, GiftDTO dto) {
         String identity = sha.getUser().getName();
         gameService.gift(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/skip")
+    @MessageMapping("/lobby/{lobbyId}/action/skip")
     public void skip(@DestinationVariable String lobbyId,
                      SimpMessageHeaderAccessor sha, SkipDTO dto) {
         String identity = sha.getUser().getName();
         gameService.skip(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/fantastic")
+    @MessageMapping("/lobby/{lobbyId}/action/fantastic")
     public void fantastic(@DestinationVariable String lobbyId,
                         SimpMessageHeaderAccessor sha, FantasticDTO dto) {
         String identity = sha.getUser().getName();
         gameService.fantastic(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/fantastic-four")
+    @MessageMapping("/lobby/{lobbyId}/action/fantastic-four")
     public void fantasticFour(@DestinationVariable String lobbyId,
                         SimpMessageHeaderAccessor sha, FantasticFourDTO dto) {
         String identity = sha.getUser().getName();
         gameService.fantasticFour(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/equality")
+    @MessageMapping("/lobby/{lobbyId}/action/equality")
     public void equality(@DestinationVariable String lobbyId,
                           SimpMessageHeaderAccessor sha, EqualityDTO dto) {
         String identity = sha.getUser().getName();
