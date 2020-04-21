@@ -4,9 +4,8 @@ import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 public interface Action {
-    void perform();
+    Chat perform();
     Player[] getTargets();
     Player getInitiator();
     boolean isCounterable();
-    Chat getChat();
 }
