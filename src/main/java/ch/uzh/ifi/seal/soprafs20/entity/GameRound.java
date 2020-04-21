@@ -127,6 +127,9 @@ public class GameRound {
 
                     if (cardToPlay.getType() == Type.NUMBER) {
                         this.gameService.sendChatPlayerMessage(this.lobbyId, "played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay), player.getUsername());
+                        if (cardToPlay.getColor() == Color.BLACK) {
+                            performEvent();
+                        }
                         finishTurn();
                     }
                     else if (cardToPlay.getType() == Type.SPECIAL) {
