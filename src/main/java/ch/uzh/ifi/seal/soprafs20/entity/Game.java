@@ -16,7 +16,6 @@ public class Game {
     private int maxPoints;
     private Player firstPlayer;
     private List<Player> winners;
-    private List<Event> events;
     private Timer timer;
 
     private GameService gameService;
@@ -29,7 +28,6 @@ public class Game {
         this.firstPlayer = listOfPlayers.get(0);
         this.maxPoints = calculateMaxPoints();
         this.winners = new ArrayList<>();
-        this.events = new ArrayList<>();
     }
 
     public GameRound getCurrentGameRound() {
@@ -37,16 +35,13 @@ public class Game {
     }
 
     public void startGame() {
-        initEvents();
-        shuffleEvents();
-        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer);
         this.currentGameRound.startGameRound();
     }
 
     private void startNewGameRound() {
-        shuffleEvents();
         this.gameService.sendStartGameRound(this.lobbyId);
-        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer, this.events);
+        this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer);
         this.currentGameRound.startGameRound();
     }
 
@@ -175,55 +170,5 @@ public class Game {
 
     private void removeFromPlayerList(Player player) {
         this.listOfPlayers.removeIf(p -> player.getIdentity().equals(p.getIdentity()));
-    }
-
-    private void shuffleEvents() {
-        Collections.shuffle(this.events);
-    }
-
-    private void initEvents() {
-        //initialize all Events
-        Event charity = new CharityEvent();
-        Event communism = new CommunismEvent();
-        Event doomsday = new DoomsdayEvent();
-        Event earthquake = new EarthquakeEvent();
-        Event expansion = new ExpansionEvent();
-        Event finishLine = new FinishLineEvent();
-        Event fridayTheThirteenth = new FridayTheThirteenthEvent();
-        Event gamblingMan = new GamblingManEvent();
-        Event market = new MarketEvent();
-        Event matingSeason = new MatingSeasonEvent();
-        Event merryChristmas = new MerryChristmasEvent();
-        Event mexicanStandoff = new MexicanStandoffEvent();
-        Event recession = new RecessionEvent();
-        Event robinHood = new RobinHoodEvent();
-        Event surpriseParty = new SurprisePartyEvent();
-        Event theAllSeeingEye = new TheAllSeeingEyeEvent();
-        Event thirdTimeLucky = new ThirdTimeLuckyEvent();
-        Event timeBomb = new TimeBombEvent();
-        Event tornado = new TornadoEvent();
-        Event vandalism = new VandalismEvent();
-
-        //add them to the list of all events
-        this.events.add(charity);
-        this.events.add(communism);
-        this.events.add(doomsday);
-        this.events.add(earthquake);
-        this.events.add(expansion);
-        this.events.add(finishLine);
-        this.events.add(fridayTheThirteenth);
-        this.events.add(gamblingMan);
-        this.events.add(market);
-        this.events.add(merryChristmas);
-        this.events.add(matingSeason);
-        this.events.add(mexicanStandoff);
-        this.events.add(recession);
-        this.events.add(robinHood);
-        this.events.add(surpriseParty);
-        this.events.add(theAllSeeingEye);
-        this.events.add(thirdTimeLucky);
-        this.events.add(timeBomb);
-        this.events.add(tornado);
-        this.events.add(vandalism);
     }
 }

@@ -4,7 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
-import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
+import ch.uzh.ifi.seal.soprafs20.entity.events.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
@@ -29,7 +29,7 @@ public class GameRound {
     private final GameService gameService;
 
 
-    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer, List<Event> events) {
+    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
         this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
@@ -37,12 +37,13 @@ public class GameRound {
         this.gameService = GameService.getInstance();
         this.turnNumber = 0;
         this.remainingTurns = -1; //indicates that there is no limit
-        this.events = events;
         this.currentAction = null;
+        this.events = new ArrayList<>();
     }
 
     //creates Piles & player hands
     public void initializeGameRound() {
+        initEvents();
         this.drawStack = new DrawStack();
         this.discardPile = new DiscardPile();
 
@@ -273,6 +274,7 @@ public class GameRound {
     }
 
     private void performAction() {
+        this.timer.cancel();
         this.currentAction.perform();
         Player initiator = currentAction.getInitiator();
         Player[] targets = currentAction.getTargets();
@@ -407,5 +409,53 @@ public class GameRound {
             }
         }
         return null;
+    }
+
+    private void initEvents() {
+        //initialize all Events
+        Event charity = new CharityEvent();
+        Event communism = new CommunismEvent();
+        Event doomsday = new DoomsdayEvent();
+        Event earthquake = new EarthquakeEvent();
+        Event expansion = new ExpansionEvent();
+        Event finishLine = new FinishLineEvent();
+        Event fridayTheThirteenth = new FridayTheThirteenthEvent();
+        Event gamblingMan = new GamblingManEvent();
+        Event market = new MarketEvent();
+        Event matingSeason = new MatingSeasonEvent();
+        Event merryChristmas = new MerryChristmasEvent();
+        Event mexicanStandoff = new MexicanStandoffEvent();
+        Event recession = new RecessionEvent();
+        Event robinHood = new RobinHoodEvent();
+        Event surpriseParty = new SurprisePartyEvent();
+        Event theAllSeeingEye = new TheAllSeeingEyeEvent();
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent();
+        Event timeBomb = new TimeBombEvent();
+        Event tornado = new TornadoEvent();
+        Event vandalism = new VandalismEvent();
+
+        //add them to the list of all events
+        this.events.add(charity);
+        this.events.add(communism);
+        this.events.add(doomsday);
+        this.events.add(earthquake);
+        this.events.add(expansion);
+        this.events.add(finishLine);
+        this.events.add(fridayTheThirteenth);
+        this.events.add(gamblingMan);
+        this.events.add(market);
+        this.events.add(merryChristmas);
+        this.events.add(matingSeason);
+        this.events.add(mexicanStandoff);
+        this.events.add(recession);
+        this.events.add(robinHood);
+        this.events.add(surpriseParty);
+        this.events.add(theAllSeeingEye);
+        this.events.add(thirdTimeLucky);
+        this.events.add(timeBomb);
+        this.events.add(tornado);
+        this.events.add(vandalism);
+
+        Collections.shuffle(this.events);
     }
 }
