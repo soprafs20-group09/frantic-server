@@ -378,7 +378,9 @@ public class GameRound {
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
             this.currentPlayer.setBlocked(false);
-            incrementCurrentPlayerMap(this.currentPlayer);
+            if (timeBomb) {
+                incrementCurrentPlayerMap(this.currentPlayer);
+            }
             changePlayer();
         }
     }
