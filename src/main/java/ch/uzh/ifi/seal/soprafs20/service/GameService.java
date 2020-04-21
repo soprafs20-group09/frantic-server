@@ -109,6 +109,20 @@ public class GameService {
         }
     }
 
+    public void counterAttack(String lobbyId, String identity, CounterAttackDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeCounterAttackAction(identity, dto.getColor());
+        }
+    }
+
+    public void niceTry(String lobbyId, String identity, NiceTryDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().storeNiceTryAction(identity, dto.getColor());
+        }
+    }
+
     public void endTurn(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
@@ -173,6 +187,20 @@ public class GameService {
         ActionResponseDTO dto = new ActionResponseDTO();
         dto.setAction(FranticUtils.getStringRepresentation(card.getValue()));
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
+    }
+
+    public void sendCounterAttackWindow(String lobbyId, Player player, int[] playable, int time) {
+        CounterAttackWindowDTO dto = new CounterAttackWindowDTO();
+        dto.setPlayable(playable);
+        dto.setTime(time);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/attack-window", dto);
+    }
+
+    public void sendNiceTryWindow(String lobbyId, Player player, int[] playable, int time) {
+        NiceTryWindowDTO dto = new NiceTryWindowDTO();
+        dto.setPlayable(playable);
+        dto.setTime(time);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/nice-try-window", dto);
     }
 
     public void sendEndRound(String lobbyId, List<Player> players) {

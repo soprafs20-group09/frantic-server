@@ -87,4 +87,18 @@ public class GameController {
         String identity = sha.getUser().getName();
         gameService.equality(lobbyId, identity, dto);
     }
+
+    @MessageMapping("/lobby/{lobbyId}/action/counter-attack")
+    public void counterAttack(@DestinationVariable String lobbyId,
+                         SimpMessageHeaderAccessor sha, CounterAttackDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.counterAttack(lobbyId, identity, dto);
+    }
+
+    @MessageMapping("/lobby/{lobbyId}/action/nice-try")
+    public void counterAttack(@DestinationVariable String lobbyId,
+                              SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.niceTry(lobbyId, identity, dto);
+    }
 }
