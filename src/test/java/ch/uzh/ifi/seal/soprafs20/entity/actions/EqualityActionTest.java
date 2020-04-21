@@ -36,6 +36,7 @@ class EqualityActionTest {
         this.initiator.pushCardToHand(blue3);
 
         this.target = new Player();
+        this.target.setUsername("TripleOwner7");
 
         discardPile.push(red1);
 
@@ -77,5 +78,13 @@ class EqualityActionTest {
     @Test
     public void isCounterableTest(){
         assertTrue(equalityAction.isCounterable());
+    }
+
+    @Test
+    public void getChatTest() {
+        assertEquals("event", equalityAction.getChat().getType());
+        assertEquals("equality", equalityAction.getChat().getIcon());
+        equalityAction.perform();
+        assertEquals("TripleOwner7 drew 3 cards.", equalityAction.getChat().getMessage());
     }
 }

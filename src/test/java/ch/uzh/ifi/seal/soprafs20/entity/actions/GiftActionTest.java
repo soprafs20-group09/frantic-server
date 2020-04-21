@@ -23,11 +23,13 @@ class GiftActionTest {
     @BeforeEach
     public void setup() {
         this.initiator = new Player();
+        this.initiator.setUsername("GiftMaker");
         this.initiator.pushCardToHand(blue1);
         this.initiator.pushCardToHand(blue2);
         this.initiator.pushCardToHand(blue3);
 
         this.target = new Player();
+        this.target.setUsername("GiftTaker");
 
         int[] gifts = new int[]{1, 2};
 
@@ -69,5 +71,13 @@ class GiftActionTest {
         assertEquals(blue2, this.initiator.popCard(0));
         assertEquals(fuckYou, this.initiator.popCard(0));
         assertEquals(blue3, this.target.popCard(0));
+    }
+
+    @Test
+    public void getChatTest() {
+        assertEquals("event", giftAction.getChat().getType());
+        assertEquals("gift", giftAction.getChat().getIcon());
+        giftAction.perform();
+        assertEquals("GiftMaker gifted GiftTaker 2 cards.", giftAction.getChat().getMessage());
     }
 }
