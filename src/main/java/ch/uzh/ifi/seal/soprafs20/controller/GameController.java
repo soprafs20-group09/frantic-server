@@ -88,7 +88,7 @@ public class GameController {
         gameService.equality(lobbyId, identity, dto);
     }
 
-    @MessageMapping("/lobby/{lobbyId}/action/counter-attack")
+    @MessageMapping("/lobby/{lobbyId}/action/counterattack")
     public void counterAttack(@DestinationVariable String lobbyId,
                          SimpMessageHeaderAccessor sha, CounterAttackDTO dto) {
         String identity = sha.getUser().getName();
