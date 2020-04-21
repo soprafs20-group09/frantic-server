@@ -518,10 +518,10 @@ public class GameRound {
         //initialize all Events
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();
-        Event doomsday = new DoomsdayEvent();
+        Event doomsday = new DoomsdayEvent(this.game, this.listOfPlayers, this.currentPlayer);
         Event earthquake = new EarthquakeEvent();
         Event expansion = new ExpansionEvent();
-        Event finishLine = new FinishLineEvent();
+        Event finishLine = new FinishLineEvent(game, this.listOfPlayers);
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
         Event gamblingMan = new GamblingManEvent();
         Event market = new MarketEvent();
