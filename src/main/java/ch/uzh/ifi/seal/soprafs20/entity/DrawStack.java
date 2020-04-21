@@ -38,7 +38,13 @@ public class DrawStack extends Pile<Card> {
         for (int i = 0; i < 2; i++) {
             this.push(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.EQUALITY, true, orderNr++));
         }
-        // insert NiceTry (1) and CounterAttack (4)
+        for (int i = 0; i < 4; i++) {
+            this.push(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, true, orderNr++));
+        }
+        for (int i = 0; i < 1; i++) {
+            this.push(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.NICETRY, false, orderNr++));
+        }
+
         this.push(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, orderNr));
         this.shuffle();
     }
