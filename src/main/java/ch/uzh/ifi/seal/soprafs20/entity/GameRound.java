@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
@@ -57,6 +58,11 @@ public class GameRound {
                 player.pushCardToHand(card);
             }
         }
+
+        for (Player player : this.listOfPlayers) {
+            this.initMap(player, 0);
+        }
+
         //move initial card to discardPile
         this.discardPile.push(this.drawStack.pop());
     }
@@ -525,7 +531,7 @@ public class GameRound {
         Event surpriseParty = new SurprisePartyEvent();
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
-        Event timeBomb = new TimeBombEvent();
+        Event timeBomb = new TimeBombEvent(this);
         Event tornado = new TornadoEvent(this);
         Event vandalism = new VandalismEvent();
 
