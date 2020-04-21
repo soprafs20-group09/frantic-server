@@ -92,6 +92,10 @@ public class Player implements Serializable {
         return hand.pop(index);
     }
 
+    public Card popCard() {
+        return hand.pop(hand.size() -1);
+    }
+
     public void pushCardToHand(Card card) {
         this.hand.push(card);
     }

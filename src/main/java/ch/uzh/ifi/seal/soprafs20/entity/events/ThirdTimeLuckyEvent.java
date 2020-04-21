@@ -2,13 +2,15 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 
+import java.util.List;
+
 public class ThirdTimeLuckyEvent implements Event {
 
-    private GameRound gameRound;
+    private List<Player> playerList;
     private Pile<Card> drawStack;
 
     public ThirdTimeLuckyEvent(GameRound round, Pile<Card> stack) {
-        this.gameRound = round;
+        this.playerList = round.getListOfPlayers();
         this.drawStack = stack;
     }
 
@@ -17,7 +19,7 @@ public class ThirdTimeLuckyEvent implements Event {
     }
 
     public void performEvent() {
-        for (Player player : this.gameRound.getListOfPlayers()) {
+        for (Player player : this.playerList) {
            for (int i = 0; i < 3; i++) {
                if (!drawStack.empty()) {
                    player.pushCardToHand(drawStack.pop());

@@ -26,11 +26,11 @@ public class ThirdTimeLuckyEventTest {
     private Game game;
 
 
-    @Mock
+    /*@Mock
     PlayerService playerService;
 
 
-    /*public ThirdTimeLuckyEventTest() {
+    public ThirdTimeLuckyEventTest() {
         ArrayList<Player> playerList  = new ArrayList<>();
         p1 = new Player();
         p2 = new Player();
@@ -47,7 +47,7 @@ public class ThirdTimeLuckyEventTest {
         GameRound gameRound = new GameRound(game, "a", playerList, p1);
         DrawStack drawStack = new DrawStack();
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(gameRound, drawStack);
-    }*/
+    }
 
     @Test
     public void getNameTest() {
@@ -57,7 +57,7 @@ public class ThirdTimeLuckyEventTest {
     @Test
     public void getMessageTest() {
         assertEquals("Three cards for everyone!", thirdTimeLucky.getMessage());
-    }
+    }*/
 
     /*@Test
     public void performTest() {

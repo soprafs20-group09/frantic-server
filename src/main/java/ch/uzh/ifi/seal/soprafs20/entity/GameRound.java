@@ -525,7 +525,7 @@ public class GameRound {
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
         Event timeBomb = new TimeBombEvent();
-        Event tornado = new TornadoEvent();
+        Event tornado = new TornadoEvent(this);
         Event vandalism = new VandalismEvent();
 
         //add them to the list of all events

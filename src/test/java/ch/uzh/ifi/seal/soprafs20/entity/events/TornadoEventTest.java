@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TornadoEventTest {
 
-    private Event tornado = new TornadoEvent();
+    /*private Event tornado = new TornadoEvent();
 
     @Test
     public void getNameTest() {
@@ -16,5 +16,5 @@ public class TornadoEventTest {
     @Test
     public void getMessageTest() {
         assertEquals("Oh no! A tornado whirled all the cards around! Looks like we have to redistribute them!", tornado.getMessage());
-    }
+    }*/
 }
