@@ -273,6 +273,22 @@ public class GameRound {
         prepareCounterAttack();
     }
 
+    //Case where CounterAttack is played as color-wish
+    public void storeCounterAttackAction(String identity, Color color) {
+        Player initiator = getPlayerByIdentity(identity);
+        this.currentAction = new CounterAttackAction(initiator, color, (DiscardPile) this.discardPile);
+        timer.cancel();
+        performAction();
+    }
+
+    //Case where NiceTry is played as color-wish
+    public void storeNiceTryAction(String identity, Color color) {
+        Player initiator = getPlayerByIdentity(identity);
+        this.currentAction = new NiceTryAction(initiator, color, (DiscardPile) this.discardPile);
+        timer.cancel();
+        performAction();
+    }
+
     private void performAction() {
         this.timer.cancel();
         this.currentAction.perform();
