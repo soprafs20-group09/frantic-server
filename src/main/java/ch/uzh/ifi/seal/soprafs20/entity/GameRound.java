@@ -315,9 +315,9 @@ public class GameRound {
 
     private void prepareCounterAttack() {
         for (Player target : this.currentAction.getTargets()) {
-            List<Integer> cards = target.hasCounterAttack();
-            if (!cards.isEmpty()) {
-                //TODO: Send counter attack opportunity
+            int[] cards = target.hasCounterAttack();
+            if (cards.length > 0) {
+                this.gameService.sendCounterAttackWindow(this.lobbyId, target, cards, 5);
             }
         }
         startCounterAttackTimer(5);
@@ -325,8 +325,9 @@ public class GameRound {
 
     private void prepareNiceTry() {
         for (Player player : this.listOfPlayers) {
-            if (player.hasNiceTry() != -1) {
-                //TODO: Send Nice Try opportunity
+            int card = player.hasNiceTry();
+            if (card != -1) {
+                this.gameService.sendNiceTryWindow(this.lobbyId, player, new int[]{card}, 5);
             }
         }
         startNiceTryTimer(5);

@@ -1,14 +1,16 @@
 package ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+
 public class NiceTryDTO {
 
-    private String color;
+    private Color color;
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 }

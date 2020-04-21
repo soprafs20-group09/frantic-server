@@ -133,14 +133,14 @@ public class Player implements Serializable {
         return -1;
     }
 
-    public List<Integer> hasCounterAttack() {
+    public int[] hasCounterAttack() {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < hand.size(); i++) {
             if (hand.peek(i).getValue() == Value.COUNTERATTACK) {
                 result.add(i);
             }
         }
-        return result;
+        return result.stream().mapToInt(i -> i).toArray();
     }
 
     public int calculatePoints() {
