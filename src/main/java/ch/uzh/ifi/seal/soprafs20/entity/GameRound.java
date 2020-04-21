@@ -500,7 +500,7 @@ public class GameRound {
         Event robinHood = new RobinHoodEvent();
         Event surpriseParty = new SurprisePartyEvent();
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();
-        Event thirdTimeLucky = new ThirdTimeLuckyEvent();
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
         Event timeBomb = new TimeBombEvent();
         Event tornado = new TornadoEvent();
         Event vandalism = new VandalismEvent();
@@ -528,5 +528,9 @@ public class GameRound {
         this.events.add(vandalism);
 
         Collections.shuffle(this.events);
+    }
+
+    public List<Player> getListOfPlayers(){
+        return this.listOfPlayers;
     }
 }
