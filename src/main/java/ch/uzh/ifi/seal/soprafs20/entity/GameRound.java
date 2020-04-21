@@ -341,7 +341,7 @@ public class GameRound {
 
     private void performEvent() {
         Event event = this.events.remove(0);
-        //TODO: Send event information to clients
+        this.gameService.sendEvent(this.lobbyId, event);
         event.performEvent();
     }
 

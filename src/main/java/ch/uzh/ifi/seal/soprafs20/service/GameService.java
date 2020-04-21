@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
@@ -201,6 +202,13 @@ public class GameService {
         dto.setPlayable(playable);
         dto.setTime(time);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/nice-try-window", dto);
+    }
+
+    public void sendEvent(String lobbyId, Event event) {
+        EventDTO dto = new EventDTO();
+        dto.setEvent(event.getName());
+        dto.setMessage(event.getMessage());
+        webSocketService.sendToLobby(lobbyId, "/event", dto);
     }
 
     public void sendEndRound(String lobbyId, List<Player> players) {
