@@ -20,6 +20,7 @@ public class EqualityAction implements Action {
         this.color = color;
         this.discardPile = discardPile;
         this.drawStack = drawStack;
+        this.cardsDrawn = 0;
     }
 
     @Override
@@ -49,8 +50,9 @@ public class EqualityAction implements Action {
         return true;
     }
 
+    @Override
     public Chat getChat() {
         return new Chat("event", "equality", this.target.getUsername()
-                + " drew " + cardsDrawn + " cards.");
+                + " drew " + this.cardsDrawn + " cards.");
     }
 }

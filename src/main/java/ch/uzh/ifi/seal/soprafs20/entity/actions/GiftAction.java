@@ -43,6 +43,7 @@ public class GiftAction implements Action {
         return true;
     }
 
+    @Override
     public Chat getChat() {
         return new Chat("event", "gift", this.initiator.getUsername()
                 + " gifted " + this.target.getUsername() + " 2 cards.");

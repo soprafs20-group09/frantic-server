@@ -3,10 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DiscardPile;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -72,5 +69,10 @@ public class FantasticFourAction implements Action {
     @Override
     public boolean isCounterable() {
         return true;
+    }
+
+    @Override
+    public Chat getChat() {
+        return null;
     }
 }

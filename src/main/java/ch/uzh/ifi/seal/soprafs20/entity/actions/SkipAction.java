@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.actions;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 public class SkipAction implements Action{
@@ -32,5 +33,10 @@ public class SkipAction implements Action{
     @Override
     public boolean isCounterable() {
         return true;
+    }
+
+    @Override
+    public Chat getChat() {
+        return null;
     }
 }

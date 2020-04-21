@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.DiscardPile;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
@@ -50,5 +51,10 @@ public class FantasticAction implements Action {
     @Override
     public boolean isCounterable() {
         return false;
+    }
+
+    @Override
+    public Chat getChat() {
+        return null;
     }
 }
