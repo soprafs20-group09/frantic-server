@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 public class CounterAttackAction implements Action {
     private Player initiator;
@@ -21,7 +22,8 @@ public class CounterAttackAction implements Action {
     @Override
     public Chat perform() {
         this.discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
-        return new Chat();
+        return new Chat("event", "counter-attack", this.initiator.getUsername()
+                + " wished " + FranticUtils.getStringRepresentation(this.color));
     }
 
     @Override
