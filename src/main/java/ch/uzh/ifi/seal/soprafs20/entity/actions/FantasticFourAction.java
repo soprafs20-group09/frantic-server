@@ -62,7 +62,7 @@ public class FantasticFourAction implements Action {
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
-        if (this.wishedColor != null) {
+        if (this.wishedColor != Color.NONE) {
             chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
                     + " wished " + FranticUtils.getStringRepresentation(this.wishedColor)));
         }
