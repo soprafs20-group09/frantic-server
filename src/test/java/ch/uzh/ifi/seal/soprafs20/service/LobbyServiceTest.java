@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
@@ -307,7 +308,7 @@ public class LobbyServiceTest {
         lobbyService.kickPlayer("abc", testPlayer.getIdentity(), kick);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches(testPlayer.getIdentity()), Mockito.matches("/queue/disconnect"), Mockito.any());
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatPlayerMessage("abc", "was kicked!", testPlayer.getUsername());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage(Mockito.matches("abc"), (Chat) Mockito.any());
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("abc"), Mockito.matches("/lobby-state"), Mockito.any());
     }
 

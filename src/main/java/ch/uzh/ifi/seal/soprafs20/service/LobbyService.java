@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
@@ -117,7 +118,8 @@ public class LobbyService {
             webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(toKick);
 
-            webSocketService.sendChatPlayerMessage(lobbyId, "was kicked!", toKick.getUsername());
+            Chat chat = new Chat("event", "avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
+            webSocketService.sendChatMessage(lobbyId, chat);
             webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
         }
     }
@@ -129,7 +131,8 @@ public class LobbyService {
         if (player != null) {
             String lobbyId = playerService.removePlayer(player);
             if (lobbyId != null) {
-                webSocketService.sendChatPlayerMessage(lobbyId, "left the lobby.", player.getUsername());
+                Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
+                webSocketService.sendChatMessage(lobbyId, chat);
                 if (player.isAdmin()) {
                     DisconnectDTO message = new DisconnectDTO();
                     message.setReason("Host left the lobby.");

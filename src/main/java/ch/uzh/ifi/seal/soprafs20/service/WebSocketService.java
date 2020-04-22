@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
@@ -30,19 +31,20 @@ public class WebSocketService {
         return toCheck.getLobbyId().equals(lobbyId);
     }
 
-    protected void sendChatEventMessage(String lobbyId, String message) {
-        ChatDTO chat = new ChatDTO();
-        chat.setType("event");
-        chat.setMessage(message);
-        sendToLobby(lobbyId, "/chat", chat);
+    protected void sendChatMessage(String lobbyId, List<Chat> chats) {
+        for (Chat chat : chats) {
+            sendChatMessage(lobbyId, chat);
+        }
     }
 
-    protected void sendChatPlayerMessage(String lobbyId, String message, String username) {
-        ChatDTO chat = new ChatDTO();
-        chat.setType("event");
-        chat.setMessage(username + " " + message);
-        chat.setIcon("avatar:" + username);
-        sendToLobby(lobbyId, "/chat", chat);
+    protected void sendChatMessage(String lobbyId, Chat chat) {
+        ChatDTO dto = new ChatDTO();
+        dto.setType(chat.getType());
+        dto.setUsername(chat.getUsername());
+        dto.setIcon(chat.getIcon());
+        dto.setMessage(chat.getMessage());
+
+        sendToLobby(lobbyId, "/chat", dto);
     }
 
     protected void sendToPlayer(String identity, String path, Object dto) {

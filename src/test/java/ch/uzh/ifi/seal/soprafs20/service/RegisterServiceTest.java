@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
@@ -69,6 +70,6 @@ public class RegisterServiceTest {
 
         Mockito.verify(webSocketService).sendToPlayer(Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.verify(webSocketService).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
-        Mockito.verify(webSocketService).sendChatPlayerMessage(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(webSocketService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
     }
 }

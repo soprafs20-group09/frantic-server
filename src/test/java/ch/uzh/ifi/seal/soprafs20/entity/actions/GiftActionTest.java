@@ -9,6 +9,8 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GiftActionTest {
@@ -39,16 +41,16 @@ class GiftActionTest {
 
     @Test
     public void performTest(){
-        Chat resultChat = giftAction.perform();
+        List<Chat> resultChat = giftAction.perform();
         assertEquals(1, this.initiator.getHandSize());
         assertEquals(2, this.target.getHandSize());
         assertEquals(blue1, this.initiator.popCard(0));
         assertEquals(blue2, this.target.popCard(0));
         assertEquals(blue3, this.target.popCard(0));
 
-        assertEquals("event", resultChat.getType());
-        assertEquals("gift", resultChat.getIcon());
-        assertEquals("GiftMaker gifted GiftTaker 2 cards.", resultChat.getMessage());
+        assertEquals("event", resultChat.get(0).getType());
+        assertEquals("special:gift", resultChat.get(0).getIcon());
+        assertEquals("GiftMaker gifted GiftTaker 2 cards.", resultChat.get(0).getMessage());
     }
 
     @Test

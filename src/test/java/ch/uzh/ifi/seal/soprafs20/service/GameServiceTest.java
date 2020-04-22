@@ -192,17 +192,11 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendChatEventMessageTest() {
-        gameService.sendChatEventMessage("testLobbyId", "testMessage");
+    public void sendChatMessageTest() {
+        Chat chat = new Chat("msg", "avatar:testPlayer", "testMessage");
+        gameService.sendChatMessage("testLobbyId", chat);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatEventMessage("testLobbyId", "testMessage");
-    }
-
-    @Test
-    public void sendPlayerMessageTest() {
-        gameService.sendChatPlayerMessage("testLobbyId", "testMessage", "testUsername");
-
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatPlayerMessage("testLobbyId", "testMessage", "testUsername");
+        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage("testLobbyId", chat);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
@@ -69,7 +70,8 @@ public class RegisterService {
         Thread.sleep(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
-        webSocketService.sendChatPlayerMessage(lobbyId, "joined the lobby.", player.getUsername());
+        Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");
+        webSocketService.sendChatMessage(lobbyId, chat);
     }
 
     public String getUsernameFromAuthToken(String authToken) {

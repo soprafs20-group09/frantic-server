@@ -131,12 +131,12 @@ public class GameService {
         }
     }
 
-    public void sendChatEventMessage(String lobbyId, String message) {
-        webSocketService.sendChatEventMessage(lobbyId, message);
+    public void sendChatMessage(String lobbyId, Chat chat) {
+        webSocketService.sendChatMessage(lobbyId, chat);
     }
 
-    public void sendChatPlayerMessage(String lobbyId, String message, String username) {
-        webSocketService.sendChatPlayerMessage(lobbyId, message, username);
+    public void sendChatMessage(String lobbyId, List<Chat> chat) {
+        webSocketService.sendChatMessage(lobbyId, chat);
     }
 
     public void sendStartGame(String lobbyId) {

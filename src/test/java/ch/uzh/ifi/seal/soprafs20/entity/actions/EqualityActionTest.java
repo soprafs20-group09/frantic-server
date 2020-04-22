@@ -7,6 +7,8 @@ import ch.uzh.ifi.seal.soprafs20.entity.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,7 +49,7 @@ class EqualityActionTest {
 
     @Test
     public void performTest(){
-        Chat resultChat = equalityAction.perform();
+        List<Chat> resultChat = equalityAction.perform();
         assertEquals(3, this.initiator.getHandSize());
         assertEquals(3, this.target.getHandSize());
         assertEquals(blue1, this.initiator.popCard(0));
@@ -61,9 +63,9 @@ class EqualityActionTest {
         assertEquals(colorWishBlue.getType(), popped.getType());
         assertEquals(colorWishBlue.getValue(), popped.getValue());
 
-        assertEquals("event", resultChat.getType());
-        assertEquals("equality", resultChat.getIcon());
-        assertEquals("TripleOwner7 drew 3 cards.", resultChat.getMessage());
+        assertEquals("event", resultChat.get(0).getType());
+        assertEquals("special:equality", resultChat.get(0).getIcon());
+        assertEquals("TripleOwner7 drew 3 cards.", resultChat.get(0).getMessage());
     }
 
     @Test
