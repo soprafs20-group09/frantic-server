@@ -7,7 +7,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 
 public class ExchangeAction implements Action {
 
@@ -39,8 +39,9 @@ public class ExchangeAction implements Action {
         return true;
     }
 
-    public Chat perform() {
-        ArrayList<Card> initiatorCards = new ArrayList<Card>();
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
+        ArrayList<Card> initiatorCards = new ArrayList<>();
         for (int i : exchangeCards) {
             Card toPush = this.initiator.peekCard(i);
             if (toPush.getValue() != Value.FUCKYOU) {
@@ -80,6 +81,8 @@ public class ExchangeAction implements Action {
             this.target.pushCardToHand(c);
         }
 
-        return new Chat();
+        chat.add(new Chat("event", "special:exchange", this.initiator.getUsername()
+                + " exchanged 2 chards with " + this.target.getUsername()));
+        return chat;
     }
 }

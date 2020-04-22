@@ -3,6 +3,9 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SkipAction implements Action{
 
     private Player initiator;
@@ -14,11 +17,14 @@ public class SkipAction implements Action{
     }
 
     @Override
-    public Chat perform() {
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
         if (!this.target.isBlocked()){
             this.target.setBlocked(true);
         }
-        return new Chat();
+        chat.add(new Chat("event", "special:skip", this.initiator.getUsername()
+                + " skipped " + this.target.getUsername()));
+        return chat;
     }
 
     @Override

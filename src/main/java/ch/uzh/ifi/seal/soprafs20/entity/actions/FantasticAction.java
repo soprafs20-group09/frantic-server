@@ -7,6 +7,10 @@ import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.DiscardPile;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FantasticAction implements Action {
 
@@ -33,10 +37,19 @@ public class FantasticAction implements Action {
     }
 
     @Override
-    public Chat perform() {
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
-        return new Chat();
+        if (this.wishedColor != Color.NONE) {
+            chat.add(new Chat("event", "special:fantastic", this.initiator.getUsername()
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedColor)));
+        }
+        else {
+            chat.add(new Chat("event", "special:fantastic", this.initiator.getUsername()
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedValue)));
+        }
+        return chat;
     }
 
     @Override

@@ -5,7 +5,9 @@ import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EqualityAction implements Action {
     private Player initiator;
@@ -25,23 +27,23 @@ public class EqualityAction implements Action {
     }
 
     @Override
-    public Chat perform() {
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
         if (this.target != null) {
             while (this.initiator.getHandSize() > this.target.getHandSize()) {
                 this.target.pushCardToHand(drawStack.pop());
                 this.cardsDrawn += 1;
             }
-            discardPile.pop();
-            discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
-            return new Chat("event", "equality", this.target.getUsername()
-                    + " drew " + this.cardsDrawn + " cards.");
+
+            chat.add(new Chat("event", "special:equality", this.target.getUsername()
+                    + " drew " + this.cardsDrawn + " cards."));
         }
-        else {
-            discardPile.pop();
-            discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
-            return new Chat("event", "equality", this.initiator.getUsername()
-                    + " wished " + FranticUtils.getStringRepresentation(this.color));
-        }
+        discardPile.pop();
+        discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
+        chat.add(new Chat("event", "special:equality", this.initiator.getUsername()
+                + " wished " + FranticUtils.getStringRepresentation(this.color)));
+
+        return chat;
     }
 
     @Override

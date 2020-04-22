@@ -4,8 +4,9 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 public class GiftAction implements Action {
     private Player initiator;
@@ -19,15 +20,17 @@ public class GiftAction implements Action {
     }
 
     @Override
-    public Chat perform() {
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
         Arrays.sort(gifts);
         for (int i = this.gifts.length - 1; i >= 0; i--) {
             if (this.initiator.peekCard(this.gifts[i]).getValue() != Value.FUCKYOU) {
                 target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
             }
         }
-        return new Chat("event", "gift", this.initiator.getUsername()
-                + " gifted " + this.target.getUsername() + " 2 cards.");
+        chat.add(new Chat("event", "special:gift", this.initiator.getUsername()
+                + " gifted " + this.target.getUsername() + " 2 cards."));
+        return chat;
     }
 
     @Override

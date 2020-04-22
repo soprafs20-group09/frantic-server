@@ -4,8 +4,10 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class FantasticFourAction implements Action {
@@ -42,18 +44,33 @@ public class FantasticFourAction implements Action {
 
 
     @Override
-    public Chat perform() {
+    public List<Chat> perform() {
+        List<Chat> chat = new ArrayList<>();
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
             for (int i = 0; i < target.getValue(); i++){
                 Card c = drawStack.pop();
                 target.getKey().pushCardToHand(c);
             }
+            if (target.getValue() == 1) {
+                chat.add(new Chat("event", "special:fantastic", target.getKey().getUsername() + " drew one card."));
+            }
+            else {
+                chat.add(new Chat("event", "special:fantastic", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
+            }
         }
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
-        return new Chat();
+        if (this.wishedColor != null) {
+            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedColor)));
+        }
+        else {
+            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedValue)));
+        }
+        return chat;
     }
 
     @Override
