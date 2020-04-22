@@ -59,6 +59,16 @@ public class Card {
     }
 
     public boolean isPlayableOn(Card other) {
+        // if a multicolor card is on top at the beginning
+        if (other.getColor().equals(Color.MULTICOLOR) && other.getType().equals(Type.SPECIAL)) {
+            if (other.getValue().equals(Value.FANTASTIC) || other.getValue().equals(Value.FANTASTICFOUR)) {
+                return true;
+            }
+            else {
+                return !this.getColor().equals(Color.BLACK);
+            }
+        }
+
         switch (this.getColor()) {
             case BLACK:
                 return this.getValue() == Value.FUCKYOU || this.getValue() == other.getValue();
