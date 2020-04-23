@@ -117,17 +117,6 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void closeLobby_removeLobbyAndPlayer() {
-        String lobbyId = lobbyService.createLobby(player1);
-        assertNotNull(lobbyRepository.findByLobbyId(lobbyId));
-        assertNotNull(playerRepository.findByIdentity(player1.getIdentity()));
-
-        lobbyService.closeLobby(lobbyId);
-        assertNull(lobbyRepository.findByLobbyId(lobbyId));
-        assertNull(playerRepository.findByIdentity(player1.getIdentity()));
-    }
-
-    @Test
     public void updateLobbySettings_updateLobby() {
         String lobbyId = lobbyService.createLobby(player1);
         LobbySettingsDTO newSettings = new LobbySettingsDTO();

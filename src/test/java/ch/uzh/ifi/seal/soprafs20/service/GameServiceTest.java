@@ -188,7 +188,7 @@ public class GameServiceTest {
     public void endTurnTest() {
         gameService.endTurn("testLobbyId", "testIdentity");
 
-        Mockito.verify(gameRound, Mockito.times(1)).finishTurn();
+        Mockito.verify(gameRound, Mockito.times(1)).playerFinishesTurn(Mockito.any());
     }
 
     @Test

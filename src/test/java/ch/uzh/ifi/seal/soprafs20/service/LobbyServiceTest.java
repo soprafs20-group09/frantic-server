@@ -164,15 +164,6 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void closeLobby_deletePlayer() {
-        lobbyService.closeLobby("abc");
-
-        Mockito.verify(playerRepository, Mockito.times(2)).delete(Mockito.any());
-        Mockito.verify(playerRepository, Mockito.times(2)).findByUsernameAndLobbyId(Mockito.any(), Mockito.any());
-        Mockito.verify(lobbyRepository, Mockito.times(1)).delete(Mockito.any());
-    }
-
-    @Test
     public void getLobbyState_returnLobbyStateDTO() {
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
@@ -319,16 +310,6 @@ public class LobbyServiceTest {
         lobbyService.handleDisconnect("abc");
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/lobby-state"), Mockito.any());
-    }
-
-    @Test
-    void handleDisconnect_admin_sendDisconnectToLobby() {
-        testPlayer.setAdmin(true);
-        Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
-
-        lobbyService.handleDisconnect("abc");
-
-        Mockito.verify(webSocketService, Mockito.times(1)).sendDisconnectToLobby(Mockito.matches("lobbyId"), Mockito.any());
     }
 
     @Test
