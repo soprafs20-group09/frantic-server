@@ -138,7 +138,7 @@ public class GameRound {
                                 this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
                         this.gameService.sendChatMessage(this.lobbyId, chat);
                         if (cardToPlay.getColor() == Color.BLACK) {
-                            performEvent();
+                            //performEvent();
                         }
                         finishTurn();
                     }
@@ -337,11 +337,9 @@ public class GameRound {
     }
 
     private void prepareCounterAttack() {
-        for (Player target : this.currentAction.getTargets()) {
-            int[] cards = target.hasCounterAttack();
-            if (cards.length > 0) {
-                this.gameService.sendCounterAttackWindow(this.lobbyId, target, cards, 5);
-            }
+        for (Player player : this.getListOfPlayers()) {
+            int[] cards = player.hasCounterAttack();
+            this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
         }
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         startCounterAttackTimer(5);
@@ -351,7 +349,7 @@ public class GameRound {
         for (Player player : this.listOfPlayers) {
             int card = player.hasNiceTry();
             if (card != -1) {
-                this.gameService.sendNiceTryWindow(this.lobbyId, player, new int[]{card}, 5);
+                this.gameService.sendAttackWindow(this.lobbyId, player, new int[]{card}, 5);
             }
         }
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
@@ -550,7 +548,7 @@ public class GameRound {
         Event timeBomb = new TimeBombEvent(this);
         Event tornado = new TornadoEvent(this);
         Event vandalism = new VandalismEvent();
-/*
+
         //add them to the list of all events
         this.events.add(charity);
         this.events.add(communism);
@@ -568,10 +566,10 @@ public class GameRound {
         this.events.add(robinHood);
         this.events.add(surpriseParty);
         this.events.add(theAllSeeingEye);
-        this.events.add(thirdTimeLucky);*/
-        this.events.add(timeBomb);/*
+        this.events.add(thirdTimeLucky);
+        this.events.add(timeBomb);
         this.events.add(tornado);
-        this.events.add(vandalism);*/
+        this.events.add(vandalism);
 
         Collections.shuffle(this.events);
     }

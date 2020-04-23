@@ -190,18 +190,11 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
     }
 
-    public void sendCounterAttackWindow(String lobbyId, Player player, int[] playable, int time) {
-        CounterAttackWindowDTO dto = new CounterAttackWindowDTO();
+    public void sendAttackWindow(String lobbyId, Player player, int[] playable, int time) {
+        AttackWindowDTO dto = new AttackWindowDTO();
         dto.setPlayable(playable);
         dto.setTime(time);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/attack-window", dto);
-    }
-
-    public void sendNiceTryWindow(String lobbyId, Player player, int[] playable, int time) {
-        NiceTryWindowDTO dto = new NiceTryWindowDTO();
-        dto.setPlayable(playable);
-        dto.setTime(time);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/nice-try-window", dto);
     }
 
     public void sendEvent(String lobbyId, Event event) {
