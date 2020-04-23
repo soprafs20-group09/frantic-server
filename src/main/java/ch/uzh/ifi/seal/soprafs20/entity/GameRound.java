@@ -343,6 +343,7 @@ public class GameRound {
                 this.gameService.sendCounterAttackWindow(this.lobbyId, target, cards, 5);
             }
         }
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         startCounterAttackTimer(5);
     }
 
@@ -353,6 +354,7 @@ public class GameRound {
                 this.gameService.sendNiceTryWindow(this.lobbyId, player, new int[]{card}, 5);
             }
         }
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         startNiceTryTimer(5);
     }
 
