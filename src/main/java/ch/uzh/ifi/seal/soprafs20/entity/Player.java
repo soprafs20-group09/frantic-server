@@ -124,13 +124,13 @@ public class Player implements Serializable {
         this.admin = admin;
     }
 
-    public int hasNiceTry() {
+    public int[] hasNiceTry() {
         for (int i = 0; i < hand.size(); i++) {
             if (hand.peek(i).getValue() == Value.NICETRY) {
-                return i;
+                return new int[]{i};
             }
         }
-        return -1;
+        return new int[0];
     }
 
     public int[] hasCounterAttack() {
