@@ -127,7 +127,7 @@ public class GameService {
     public void endTurn(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().finishTurn();
+            game.getCurrentGameRound().playerFinishesTurn(identity);
         }
     }
 

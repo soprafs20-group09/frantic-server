@@ -25,6 +25,7 @@ public class GameRound {
     private Pile<Card> drawStack;
     private Pile<Card> discardPile;
     private Action currentAction;
+    private boolean isProcessing;
 
     private final GameService gameService;
 
@@ -40,6 +41,7 @@ public class GameRound {
         this.bombMap = new HashMap<>();
         this.currentAction = null;
         this.events = new ArrayList<>();
+        this.isProcessing = false;
     }
 
     //creates Piles & player hands
@@ -79,6 +81,7 @@ public class GameRound {
 
     private void prepareNewTurn() {
         changePlayer();
+        endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
         if (timeBomb) {
             this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
             if (isTimeBombExploding()) {
@@ -101,6 +104,14 @@ public class GameRound {
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
         startTurnTimer(30);
+    }
+
+    public void playerFinishesTurn(String identity) {
+        Player player = getPlayerByIdentity(identity);
+        //the process is only started when no process is running
+        if (player != null && player == this.currentPlayer && startProcess()) {
+            finishTurn();
+        }
     }
 
     public void finishTurn() {
@@ -514,6 +525,20 @@ public class GameRound {
             }
         };
         this.timer.schedule(timerTask, milliseconds);
+    }
+
+    private synchronized boolean startProcess() {
+        if (this.isProcessing) {
+            return false;
+        }
+        else {
+            this.isProcessing = true;
+            return true;
+        }
+    }
+
+    private synchronized void endProcess() {
+        this.isProcessing = false;
     }
 
     private Player getPlayerByIdentity(String identity) {
