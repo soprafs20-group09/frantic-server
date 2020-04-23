@@ -29,8 +29,8 @@ public abstract class Pile<E> extends Stack<E> {
         return elements.get(elements.size() - 1);
     }
 
-    public synchronized E peekSecond() {
-        return elements.get(elements.size() - 2);
+    public synchronized E peekN(int n) {
+        return elements.get(elements.size() - n);
     }
 
     public synchronized int size() {
