@@ -456,13 +456,18 @@ public class GameRound {
     }
 
     public void playerLostConnection(Player player) {
-        if (player == this.currentPlayer) {
-            this.timer.cancel();
-            prepareNewTurn();
+        if (this.listOfPlayers.size() > 1) {
+            if (player == this.currentPlayer) {
+                this.timer.cancel();
+                prepareNewTurn();
+            }
+            this.bombMap.remove(player);
+            this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
+            sendGameState();
         }
-        this.bombMap.remove(player);
-        this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
-        sendGameState();
+        else {
+            this.timer.cancel();
+        }
     }
 
     public void startTurnTimer(int seconds) {
