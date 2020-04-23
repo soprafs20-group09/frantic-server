@@ -80,16 +80,16 @@ public class GameRound {
     }
 
     private void prepareNewTurn() {
-        changePlayer();
-        endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
-        if (timeBomb) {
-            this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
-            if (isTimeBombExploding()) {
-                bombExploded();
-                return;
-            }
-        }
         if (!isRoundOver()) {
+            changePlayer();
+            endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
+            if (timeBomb) {
+                this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
+                if (isTimeBombExploding()) {
+                    bombExploded();
+                    return;
+                }
+            }
             sendGameState();
             this.hasCurrentPlayerMadeMove = false;
             startTurn();
@@ -170,7 +170,7 @@ public class GameRound {
                     }
                 }
                 //counter attack case
-                else if (this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
+                else if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
                     for (Player target : this.currentAction.getTargets()) {
                         if (player.equals(target)) {
                             this.discardPile.push(cardToPlay);
@@ -195,12 +195,14 @@ public class GameRound {
                 }
                 //nice try case
                 else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
+                    cardToPlay = player.popCard(index);
+                    this.discardPile.push(cardToPlay);
+                    this.gameService.sendHand(this.lobbyId, player);
                     for (Player potentialWinner : this.listOfPlayers) {
                         if (potentialWinner.getHandSize() == 0) {
                             this.timer.cancel();
                             drawCardFromStack(potentialWinner, 3);
                             this.gameService.sendHand(this.lobbyId, potentialWinner);
-
                         }
                     }
                     prepareNewTurn();
@@ -355,22 +357,19 @@ public class GameRound {
     }
 
     private void prepareCounterAttack() {
+        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         for (Player player : this.getListOfPlayers()) {
             int[] cards = player.hasCounterAttack();
             this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
         }
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         startCounterAttackTimer(5);
     }
 
     private void prepareNiceTry() {
         for (Player player : this.listOfPlayers) {
-            int card = player.hasNiceTry();
-            if (card != -1) {
-                this.gameService.sendAttackWindow(this.lobbyId, player, new int[]{card}, 5);
-            }
+            int[] card = player.hasNiceTry();
+            this.gameService.sendAttackWindow(this.lobbyId, player, card, 5);
         }
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         startNiceTryTimer(5);
     }
 
@@ -422,12 +421,7 @@ public class GameRound {
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
     private boolean isRoundOver() {
-        if (!timeBomb) {
             return (getHandSizes().containsValue(0));
-        }
-        else {
-            return isTimeBombExploding();
-        }
     }
 
     private boolean isTimeBombExploding() {
