@@ -130,34 +130,42 @@ public class LobbyService {
 
         if (player != null) {
             String lobbyId = playerService.removePlayer(player);
-            if (lobbyId != null) {
+            Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+            if (lobby != null) {
                 Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
                 webSocketService.sendChatMessage(lobbyId, chat);
-                if (player.isAdmin()) {
-                    DisconnectDTO message = new DisconnectDTO();
-                    message.setReason("Host left the lobby.");
-                    webSocketService.sendDisconnectToLobby(lobbyId, message);
-                    closeLobby(lobbyId);
-                } else {
+                List<String> playerList = lobby.getListOfPlayers();
+                if (playerList.size() > 1) {
+                    if (player.isAdmin()) {
+                        Player newHost = playerRepository.findByUsernameAndLobbyId(playerList.get(0), lobbyId);
+                        newHost.setAdmin(true);
+                        lobby.setCreator(newHost.getUsername());
+                        playerRepository.flush();
+                        lobbyRepository.flush();
+                        chat = new Chat("event", "avatar:" + newHost.getUsername(), newHost.getUsername() + " is now host.");
+                        webSocketService.sendChatMessage(lobbyId, chat);
+                    }
                     webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+                }
+                else if (playerList.size() == 1) {
+                    if (lobby.isPlaying()) {
+                        Player last = playerRepository.findByUsernameAndLobbyId(playerList.get(0), lobbyId);
+                        DisconnectDTO disconnectDTO = new DisconnectDTO();
+                        disconnectDTO.setReason("Not enough players to play.");
+                        webSocketService.sendToPlayer(last.getIdentity(), "/queue/disconnect", disconnectDTO);
+                        playerService.removePlayer(last);
+                        lobbyRepository.delete(lobby);
+                        GameRepository.removeGame(lobbyId);
+                    }
+                    else {
+                        webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+                    }
+                }
+                else {
+                    lobbyRepository.delete(lobby);
                 }
             }
         }
-    }
-
-    public void closeLobby(String lobbyId) {
-
-        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-
-        List<String> players = lobby.getListOfPlayers();
-        for (String player : players) {
-            Player p = playerRepository.findByUsernameAndLobbyId(player, lobby.getLobbyId());
-            playerRepository.delete(p);
-        }
-        playerRepository.flush();
-        lobbyRepository.delete(lobby);
-        GameRepository.removeGame(lobbyId);
-        log.debug(String.format("Lobby '%s' with ID '%s' was closed", lobby.getName(), lobby.getLobbyId()));
     }
 
     public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO dto) {
