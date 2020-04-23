@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
-import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
@@ -21,10 +20,7 @@ public class GameRound {
     private Timer timer;
     private int turnNumber;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
-    private HashMap<Player, Integer> map;
-    private boolean exploded;
-    private String timeBombState;
-    private List<Player> roundWinners;
+    private HashMap<Player, Integer> bombMap;
     private List<Event> events;
     private Pile<Card> drawStack;
     private Pile<Card> discardPile;
@@ -40,8 +36,8 @@ public class GameRound {
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
         this.turnNumber = 0;
-        this.map = new HashMap<Player, Integer>();
-        this.roundWinners = new ArrayList<>();
+        this.timeBomb = false;
+        this.bombMap = new HashMap<>();
         this.currentAction = null;
         this.events = new ArrayList<>();
     }
@@ -58,10 +54,6 @@ public class GameRound {
                 Card card = this.drawStack.pop();
                 player.pushCardToHand(card);
             }
-        }
-
-        for (Player player : this.listOfPlayers) {
-            this.initMap(player, 0);
         }
 
         //move initial card to discardPile
@@ -86,11 +78,15 @@ public class GameRound {
     }
 
     private void prepareNewTurn() {
-        if (!isRoundOver()) {
-            if (timeBomb) {
-                incrementCurrentPlayerMap(currentPlayer);
+        changePlayer();
+        if (timeBomb) {
+            this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
+            if (isTimeBombExploding()) {
+                bombExploded();
+                return;
             }
-            changePlayer();
+        }
+        if (!isRoundOver()) {
             sendGameState();
             this.hasCurrentPlayerMadeMove = false;
             startTurn();
@@ -382,16 +378,15 @@ public class GameRound {
         return mappedPlayers;
     }
 
-    public void initMap(Player player, int i) {
-        map.put(player, i);
-    }
-
     private void incrementCurrentPlayerMap(Player player) {
-        map.put(player, map.get(player) + 1);
+        bombMap.put(player, bombMap.get(player) + 1);
     }
 
-    public void setTimeBomb(boolean b) {
-        this.timeBomb = b;
+    public void setTimeBomb() {
+        this.timeBomb = true;
+        for (Player player : this.listOfPlayers) {
+            this.bombMap.put(player, 0);
+        }
     }
 
     private void changePlayer() {
@@ -402,9 +397,6 @@ public class GameRound {
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
             this.currentPlayer.setBlocked(false);
-            if (timeBomb) {
-                incrementCurrentPlayerMap(this.currentPlayer);
-            }
             changePlayer();
         }
     }
@@ -412,59 +404,50 @@ public class GameRound {
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
     private boolean isRoundOver() {
-        return (getHandSizes().containsValue(0) || isTimeBombExploding());
+        if (!timeBomb) {
+            return (getHandSizes().containsValue(0));
+        }
+        else {
+            return isTimeBombExploding();
+        }
     }
 
     private boolean isTimeBombExploding() {
-        this.exploded = true;
-        for (Player player : map.keySet()) {
-            if (map.get(player) != 3) {
-                this.exploded = false;
-            }
-        }
-        if (!timeBomb) {
-            updateTimeBombState("noTimeBomb");
-        }
-        else {
-            if (this.exploded) {
-                updateTimeBombState("exploded");
-            }
-            else {
-                updateTimeBombState("defused");
-            }
-        }
-        return this.exploded;
-    }
-
-    private void updateTimeBombState(String timeBombState) {
-        this.timeBombState = timeBombState;
+        return this.bombMap.get(this.currentPlayer) >= 4;
     }
 
     private void onRoundOver() {
-        for (Player player : listOfPlayers) {
-            if (player.getHandSize() == 0) {
-                roundWinners.add(player);
-            }
-        }
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
-            switch (timeBombState) {
-                case "noTimeBomb":
-                    player.setPoints(player.getPoints() + playersPoints);
-                case "exploded":
-                    player.setPoints(player.getPoints() + 2 * playersPoints);
-                case "defused":
-                    for (Player winner : roundWinners) {
-                        if (player.getUsername().equals(winner.getUsername())) {
-                            player.setPoints(player.getPoints() - 10);
-                        }
-                        else {
-                            player.setPoints(player.getPoints() + playersPoints + 10);
-                        }
-                    }
+            if (!this.timeBomb) {
+                player.setPoints(player.getPoints() + playersPoints);
             }
+            else {
+                if (playersPoints == 0) {
+                    player.setPoints(player.getPoints() - 10);
+                }
+                else {
+                    player.setPoints(player.getPoints() + playersPoints + 10);
+                }
+            }
+
+            if (playersPoints >= maxPoints) {
+                maxPoints = playersPoints;
+                playerWithMaxPoints = player;
+            }
+        }
+        this.game.endGameRound(playerWithMaxPoints);
+    }
+
+    private void bombExploded() {
+        int maxPoints = 0;
+        Player playerWithMaxPoints = this.currentPlayer;
+        for (Player player : listOfPlayers) {
+            int playersPoints = player.calculatePoints();
+            player.setPoints(player.getPoints() + 2 * playersPoints);
+
             if (playersPoints >= maxPoints) {
                 maxPoints = playersPoints;
                 playerWithMaxPoints = player;
@@ -478,7 +461,7 @@ public class GameRound {
             this.timer.cancel();
             prepareNewTurn();
         }
-        map.remove(player);
+        this.bombMap.remove(player);
         this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
         sendGameState();
     }
@@ -563,7 +546,7 @@ public class GameRound {
         Event timeBomb = new TimeBombEvent(this);
         Event tornado = new TornadoEvent(this);
         Event vandalism = new VandalismEvent();
-
+/*
         //add them to the list of all events
         this.events.add(charity);
         this.events.add(communism);
@@ -581,10 +564,10 @@ public class GameRound {
         this.events.add(robinHood);
         this.events.add(surpriseParty);
         this.events.add(theAllSeeingEye);
-        this.events.add(thirdTimeLucky);
-        this.events.add(timeBomb);
+        this.events.add(thirdTimeLucky);*/
+        this.events.add(timeBomb);/*
         this.events.add(tornado);
-        this.events.add(vandalism);
+        this.events.add(vandalism);*/
 
         Collections.shuffle(this.events);
     }
