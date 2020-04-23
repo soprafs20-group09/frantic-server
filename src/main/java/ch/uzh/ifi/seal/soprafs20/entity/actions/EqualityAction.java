@@ -41,7 +41,7 @@ public class EqualityAction implements Action {
         discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
         chat.add(new Chat("event", "special:equality", this.initiator.getUsername()
-                + " wished " + FranticUtils.getStringRepresentation(this.color)));
+                + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
 
         return chat;
     }

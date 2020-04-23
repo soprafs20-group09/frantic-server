@@ -135,7 +135,7 @@ public class GameRound {
 
                     if (cardToPlay.getType() == Type.NUMBER) {
                         Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay));
+                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
                         this.gameService.sendChatMessage(this.lobbyId, chat);
                         if (cardToPlay.getColor() == Color.BLACK) {
                             performEvent();
@@ -144,7 +144,7 @@ public class GameRound {
                     }
                     else if (cardToPlay.getType() == Type.SPECIAL) {
                         Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()));
+                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                         this.gameService.sendChatMessage(this.lobbyId, chat);
                         if (cardToPlay.getValue() == Value.FUCKYOU) {
                             finishTurn();
@@ -165,7 +165,7 @@ public class GameRound {
                             this.discardPile.push(cardToPlay);
                             this.gameService.sendHand(this.lobbyId, player);
                             Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()));
+                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             sendGameState();
                             this.gameService.sendActionResponse(this.lobbyId, player, this.discardPile.peekSecond());

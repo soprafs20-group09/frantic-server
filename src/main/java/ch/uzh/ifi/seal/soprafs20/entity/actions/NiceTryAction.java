@@ -27,7 +27,7 @@ public class NiceTryAction implements Action {
         List<Chat> chat = new ArrayList<>();
         this.discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
         chat.add(new Chat("event", "special:nice-try", this.initiator.getUsername()
-                + " wished " + FranticUtils.getStringRepresentation(this.color)));
+                + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
         return chat;
     }
 

@@ -23,7 +23,7 @@ public class SkipAction implements Action{
             this.target.setBlocked(true);
         }
         chat.add(new Chat("event", "special:skip", this.initiator.getUsername()
-                + " skipped " + this.target.getUsername()));
+                + " skipped " + this.target.getUsername() + "."));
         return chat;
     }
 

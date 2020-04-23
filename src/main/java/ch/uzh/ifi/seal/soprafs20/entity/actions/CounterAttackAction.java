@@ -28,7 +28,7 @@ public class CounterAttackAction implements Action {
 
         this.discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
         chat.add(new Chat("event", "special:counterattack", this.initiator.getUsername()
-                + " wished " + FranticUtils.getStringRepresentation(this.color)));
+                + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
         return chat;
     }
 

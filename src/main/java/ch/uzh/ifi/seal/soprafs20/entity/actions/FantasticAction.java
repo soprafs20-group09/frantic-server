@@ -43,11 +43,11 @@ public class FantasticAction implements Action {
         discardPile.push(wish);
         if (this.wishedColor != Color.NONE) {
             chat.add(new Chat("event", "special:fantastic", this.initiator.getUsername()
-                    + " wished " + FranticUtils.getStringRepresentation(this.wishedColor)));
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedColor) + "."));
         }
         else {
             chat.add(new Chat("event", "special:fantastic", this.initiator.getUsername()
-                    + " wished " + FranticUtils.getStringRepresentation(this.wishedValue)));
+                    + " wished " + FranticUtils.getStringRepresentation(this.wishedValue) + "."));
         }
         return chat;
     }
