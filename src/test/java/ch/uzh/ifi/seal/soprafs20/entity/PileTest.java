@@ -47,7 +47,7 @@ class PileTest {
         drawStack.push(blue1);
         drawStack.push(testCard);
 
-        Card peeked = drawStack.peekSecond();
+        Card peeked = drawStack.peekN(2);
         assertEquals(Type.NUMBER, peeked.getType());
         assertEquals(Color.BLUE, peeked.getColor());
 

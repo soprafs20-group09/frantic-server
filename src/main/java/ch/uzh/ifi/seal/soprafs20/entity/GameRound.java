@@ -168,7 +168,14 @@ public class GameRound {
                                     this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             sendGameState();
-                            this.gameService.sendActionResponse(this.lobbyId, player, this.discardPile.peekSecond());
+                            //search card that performed action
+                            for (int n = 2; n <= 5; n++) {
+                                if (this.discardPile.peekN(n).getValue() != Value.COUNTERATTACK) {
+                                    this.gameService.sendActionResponse(this.lobbyId, player, this.discardPile.peekN(n));
+                                    break;
+                                }
+                            }
+
                             this.timer.cancel();
                             startCounterAttackTimer(30);
                             break;
@@ -232,7 +239,7 @@ public class GameRound {
             return null;
         }
         if (card.getValue() == Value.FUCKYOU && this.discardPile.size() > 1) {
-            return this.discardPile.peekSecond();
+            return this.discardPile.peekN(2);
         }
         return this.discardPile.peek();
     }
@@ -395,6 +402,9 @@ public class GameRound {
 
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
+            Chat chat = new Chat("event", "special:skip", this.currentPlayer
+                    + " is skipped");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
             this.currentPlayer.setBlocked(false);
             changePlayer();
         }
