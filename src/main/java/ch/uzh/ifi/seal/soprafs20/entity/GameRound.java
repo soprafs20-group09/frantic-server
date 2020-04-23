@@ -421,7 +421,7 @@ public class GameRound {
     //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
     // or in case of the time-bomb event, if the 3 rounds are played
     private boolean isRoundOver() {
-            return (getHandSizes().containsValue(0));
+        return (getHandSizes().containsValue(0));
     }
 
     private boolean isTimeBombExploding() {
@@ -519,6 +519,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
+    //Helper method to make sure only one action (invoked by a player) is processed at a time
     private synchronized boolean startProcess() {
         if (this.isProcessing) {
             return false;
