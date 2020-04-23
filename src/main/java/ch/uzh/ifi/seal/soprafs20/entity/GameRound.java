@@ -106,9 +106,6 @@ public class GameRound {
     public void finishTurn() {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
-            Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                    this.currentPlayer.getUsername() + " drew a card.");
-            this.gameService.sendChatMessage(this.lobbyId, chat);
         }
         this.timer.cancel();
         //return empty playable cards after turn finished
