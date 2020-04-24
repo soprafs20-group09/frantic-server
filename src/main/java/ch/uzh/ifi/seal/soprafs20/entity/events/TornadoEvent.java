@@ -6,8 +6,8 @@ import java.util.List;
 
 public class TornadoEvent implements Event {
 
-    private List<Player> listOfPlayers;
-    private Pile<Card> tornadoStack;
+    private final List<Player> listOfPlayers;
+    private final Pile<Card> tornadoStack;
 
     public TornadoEvent(GameRound round) {
         this.listOfPlayers = round.getListOfPlayers();
@@ -31,7 +31,7 @@ public class TornadoEvent implements Event {
         int i = 0;
         while (this.tornadoStack.size() != 0) {
             this.listOfPlayers.get(i).pushCardToHand(this.tornadoStack.pop());
-            int m = ++i%this.listOfPlayers.size();
+            int m = ++i % this.listOfPlayers.size();
         }
     }
 

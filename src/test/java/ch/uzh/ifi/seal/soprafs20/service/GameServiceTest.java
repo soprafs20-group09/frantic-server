@@ -7,8 +7,13 @@ import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +98,7 @@ public class GameServiceTest {
     @Test
     public void exchangeActionTest() {
         ExchangeDTO exchangeDTO = Mockito.mock(ExchangeDTO.class);
-        Mockito.when(exchangeDTO.getCards()).thenReturn(new int[]{1,2});
+        Mockito.when(exchangeDTO.getCards()).thenReturn(new int[]{1, 2});
         Mockito.when(exchangeDTO.getTarget()).thenReturn("testTarget");
 
         gameService.exchange("testLobbyId", "testIdentity", exchangeDTO);
@@ -105,7 +110,7 @@ public class GameServiceTest {
     @Test
     public void giftActionTest() {
         GiftDTO giftDTO = Mockito.mock(GiftDTO.class);
-        Mockito.when(giftDTO.getCards()).thenReturn(new int[]{1,2});
+        Mockito.when(giftDTO.getCards()).thenReturn(new int[]{1, 2});
         Mockito.when(giftDTO.getTarget()).thenReturn("testTarget");
 
         gameService.gift("testLobbyId", "testIdentity", giftDTO);

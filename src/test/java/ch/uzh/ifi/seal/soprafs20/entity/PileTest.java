@@ -5,8 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 class PileTest {
@@ -27,7 +26,7 @@ class PileTest {
 
     @Test
     public void peek1stCard() {
-        Card testCard = new Card(Color.GREEN, Type.SPECIAL, Value.SECONDCHANCE,false, 1);
+        Card testCard = new Card(Color.GREEN, Type.SPECIAL, Value.SECONDCHANCE, false, 1);
         DrawStack drawStack = new DrawStack();
         drawStack.push(testCard);
 
@@ -42,7 +41,7 @@ class PileTest {
     @Test
     public void peek2ndCard() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
-        Card testCard = new Card(Color.GREEN, Type.SPECIAL, Value.SECONDCHANCE,false, 1);
+        Card testCard = new Card(Color.GREEN, Type.SPECIAL, Value.SECONDCHANCE, false, 1);
         DrawStack drawStack = new DrawStack();
         drawStack.push(blue1);
         drawStack.push(testCard);
@@ -58,8 +57,8 @@ class PileTest {
         DrawStack drawStack = new DrawStack();
         int oldSize = drawStack.size();
         Card popped = drawStack.pop();
-        
-        assertEquals(oldSize-1, drawStack.size());
+
+        assertEquals(oldSize - 1, drawStack.size());
 
     }
 }

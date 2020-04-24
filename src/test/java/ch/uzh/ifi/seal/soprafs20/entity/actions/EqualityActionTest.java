@@ -14,18 +14,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EqualityActionTest {
 
+    DiscardPile discardPile = new DiscardPile();
     private Player initiator;
     private Player target;
     private Action equalityAction;
-    private Card blue1 = new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 0);
-    private Card blue2 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 1);
-    private Card blue3 = new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2);
-    private Card red1 = new Card(Color.RED, Type.NUMBER, Value.ONE, false, 3);
-    private Card red2 = new Card(Color.RED, Type.NUMBER, Value.TWO, false, 4);
-    private Card red3 = new Card(Color.RED, Type.NUMBER, Value.THREE, false, 5);
-    private Card red4 = new Card(Color.RED, Type.NUMBER, Value.FOUR, false, 6);
-    private Card colorWishBlue = new Card(Color.BLUE, Type.WISH, Value.COLORWISH, false, 7);
-    DiscardPile discardPile = new DiscardPile();
+    private final Card blue1 = new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 0);
+    private final Card blue2 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 1);
+    private final Card blue3 = new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2);
+    private final Card red1 = new Card(Color.RED, Type.NUMBER, Value.ONE, false, 3);
+    private final Card red2 = new Card(Color.RED, Type.NUMBER, Value.TWO, false, 4);
+    private final Card red3 = new Card(Color.RED, Type.NUMBER, Value.THREE, false, 5);
+    private final Card red4 = new Card(Color.RED, Type.NUMBER, Value.FOUR, false, 6);
+    private final Card colorWishBlue = new Card(Color.BLUE, Type.WISH, Value.COLORWISH, false, 7);
 
     @BeforeEach
     public void setup() {
@@ -48,7 +48,7 @@ class EqualityActionTest {
     }
 
     @Test
-    public void performTest(){
+    public void performTest() {
         List<Chat> resultChat = equalityAction.perform();
         assertEquals(3, this.initiator.getHandSize());
         assertEquals(3, this.target.getHandSize());
@@ -69,17 +69,17 @@ class EqualityActionTest {
     }
 
     @Test
-    public void getTargetsTest(){
+    public void getTargetsTest() {
         assertEquals(this.target, equalityAction.getTargets()[0]);
     }
 
     @Test
-    public void getInitiatorTest(){
+    public void getInitiatorTest() {
         assertEquals(this.initiator, equalityAction.getInitiator());
     }
 
     @Test
-    public void isCounterableTest(){
+    public void isCounterableTest() {
         assertTrue(equalityAction.isCounterable());
     }
 }

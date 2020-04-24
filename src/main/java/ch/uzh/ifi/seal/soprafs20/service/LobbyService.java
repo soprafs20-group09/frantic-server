@@ -56,8 +56,9 @@ public class LobbyService {
 
         List<Lobby> allLobbies;
         if (q != null) {
-            allLobbies =  lobbyRepository.findByNameContainsOrCreatorContains(q, q);
-        } else {
+            allLobbies = lobbyRepository.findByNameContainsOrCreatorContains(q, q);
+        }
+        else {
             allLobbies = lobbyRepository.findAll();
         }
         allLobbies.removeIf(lobby -> !lobby.isPublic());

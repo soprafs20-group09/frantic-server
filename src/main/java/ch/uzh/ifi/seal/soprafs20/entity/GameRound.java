@@ -12,23 +12,22 @@ import java.util.*;
 
 public class GameRound {
 
-    private Game game;
-    private String lobbyId;
-    private List<Player> listOfPlayers;
+    private final GameService gameService;
+    private final Game game;
+    private final String lobbyId;
+    private final List<Player> listOfPlayers;
     private Player currentPlayer;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
     private int turnNumber;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
-    private HashMap<Player, Integer> bombMap;
-    private List<Event> events;
+    private final HashMap<Player, Integer> bombMap;
+    private final List<Event> events;
     private Pile<Card> drawStack;
     private Pile<Card> discardPile;
     private Action currentAction;
     private boolean isProcessing;
     private boolean attackState;
-
-    private final GameService gameService;
 
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {

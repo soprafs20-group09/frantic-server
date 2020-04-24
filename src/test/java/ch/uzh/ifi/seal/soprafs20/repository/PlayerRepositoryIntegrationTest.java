@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs20.repository;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

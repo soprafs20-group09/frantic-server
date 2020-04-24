@@ -14,15 +14,15 @@ import java.util.List;
 
 public class FantasticAction implements Action {
 
-    private Player initiator;
-    private Value wishedValue;
+    private final Player initiator;
+    private final Value wishedValue;
     private Color wishedColor;
     private Player[] targets;
-    private DiscardPile discardPile;
+    private final DiscardPile discardPile;
 
-    public FantasticAction(Player initiator, int value, DiscardPile pile){
+    public FantasticAction(Player initiator, int value, DiscardPile pile) {
         this.initiator = initiator;
-        this.wishedValue = Value.values()[value-1];
+        this.wishedValue = Value.values()[value - 1];
         this.wishedColor = Color.NONE;
         this.discardPile = pile;
     }

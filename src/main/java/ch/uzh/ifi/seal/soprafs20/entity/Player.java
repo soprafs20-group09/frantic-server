@@ -16,29 +16,21 @@ import java.util.List;
 public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @Transient
+    private final Hand hand;
     @Id
     @GeneratedValue
     private Long id;
-
     @Column(nullable = false)
     private String username;
-
     @Column(unique = true)
     private String identity;
-
     @Column
     private boolean admin;
-
     @Column
     private String lobbyId;
-
     @Transient
     private int points;
-
-    @Transient
-    private final Hand hand;
-
     @Transient
     private boolean blocked;
 
@@ -93,7 +85,7 @@ public class Player implements Serializable {
     }
 
     public Card popCard() {
-        return hand.pop(hand.size() -1);
+        return hand.pop(hand.size() - 1);
     }
 
     public void pushCardToHand(Card card) {
@@ -170,7 +162,7 @@ public class Player implements Serializable {
         List<Card> cards = hand.getCards();
         for (int i = 0; i < hand.size(); i++) {
             Card card = cards.get(i);
-            if (card.getValue() == Value.FUCKYOU ) {
+            if (card.getValue() == Value.FUCKYOU) {
                 if (this.hand.size() == 10) {
                     playable.add(i);
                 }

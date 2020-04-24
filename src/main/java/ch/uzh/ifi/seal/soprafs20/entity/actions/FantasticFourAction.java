@@ -12,30 +12,30 @@ import java.util.Map;
 
 public class FantasticFourAction implements Action {
 
-    private Player initiator;
-    private Player[] targets;
-    private Map<Player, Integer> cardDistribution;
-    private Value wishedValue;
-    private Color wishedColor;
-    private DiscardPile discardPile;
-    private DrawStack drawStack;
+    private final Player initiator;
+    private final Player[] targets;
+    private final Map<Player, Integer> cardDistribution;
+    private final Value wishedValue;
+    private final Color wishedColor;
+    private final DiscardPile discardPile;
+    private final DrawStack drawStack;
 
-    public FantasticFourAction(Player initiator, Map<Player, Integer> distribution, int value, DiscardPile discardPile, DrawStack drawStack){
+    public FantasticFourAction(Player initiator, Map<Player, Integer> distribution, int value, DiscardPile discardPile, DrawStack drawStack) {
         this.initiator = initiator;
         ArrayList<Player> players = new ArrayList<>(distribution.keySet());
-        this.cardDistribution  = distribution;
+        this.cardDistribution = distribution;
         this.targets = players.toArray(new Player[players.size()]);
-        this.wishedValue = Value.values()[value-1];
+        this.wishedValue = Value.values()[value - 1];
         this.wishedColor = Color.NONE;
         this.discardPile = discardPile;
         this.drawStack = drawStack;
     }
 
-    public FantasticFourAction(Player initiator, Map<Player, Integer> distribution, Color wishedColor, DiscardPile discardPile, DrawStack drawStack){
+    public FantasticFourAction(Player initiator, Map<Player, Integer> distribution, Color wishedColor, DiscardPile discardPile, DrawStack drawStack) {
         this.initiator = initiator;
         ArrayList<Player> players = new ArrayList<>(distribution.keySet());
         this.targets = players.toArray(new Player[players.size()]);
-        this.cardDistribution  = distribution;
+        this.cardDistribution = distribution;
         this.wishedValue = Value.NONE;
         this.wishedColor = wishedColor;
         this.discardPile = discardPile;
@@ -48,7 +48,7 @@ public class FantasticFourAction implements Action {
         List<Chat> chat = new ArrayList<>();
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
-            for (int i = 0; i < target.getValue(); i++){
+            for (int i = 0; i < target.getValue(); i++) {
                 Card c = drawStack.pop();
                 target.getKey().pushCardToHand(c);
             }

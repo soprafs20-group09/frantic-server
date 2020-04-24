@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FantasticFourActionTest {
 
 
     @Test
-    public void colorWish_OneTarget(){
+    public void colorWish_OneTarget() {
         DrawStack drawStack = new DrawStack();
         DiscardPile discardPile = new DiscardPile();
 

@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Stack;
 
 public abstract class Pile<E> extends Stack<E> {
-    private ArrayList<E> elements;
+    private final ArrayList<E> elements;
 
 
     public Pile() {

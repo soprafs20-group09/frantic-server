@@ -1,9 +1,14 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 public class SurprisePartyEvent implements Event {
-    public String getName(){
+    public String getName() {
         return "surprise-party";
-    };
-    public void performEvent() {};
-    public String getMessage() {return "Surprise another player by gifting them one of your cards!";};
+    }
+
+    public void performEvent() {
+    }
+
+    public String getMessage() {
+        return "Surprise another player by gifting them one of your cards!";
+    }
 }

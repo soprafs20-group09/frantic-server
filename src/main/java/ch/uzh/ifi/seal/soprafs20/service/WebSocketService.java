@@ -17,10 +17,9 @@ import java.util.List;
 @Transactional
 public class WebSocketService {
 
+    protected final PlayerRepository playerRepository;
     @Autowired
     protected SimpMessagingTemplate simp;
-
-    protected final PlayerRepository playerRepository;
 
     public WebSocketService(@Qualifier("playerRepository") PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;

@@ -20,14 +20,14 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/start-game")
     public void startGame(@DestinationVariable String lobbyId,
-                                    SimpMessageHeaderAccessor sha, StartGameDTO dto) {
+                          SimpMessageHeaderAccessor sha, StartGameDTO dto) {
         String identity = sha.getUser().getName();
         gameService.startGame(lobbyId, identity);
     }
 
     @MessageMapping("/lobby/{lobbyId}/play")
     public void playCard(@DestinationVariable String lobbyId,
-                           SimpMessageHeaderAccessor sha, PlayCardDTO dto) {
+                         SimpMessageHeaderAccessor sha, PlayCardDTO dto) {
         String identity = sha.getUser().getName();
         gameService.playCard(lobbyId, identity, dto);
     }
@@ -48,14 +48,14 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/action/exchange")
     public void exchange(@DestinationVariable String lobbyId,
-                        SimpMessageHeaderAccessor sha, ExchangeDTO dto) {
+                         SimpMessageHeaderAccessor sha, ExchangeDTO dto) {
         String identity = sha.getUser().getName();
         gameService.exchange(lobbyId, identity, dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/gift")
     public void gift(@DestinationVariable String lobbyId,
-                        SimpMessageHeaderAccessor sha, GiftDTO dto) {
+                     SimpMessageHeaderAccessor sha, GiftDTO dto) {
         String identity = sha.getUser().getName();
         gameService.gift(lobbyId, identity, dto);
     }
@@ -69,28 +69,28 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/action/fantastic")
     public void fantastic(@DestinationVariable String lobbyId,
-                        SimpMessageHeaderAccessor sha, FantasticDTO dto) {
+                          SimpMessageHeaderAccessor sha, FantasticDTO dto) {
         String identity = sha.getUser().getName();
         gameService.fantastic(lobbyId, identity, dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/fantastic-four")
     public void fantasticFour(@DestinationVariable String lobbyId,
-                        SimpMessageHeaderAccessor sha, FantasticFourDTO dto) {
+                              SimpMessageHeaderAccessor sha, FantasticFourDTO dto) {
         String identity = sha.getUser().getName();
         gameService.fantasticFour(lobbyId, identity, dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/equality")
     public void equality(@DestinationVariable String lobbyId,
-                          SimpMessageHeaderAccessor sha, EqualityDTO dto) {
+                         SimpMessageHeaderAccessor sha, EqualityDTO dto) {
         String identity = sha.getUser().getName();
         gameService.equality(lobbyId, identity, dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/counterattack")
     public void counterAttack(@DestinationVariable String lobbyId,
-                         SimpMessageHeaderAccessor sha, CounterAttackDTO dto) {
+                              SimpMessageHeaderAccessor sha, CounterAttackDTO dto) {
         String identity = sha.getUser().getName();
         gameService.counterAttack(lobbyId, identity, dto);
     }

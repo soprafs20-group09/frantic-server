@@ -7,19 +7,20 @@ import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 public class Card {
 
-    private Color color;
-    private Type type;
-    private Value value;
     private final int orderKey;
     private final String key;
     private final boolean counterable;
+    private final Color color;
+    private final Type type;
+    private final Value value;
 
     public Card(Color c, int value, int orderKey) {
-        this(c, Type.NUMBER, Value.values()[value-1], false, orderKey);
+        this(c, Type.NUMBER, Value.values()[value - 1], false, orderKey);
         if (value > 10) {
             throw new RuntimeException("Invalid number");
         }
     }
+
     public Card(Color c, Type t, Value v, boolean counterable, int orderKey) {
         this.type = t;
         this.color = c;
@@ -30,7 +31,7 @@ public class Card {
     }
 
     // constructor for wish card.
-    public Card(Color c, Type t, Value v){
+    public Card(Color c, Type t, Value v) {
         this(c, t, v, false, -1);
     }
 

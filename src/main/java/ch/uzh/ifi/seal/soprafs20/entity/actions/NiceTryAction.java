@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NiceTryAction implements Action {
-    private Player initiator;
+    private final Player initiator;
     private Player[] targets;
-    private Color color;
-    private DiscardPile discardPile;
+    private final Color color;
+    private final DiscardPile discardPile;
     private DrawStack drawStack;
 
     public NiceTryAction(Player initiator, Color color, DiscardPile discardPile) {

@@ -11,9 +11,9 @@ import java.util.List;
 
 public class ExchangeAction implements Action {
 
-    private Player initiator;
-    private Player target;
-    private int[] exchangeCards; // cards the initiator gives to the target
+    private final Player initiator;
+    private final Player target;
+    private final int[] exchangeCards; // cards the initiator gives to the target
 
 
     public ExchangeAction(Player initiator, Player target, int[] cards) {

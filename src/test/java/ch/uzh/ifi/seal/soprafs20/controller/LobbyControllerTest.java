@@ -39,17 +39,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LobbyControllerTest {
 
+    WebSocketStompClient stompClient;
     @Value("${local.server.port}")
     private int port;
-
     @MockBean
     private PlayerService playerService;
     @MockBean
     private LobbyService lobbyService;
-
-    @SpyBean private LobbyController lobbyController;
-
-    WebSocketStompClient stompClient;
+    @SpyBean
+    private LobbyController lobbyController;
 
     @BeforeEach
     public void setup() {
@@ -70,7 +68,8 @@ public class LobbyControllerTest {
         //when(lobbyService.updateLobbySettings(Mockito.any(), Mockito.any())).thenReturn(lobbyState);
 
         StompSession session = stompClient
-                .connect("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {})
+                .connect("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {
+                })
                 .get(1, SECONDS);
         session.subscribe("/user/queue/lobby/a/lobby-state", new StompFrameHandler() {
             @Override

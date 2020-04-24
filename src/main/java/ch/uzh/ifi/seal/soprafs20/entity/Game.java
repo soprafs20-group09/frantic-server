@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
-import ch.uzh.ifi.seal.soprafs20.entity.events.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 
@@ -9,16 +8,16 @@ import java.util.*;
 
 public class Game {
 
-    private String lobbyId;
+    private final String lobbyId;
     private GameRound currentGameRound;
-    private GameLength gameDuration;
-    private List<Player> listOfPlayers;
-    private int maxPoints;
+    private final GameLength gameDuration;
+    private final List<Player> listOfPlayers;
+    private final int maxPoints;
     private Player firstPlayer;
-    private List<Player> winners;
+    private final List<Player> winners;
     private Timer timer;
 
-    private GameService gameService;
+    private final GameService gameService;
 
     public Game(String lobbyId, GameLength gameDuration) {
         this.gameService = GameService.getInstance();

@@ -39,17 +39,15 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RegisterControllerTest {
 
+    WebSocketStompClient stompClient;
     @Value("${local.server.port}")
     private int port;
-
     @MockBean
     private PlayerService playerService;
     @MockBean
     private LobbyService lobbyService;
-
-    @SpyBean private WebSocketController webSocketController;
-
-    WebSocketStompClient stompClient;
+    @SpyBean
+    private WebSocketController webSocketController;
 
     @Test
     public void testRegistration() throws Exception {
@@ -73,7 +71,8 @@ public class RegisterControllerTest {
         when(playerService.registerPlayer(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(registered);
 
         StompSession session = stompClient
-                .connect("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {})
+                .connect("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {
+                })
                 .get(1, SECONDS);
         session.subscribe("/user/queue/register", new StompFrameHandler() {
             @Override

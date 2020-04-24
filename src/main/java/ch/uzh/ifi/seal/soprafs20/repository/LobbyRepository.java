@@ -10,5 +10,6 @@ import java.util.List;
 public interface LobbyRepository extends JpaRepository<Lobby, Long> {
 
     List<Lobby> findByNameContainsOrCreatorContains(String name, String creator);
+
     Lobby findByLobbyId(String lobbyId);
 }

@@ -7,17 +7,17 @@ import java.util.List;
 
 public class FinishLineEvent implements Event {
 
-    private Game game;
-    private List<Player> listOfPlayers;
+    private final Game game;
+    private final List<Player> listOfPlayers;
 
     public FinishLineEvent(Game game, List<Player> listOfPlayers) {
         this.game = game;
         this.listOfPlayers = listOfPlayers;
     }
 
-    public String getName(){
+    public String getName() {
         return "finish-line";
-    };
+    }
 
     public void performEvent() {
         int maxPoints = 0;
@@ -31,7 +31,10 @@ public class FinishLineEvent implements Event {
             }
         }
         this.game.endGameRound(playerWithMaxPoints);
-    };
+    }
 
-    public String getMessage() {return "Looks like the round is over! Count your points!";};
+    public String getMessage() {
+        return "Looks like the round is over! Count your points!";
+    }
+
 }

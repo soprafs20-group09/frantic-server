@@ -11,17 +11,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GiftActionTest {
 
     private Player initiator;
     private Player target;
     private Action giftAction;
-    private Card blue1 = new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 0);
-    private Card blue2 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 1);
-    private Card blue3 = new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2);
-    private Card fuckYou = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FUCKYOU, false, 3);
+    private final Card blue1 = new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 0);
+    private final Card blue2 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 1);
+    private final Card blue3 = new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2);
+    private final Card fuckYou = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FUCKYOU, false, 3);
 
     @BeforeEach
     public void setup() {
@@ -40,7 +41,7 @@ class GiftActionTest {
     }
 
     @Test
-    public void performTest(){
+    public void performTest() {
         List<Chat> resultChat = giftAction.perform();
         assertEquals(1, this.initiator.getHandSize());
         assertEquals(2, this.target.getHandSize());
@@ -54,17 +55,17 @@ class GiftActionTest {
     }
 
     @Test
-    public void getTargetsTest(){
+    public void getTargetsTest() {
         assertEquals(this.target, giftAction.getTargets()[0]);
     }
 
     @Test
-    public void getInitiatorTest(){
+    public void getInitiatorTest() {
         assertEquals(this.initiator, giftAction.getInitiator());
     }
 
     @Test
-    public void isCounterableTest(){
+    public void isCounterableTest() {
         assertTrue(giftAction.isCounterable());
     }
 

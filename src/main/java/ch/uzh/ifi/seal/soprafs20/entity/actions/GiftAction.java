@@ -9,9 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GiftAction implements Action {
-    private Player initiator;
-    private Player target;
-    private int[] gifts;
+    private final Player initiator;
+    private final Player target;
+    private final int[] gifts;
 
     public GiftAction(Player initiator, Player target, int[] gifts) {
         this.initiator = initiator;

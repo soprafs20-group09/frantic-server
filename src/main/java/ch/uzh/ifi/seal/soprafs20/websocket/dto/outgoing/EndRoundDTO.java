@@ -11,12 +11,12 @@ public class EndRoundDTO {
         return players;
     }
 
-    public int getPointLimit() {
-        return this.pointLimit;
-    }
-
     public void setPlayers(Map<String, Integer> players) {
         this.players = players;
+    }
+
+    public int getPointLimit() {
+        return this.pointLimit;
     }
 
     public void setPointLimit(int pointLimit) {

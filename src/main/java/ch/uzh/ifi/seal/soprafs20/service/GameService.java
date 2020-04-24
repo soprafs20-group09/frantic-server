@@ -22,12 +22,10 @@ import java.util.Map;
 @Transactional
 public class GameService {
 
+    private static GameService instance;
     private final WebSocketService webSocketService;
-
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
-
-    private static GameService instance;
 
     @Autowired
     public GameService(WebSocketService webSocketService,

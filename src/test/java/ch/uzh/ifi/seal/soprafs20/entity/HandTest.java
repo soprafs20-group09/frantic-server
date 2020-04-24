@@ -3,13 +3,13 @@ package ch.uzh.ifi.seal.soprafs20.entity;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HandTest {
 
     @Test
     public void pushCardToHandAndPopCardFromHand() {
-        Card blue1 = new Card(Color.BLUE, 1,1 );
+        Card blue1 = new Card(Color.BLUE, 1, 1);
 
         Hand hand = new Hand();
         hand.push(blue1);
@@ -24,9 +24,9 @@ class HandTest {
         Card blue2 = new Card(Color.BLUE, 2, 2);
         Card blue3 = new Card(Color.BLUE, 3, 3);
         Card blue4 = new Card(Color.BLUE, 4, 4);
-        Card red1 = new Card(Color.RED, 1, 5 );
-        Card red2 = new Card(Color.RED, 2, 6 );
-        Card red3 = new Card(Color.RED, 3, 7 );
+        Card red1 = new Card(Color.RED, 1, 5);
+        Card red2 = new Card(Color.RED, 2, 6);
+        Card red3 = new Card(Color.RED, 3, 7);
 
         Hand hand = new Hand();
 
@@ -52,7 +52,7 @@ class HandTest {
     @Test
     public void sizeOfHand() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
-        Card red2 = new Card(Color.RED, 2, 2 );
+        Card red2 = new Card(Color.RED, 2, 2);
 
         Hand hand = new Hand();
         assertEquals(0, hand.size());
@@ -67,9 +67,9 @@ class HandTest {
     }
 
     @Test
-    public void clearAllCardsFromHand(){
+    public void clearAllCardsFromHand() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
-        Card red2 = new Card(Color.RED, 2, 2 );
+        Card red2 = new Card(Color.RED, 2, 2);
 
         Hand hand = new Hand();
         hand.push(blue1);

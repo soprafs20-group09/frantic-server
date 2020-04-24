@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CardTest {
 
     @Test
-    public void createCards_throwsException(){
+    public void createCards_throwsException() {
         Exception e = assertThrows(RuntimeException.class, () -> new Card(Color.BLUE, 12, 1));
         String msg = e.getMessage();
         assertTrue(msg.contains("Invalid number"));

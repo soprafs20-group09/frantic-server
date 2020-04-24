@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EqualityAction implements Action {
-    private Player initiator;
-    private Player target;
-    private Color color;
-    private DiscardPile discardPile;
-    private DrawStack drawStack;
+    private final Player initiator;
+    private final Player target;
+    private final Color color;
+    private final DiscardPile discardPile;
+    private final DrawStack drawStack;
     private int cardsDrawn;
 
     public EqualityAction(Player initiator, Player target, Color color, DiscardPile discardPile, DrawStack drawStack) {

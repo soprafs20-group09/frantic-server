@@ -32,7 +32,7 @@ public class Lobby implements Serializable {
     private int players;
 
     @ElementCollection
-    private List<String> listOfPlayers;
+    private final List<String> listOfPlayers;
 
     @Column
     private GameLength gameDuration;
