@@ -137,13 +137,7 @@ public class LobbyService {
                 List<String> playerList = lobby.getListOfPlayers();
                 if (playerList.size() > 1) {
                     if (player.isAdmin()) {
-                        Player newHost = playerRepository.findByUsernameAndLobbyId(playerList.get(0), lobbyId);
-                        newHost.setAdmin(true);
-                        lobby.setCreator(newHost.getUsername());
-                        playerRepository.flush();
-                        lobbyRepository.flush();
-                        chat = new Chat("event", "avatar:" + newHost.getUsername(), newHost.getUsername() + " is now host.");
-                        webSocketService.sendChatMessage(lobbyId, chat);
+                        setNewHost(lobbyId, playerList.get(0));
                     }
                     webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
                 }
@@ -157,7 +151,8 @@ public class LobbyService {
                         lobbyRepository.delete(lobby);
                         GameRepository.removeGame(lobbyId);
                     }
-                    else {
+                    else if (player.isAdmin()) {
+                        setNewHost(lobbyId, playerList.get(0));
                         webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
                     }
                 }
@@ -166,6 +161,17 @@ public class LobbyService {
                 }
             }
         }
+    }
+
+    private void setNewHost(String lobbyId, String newHostUsername) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        Player newHost = playerRepository.findByUsernameAndLobbyId(newHostUsername, lobbyId);
+        newHost.setAdmin(true);
+        lobby.setCreator(newHost.getUsername());
+        playerRepository.flush();
+        lobbyRepository.flush();
+        Chat chat = new Chat("event", "avatar:" + newHost.getUsername(), newHost.getUsername() + " is now host.");
+        webSocketService.sendChatMessage(lobbyId, chat);
     }
 
     public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO dto) {

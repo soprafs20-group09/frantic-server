@@ -410,7 +410,7 @@ public class GameRound {
 
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
-            Chat chat = new Chat("event", "special:skip", this.currentPlayer
+            Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
                     + " is skipped");
             this.gameService.sendChatMessage(this.lobbyId, chat);
             this.currentPlayer.setBlocked(false);
