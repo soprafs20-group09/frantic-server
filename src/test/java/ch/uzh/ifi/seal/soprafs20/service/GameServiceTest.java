@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.events.FridayTheThirteenthEvent;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
@@ -185,6 +186,28 @@ public class GameServiceTest {
     }
 
     @Test
+    public void counterActionTest() {
+        CounterAttackDTO counterAttackDTO = Mockito.mock(CounterAttackDTO.class);
+        Mockito.when(counterAttackDTO.getColor()).thenReturn(Color.RED);
+
+        gameService.counterAttack("testLobbyId", "testIdentity", counterAttackDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeCounterAttackAction("testIdentity",
+                counterAttackDTO.getColor());
+    }
+
+    @Test
+    public void niceTryTest() {
+        NiceTryDTO niceTryDTO = Mockito.mock(NiceTryDTO.class);
+        Mockito.when(niceTryDTO.getColor()).thenReturn(Color.RED);
+
+        gameService.niceTry("testLobbyId", "testIdentity", niceTryDTO);
+
+        Mockito.verify(gameRound, Mockito.times(1)).storeNiceTryAction("testIdentity",
+                niceTryDTO.getColor());
+    }
+
+    @Test
     public void endTurnTest() {
         gameService.endTurn("testLobbyId", "testIdentity");
 
@@ -194,6 +217,15 @@ public class GameServiceTest {
     @Test
     public void sendChatMessageTest() {
         Chat chat = new Chat("msg", "avatar:testPlayer", "testMessage");
+        gameService.sendChatMessage("testLobbyId", chat);
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage("testLobbyId", chat);
+    }
+
+    @Test
+    public void sendChatListMessageTest() {
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("msg", "avatar:testPlayer", "testMessage"));
         gameService.sendChatMessage("testLobbyId", chat);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage("testLobbyId", chat);
@@ -261,5 +293,33 @@ public class GameServiceTest {
         gameService.sendActionResponse("testLobbyId", player, card);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/action-response"), Mockito.any());
+    }
+
+    @Test
+    public void sendAttackWindowTest() {
+        gameService.sendAttackWindow("testLobbyId", player, new int[]{1}, 5);
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/attack-window"), Mockito.any());
+    }
+
+    @Test
+    public void sendEventTest() {
+        gameService.sendEvent("testLobbyId", new FridayTheThirteenthEvent());
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/event"), Mockito.any());
+    }
+
+    @Test
+    public void sendEndRoundTest() {
+        gameService.sendEndRound("testLobbyId", Collections.singletonList(player));
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
+    }
+
+    @Test
+    public void sendEndGameTest() {
+        gameService.sendEndGame("testLobbyId", Collections.singletonList(player));
+
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-game"), Mockito.any());
     }
 }
