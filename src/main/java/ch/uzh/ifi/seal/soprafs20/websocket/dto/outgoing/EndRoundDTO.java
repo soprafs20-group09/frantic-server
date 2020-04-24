@@ -18,4 +18,8 @@ public class EndRoundDTO {
     public void setPlayers(Map<String, Integer> players) {
         this.players = players;
     }
+
+    public void setPointLimit(int pointLimit) {
+        this.pointLimit = pointLimit;
+    }
 }

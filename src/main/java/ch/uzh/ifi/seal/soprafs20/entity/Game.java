@@ -49,12 +49,12 @@ public class Game {
         setFirstPlayer(playerWithMaxPoints);
         removeCardsFromHands();
         if (!gameOver()) {
-            //TODO: Send end of round package
-            startTimer(15, false);
+            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, calculateMaxPoints());
+            startTimer(30, false);
         }
         else {
-            //TODO: Send end of game package
-            startTimer(15, true);
+            this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers);
+            startTimer(30, true);
         }
     }
 

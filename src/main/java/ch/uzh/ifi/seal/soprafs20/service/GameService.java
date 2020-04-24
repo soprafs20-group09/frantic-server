@@ -204,9 +204,10 @@ public class GameService {
         webSocketService.sendToLobby(lobbyId, "/event", dto);
     }
 
-    public void sendEndRound(String lobbyId, List<Player> players) {
+    public void sendEndRound(String lobbyId, List<Player> players, int pointLimit) {
         EndRoundDTO dto = new EndRoundDTO();
         dto.setPlayers(generatePlayerScoreDTO(players));
+        dto.setPointLimit(pointLimit);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 

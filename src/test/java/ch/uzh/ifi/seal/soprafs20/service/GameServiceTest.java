@@ -311,7 +311,7 @@ public class GameServiceTest {
 
     @Test
     public void sendEndRoundTest() {
-        gameService.sendEndRound("testLobbyId", Collections.singletonList(player));
+        gameService.sendEndRound("testLobbyId", Collections.singletonList(player), 154);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }
