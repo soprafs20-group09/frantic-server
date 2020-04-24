@@ -53,7 +53,7 @@ public class GameRound {
 
         //move 7 initial cards to player hands
         for (Player player : this.listOfPlayers) {
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 1; i <= 1; i++) {
                 Card card = this.drawStack.pop();
                 player.pushCardToHand(card);
             }
