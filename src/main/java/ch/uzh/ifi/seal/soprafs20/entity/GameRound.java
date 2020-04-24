@@ -139,7 +139,7 @@ public class GameRound {
             Card cardToPlay = player.peekCard(index);
             if (relevantCard != null && cardToPlay != null) {
                 if (attackState) {
-                    playCounterattack(player, relevantCard, cardToPlay);
+                    playCounterattack(player, relevantCard, cardToPlay, index);
                 }
                 else if (cardToPlay.isPlayableOn(relevantCard) &&
                         (relevantCard.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
@@ -195,14 +195,15 @@ public class GameRound {
         }
     }
 
-    private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay) {
+    private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
         if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
             for (Player target : this.currentAction.getTargets()) {
                 if (counterAttacker.equals(target)) {
+                    cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                            this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+                            counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
@@ -427,7 +428,7 @@ public class GameRound {
         //go to the next player, if the current player is skipped
         if (this.currentPlayer.isBlocked()) {
             Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
-                    + " is skipped");
+                    + " is skipped.");
             this.gameService.sendChatMessage(this.lobbyId, chat);
             this.currentPlayer.setBlocked(false);
             changePlayer();
