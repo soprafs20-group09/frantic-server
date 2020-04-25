@@ -96,6 +96,7 @@ public class GameRound {
             startTurn();
         }
         else {
+            sendGameState();
             prepareNiceTry();
         }
     }
@@ -173,7 +174,6 @@ public class GameRound {
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                             }
                         }
-
                     }
 
                     //nice try case
