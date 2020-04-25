@@ -28,8 +28,9 @@ public class GiftAction implements Action {
                 target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
             }
         }
+
         chat.add(new Chat("event", "special:gift", this.initiator.getUsername()
-                + " gifted " + this.target.getUsername() + " 2 cards."));
+                + " gifted " + this.target.getUsername() + " " + this.gifts.length + " cards."));
         return chat;
     }
 
