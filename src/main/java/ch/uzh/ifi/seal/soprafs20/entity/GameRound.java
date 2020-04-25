@@ -134,7 +134,7 @@ public class GameRound {
 
     public void playCard(String identity, int index) {
         Player player = getPlayerByIdentity(identity);
-        if (player != null) {
+        if (player != null && startProcess()) {
             Card relevantCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
             if (relevantCard != null && cardToPlay != null) {
@@ -178,21 +178,12 @@ public class GameRound {
 
                     //nice try case
                     else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
-                        cardToPlay = player.popCard(index);
-                        this.discardPile.push(cardToPlay);
-                        this.gameService.sendHand(this.lobbyId, player);
-                        for (Player potentialWinner : this.listOfPlayers) {
-                            if (potentialWinner.getHandSize() == 0) {
-                                this.timer.cancel();
-                                drawCardFromStack(potentialWinner, 3);
-                                this.gameService.sendHand(this.lobbyId, potentialWinner);
-                            }
-                        }
-                        prepareNewTurn();
+                        playNiceTry(player, index);
                     }
                 }
             }
         }
+        endProcess();
     }
 
     private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
@@ -215,7 +206,20 @@ public class GameRound {
                 }
             }
         }
+    }
 
+    private void playNiceTry(Player niceTryPlayer, int index) {
+        Card cardToPlay = niceTryPlayer.popCard(index);
+        this.discardPile.push(cardToPlay);
+        this.gameService.sendHand(this.lobbyId, niceTryPlayer);
+        for (Player potentialWinner : this.listOfPlayers) {
+            if (potentialWinner.getHandSize() == 0) {
+                this.timer.cancel();
+                drawCardFromStack(potentialWinner, 3);
+                this.gameService.sendHand(this.lobbyId, potentialWinner);
+            }
+        }
+        prepareNewTurn();
     }
 
     // in a turn, the current player can choose to draw a card
