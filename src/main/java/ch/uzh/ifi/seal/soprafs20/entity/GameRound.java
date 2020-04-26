@@ -143,7 +143,7 @@ public class GameRound {
                     playCounterattack(player, relevantCard, cardToPlay, index);
                 }
                 else if (cardToPlay.isPlayableOn(relevantCard) &&
-                        (relevantCard.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
+                        (cardToPlay.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
                     if (player == this.currentPlayer) {
                         cardToPlay = player.popCard(index);
                         this.discardPile.push(cardToPlay);
@@ -182,8 +182,8 @@ public class GameRound {
                     }
                 }
             }
+            endProcess();
         }
-        endProcess();
     }
 
     private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {

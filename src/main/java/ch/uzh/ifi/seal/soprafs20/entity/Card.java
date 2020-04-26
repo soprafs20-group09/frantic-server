@@ -69,6 +69,10 @@ public class Card {
                 return !this.getColor().equals(Color.BLACK);
             }
         }
+        // if the fuckyou card is on top at the beginning
+        if (other.getValue().equals(Value.FUCKYOU)) {
+            return true;
+        }
 
         switch (this.getColor()) {
             case BLACK:
