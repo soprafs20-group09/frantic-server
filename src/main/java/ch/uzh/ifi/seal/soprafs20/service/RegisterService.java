@@ -48,7 +48,7 @@ public class RegisterService {
         authMap.put(authToken, new String[]{username, lobbyId});
     }
 
-    public synchronized void joinLobby(String identity, RegisterDTO register) {
+    public synchronized void joinLobby(String identity, RegisterDTO register) throws InterruptedException {
         String username = getUsernameFromAuthToken(register.getToken());
         if (username == null) {
             throw new PlayerServiceException("Player not authenticated.");
@@ -66,6 +66,8 @@ public class RegisterService {
         removeFromAuthMap(register.getToken());
 
         webSocketService.sendToPlayer(identity, "/queue/register", registeredDTO);
+        // wait for player to subscribe to channels
+        Thread.sleep(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
         Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");
