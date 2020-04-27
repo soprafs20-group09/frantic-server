@@ -190,18 +190,17 @@ public class GameRound {
         if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
             for (Player target : this.currentAction.getTargets()) {
                 if (counterAttacker.equals(target)) {
+                    this.timer.cancel();
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendPlayableCards(this.lobbyId, counterAttacker, new int[0]);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
-                    Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
+                    Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-
-                    this.timer.cancel();
                     startCounterAttackTimer(30);
                     break;
                 }
@@ -210,13 +209,17 @@ public class GameRound {
     }
 
     private void playNiceTry(Player niceTryPlayer, int index) {
+        this.timer.cancel();
         Card cardToPlay = niceTryPlayer.popCard(index);
         this.discardPile.push(cardToPlay);
         this.gameService.sendPlayableCards(this.lobbyId, niceTryPlayer, new int[0]);
         this.gameService.sendHand(this.lobbyId, niceTryPlayer);
+        Chat chat = new Chat("event", "avatar:" + niceTryPlayer.getUsername(),
+                niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+
         for (Player potentialWinner : this.listOfPlayers) {
             if (potentialWinner.getHandSize() == 0) {
-                this.timer.cancel();
                 drawCardFromStack(potentialWinner, 3);
                 this.gameService.sendHand(this.lobbyId, potentialWinner);
             }
