@@ -224,6 +224,9 @@ public class GameService {
     }
 
     public void sendEndGame(String lobbyId, List<Player> players) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        lobby.setIsPlaying(false);
+
         EndGameDTO dto = new EndGameDTO();
         dto.setPlayers(generatePlayerScoreDTO(players));
         webSocketService.sendToLobby(lobbyId, "/end-game", dto);
