@@ -8,6 +8,8 @@ public class StartTurnDTO {
 
     private int turn;
 
+    private int timebombRounds;
+
     public String getCurrentPlayer() {
         return currentPlayer;
     }
@@ -30,5 +32,13 @@ public class StartTurnDTO {
 
     public void setTurn(int turn) {
         this.turn = turn;
+    }
+
+    public int getTimebombRounds() {
+        return timebombRounds;
+    }
+
+    public void setTimebombRounds(int timebombRounds) {
+        this.timebombRounds = timebombRounds;
     }
 }
