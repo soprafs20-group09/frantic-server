@@ -146,34 +146,39 @@ public class GameService {
     }
 
     public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
-        GameStateDTO gameState = new GameStateDTO();
-        gameState.setDiscardPile(cardToDTO(discardPile));
-        gameState.setPlayers(playersToDTO(players));
-        webSocketService.sendToLobby(lobbyId, "/game-state", gameState);
+        GameStateDTO dto = new GameStateDTO();
+        dto.setDiscardPile(cardToDTO(discardPile));
+        dto.setPlayers(playersToDTO(players));
+        webSocketService.sendToLobby(lobbyId, "/game-state", dto);
     }
 
     public void sendHand(String lobbyId, Player player) {
-        HandDTO hand = new HandDTO();
+        HandDTO dto = new HandDTO();
         CardDTO[] cards = new CardDTO[player.getHandSize()];
         for (int i = 0; i < player.getHandSize(); i++) {
             cards[i] = cardToDTO(player.peekCard(i));
         }
-        hand.setCards(cards);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", hand);
+        dto.setCards(cards);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", dto);
     }
 
     public void sendStartTurn(String lobbyId, String currentPlayer, int time, int turn) {
-        StartTurnDTO start = new StartTurnDTO();
-        start.setCurrentPlayer(currentPlayer);
-        start.setTime(time);
-        start.setTurn(turn);
-        webSocketService.sendToLobby(lobbyId, "/start-turn", start);
+        sendStartTurn(lobbyId, currentPlayer, time, turn, 0);
+    }
+
+    public void sendStartTurn(String lobbyId, String currentPlayer, int time, int turn, int timebombRounds) {
+        StartTurnDTO dto = new StartTurnDTO();
+        dto.setCurrentPlayer(currentPlayer);
+        dto.setTime(time);
+        dto.setTurn(turn);
+        dto.setTimebombRounds(timebombRounds);
+        webSocketService.sendToLobby(lobbyId, "/start-turn", dto);
     }
 
     public void sendPlayableCards(String lobbyId, Player player, int[] playable) {
-        PlayableCardsDTO playableCards = new PlayableCardsDTO();
-        playableCards.setPlayable(playable);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", playableCards);
+        PlayableCardsDTO dto = new PlayableCardsDTO();
+        dto.setPlayable(playable);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", dto);
     }
 
     public void sendDrawAnimation(String lobbyId, int amount) {
@@ -193,6 +198,15 @@ public class GameService {
         dto.setPlayable(playable);
         dto.setTime(time);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/attack-window", dto);
+    }
+
+    public void sendOverlay(String lobbyId, Player player, String icon, String title, String message, int duration) {
+        OverlayDTO dto = new OverlayDTO();
+        dto.setIcon(icon);
+        dto.setTitle(title);
+        dto.setMessage(message);
+        dto.setDuration(duration);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/overlay", dto);
     }
 
     public void sendEvent(String lobbyId, Event event) {
