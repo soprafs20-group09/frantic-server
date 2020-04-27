@@ -322,22 +322,4 @@ public class LobbyServiceTest {
         lobbyService.handleDisconnect("abc");
         Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches("testIdentity"), Mockito.matches("/queue/disconnect"), Mockito.any());
     }
-
-    @Test
-    void sendChatMessage_invalidContent_notSendToLobby() {
-        this.chat.setMessage(" ");
-
-        lobbyService.sendChatMessage("lobbyId", "identity", this.chat);
-
-        Mockito.verify(webSocketService, Mockito.times(0)).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
-    }
-
-    @Test
-    void sendChatMessage_validContent_SendToLobby() {
-        this.chat.setMessage("message");
-
-        lobbyService.sendChatMessage("lobbyId", "identity", this.chat);
-
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/chat"), Mockito.any());
-    }
 }
