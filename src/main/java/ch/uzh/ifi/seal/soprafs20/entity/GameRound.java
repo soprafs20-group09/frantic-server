@@ -390,6 +390,7 @@ public class GameRound {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
                 this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
+                //TODO: Send new package "You got attacked!"
             }
             else {
                 this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
@@ -466,6 +467,8 @@ public class GameRound {
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
+            player.setBlocked(false);
+
             int playersPoints = player.calculatePoints();
             if (!this.timeBomb) {
                 player.setPoints(player.getPoints() + playersPoints);
