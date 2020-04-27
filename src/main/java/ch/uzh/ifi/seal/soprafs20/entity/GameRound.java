@@ -192,6 +192,7 @@ public class GameRound {
                 if (counterAttacker.equals(target)) {
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
+                    this.gameService.sendPlayableCards(this.lobbyId, counterAttacker, new int[0]);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
@@ -211,6 +212,7 @@ public class GameRound {
     private void playNiceTry(Player niceTryPlayer, int index) {
         Card cardToPlay = niceTryPlayer.popCard(index);
         this.discardPile.push(cardToPlay);
+        this.gameService.sendPlayableCards(this.lobbyId, niceTryPlayer, new int[0]);
         this.gameService.sendHand(this.lobbyId, niceTryPlayer);
         for (Player potentialWinner : this.listOfPlayers) {
             if (potentialWinner.getHandSize() == 0) {
@@ -378,9 +380,17 @@ public class GameRound {
 
     private void prepareCounterAttack() {
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
-        for (Player player : this.getListOfPlayers()) {
-            int[] cards = player.hasCounterAttack();
-            this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
+        List<Player> targets = new ArrayList<>();
+        Collections.addAll(targets, this.currentAction.getTargets());
+
+        for (Player player : this.listOfPlayers) {
+            if (targets.contains(player)) {
+                int[] cards = player.hasCounterAttack();
+                this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
+            }
+            else {
+                this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
+            }
         }
         this.attackState = true;
         startCounterAttackTimer(5);
