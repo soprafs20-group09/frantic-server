@@ -323,6 +323,8 @@ public class GameServiceTest {
 
     @Test
     public void sendEndGameTest() {
+        Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
+
         gameService.sendEndGame("testLobbyId", Collections.singletonList(player));
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-game"), Mockito.any());

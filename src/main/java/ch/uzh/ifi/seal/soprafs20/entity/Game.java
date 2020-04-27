@@ -50,12 +50,19 @@ public class Game {
         removeCardsFromHands();
         if (!gameOver()) {
             this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, calculateMaxPoints());
-            startTimer(30, false);
+            startTimer(30);
         }
         else {
             this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers);
-            startTimer(30, true);
+            onGameOver();
         }
+    }
+
+    private void onGameOver() {
+        for (Player player : this.listOfPlayers) {
+            player.setPoints(0);
+        }
+        GameRepository.removeGame(this.lobbyId);
     }
 
     //Removes all cards from the players hands
@@ -137,25 +144,13 @@ public class Game {
         this.removeFromPlayerList(player);
     }
 
-    private void onGameOver() {
-        for (Player player : this.listOfPlayers) {
-            player.setPoints(0);
-        }
-        GameRepository.removeGame(this.lobbyId);
-    }
-
-    public void startTimer(int seconds, boolean gameOver) {
+    public void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                if (gameOver) {
-                    onGameOver();
-                }
-                else {
-                    startNewGameRound();
-                }
+                startNewGameRound();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
