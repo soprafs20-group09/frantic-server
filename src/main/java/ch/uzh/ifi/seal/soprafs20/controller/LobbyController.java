@@ -31,11 +31,4 @@ public class LobbyController {
         String identity = sha.getUser().getName();
         lobbyService.kickPlayer(lobbyId, identity, dto);
     }
-
-    @MessageMapping("/lobby/{lobbyId}/chat")
-    public void newChatMessage(@DestinationVariable String lobbyId,
-                               SimpMessageHeaderAccessor sha, ChatDTO dto) {
-        String identity = sha.getUser().getName();
-        lobbyService.sendChatMessage(lobbyId, identity, dto);
-    }
 }

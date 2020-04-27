@@ -218,20 +218,6 @@ public class LobbyService {
         return response;
     }
 
-    public void sendChatMessage(String lobbyId, String identity, ChatDTO dto) {
-
-        if (webSocketService.checkSender(lobbyId, identity)) {
-            if (dto.getMessage() != null && !dto.getMessage().matches("^\\s*$")) {
-                Player sender = this.playerRepository.findByIdentity(identity);
-
-                dto.setType("msg");
-                dto.setUsername(sender.getUsername());
-
-                webSocketService.sendToLobby(lobbyId, "/chat", dto);
-            }
-        }
-    }
-
     public boolean isUsernameAlreadyInLobby(String lobbyId, String username) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         List<String> players = lobby.getListOfPlayers();

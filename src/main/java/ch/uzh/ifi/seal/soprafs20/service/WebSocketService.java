@@ -1,12 +1,17 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.Game;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +23,46 @@ import java.util.List;
 public class WebSocketService {
 
     protected final PlayerRepository playerRepository;
+    private final LobbyService lobbyService;
     @Autowired
     protected SimpMessagingTemplate simp;
 
-    public WebSocketService(@Qualifier("playerRepository") PlayerRepository playerRepository) {
+    public WebSocketService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Lazy LobbyService lobbyService) {
         this.playerRepository = playerRepository;
+        this.lobbyService = lobbyService;
+    }
+
+    public void sendChatMessage(String lobbyId, String identity, ChatDTO dto) {
+
+        if (this.checkSender(lobbyId, identity)) {
+            if (dto.getMessage() != null && !dto.getMessage().matches("^\\s*$")) {
+                Player sender = this.playerRepository.findByIdentity(identity);
+                if (sender.isAdmin() && dto.getMessage().matches("^/.*")) {
+                    parseGameCommand(sender, dto.getMessage());
+                }
+                else {
+                    dto.setType("msg");
+                    dto.setUsername(sender.getUsername());
+
+                    this.sendToLobby(lobbyId, "/chat", dto);
+                }
+            }
+        }
+    }
+
+    private void parseGameCommand(Player sender, String message) {
+        if (message.equals("/end")) {
+            GameRound gameRound = GameRepository.findByLobbyId(sender.getLobbyId()).getCurrentGameRound();
+            gameRound.onRoundOver();
+        }
+        else if (message.matches("/kick\\s\\S+")) {
+            String toKick = message.split(" ")[1];
+            if (this.playerRepository.findByUsernameAndLobbyId(toKick, sender.getLobbyId()) != null) {
+                KickDTO simulateDTO = new KickDTO();
+                simulateDTO.setUsername(toKick);
+                lobbyService.kickPlayer(sender.getLobbyId(), sender.getIdentity(), simulateDTO);
+            }
+        }
     }
 
     protected boolean checkSender(String lobbyId, String identity) {
