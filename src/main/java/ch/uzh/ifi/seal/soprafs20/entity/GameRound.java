@@ -427,10 +427,6 @@ public class GameRound {
         return mappedPlayers;
     }
 
-    private void incrementCurrentPlayerMap(Player player) {
-        bombMap.put(player, bombMap.get(player) + 1);
-    }
-
     public void setTimeBomb() {
         this.timeBomb = true;
         for (Player player : this.listOfPlayers) {
@@ -463,7 +459,7 @@ public class GameRound {
         return this.bombMap.get(this.currentPlayer) >= 4;
     }
 
-    private void onRoundOver() {
+    public void onRoundOver() {
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {

@@ -79,8 +79,10 @@ public class PlayerService {
             }
 
             //remove player from PlayerRepository
-            playerRepository.delete(player);
-            playerRepository.flush();
+            if (playerRepository.findByIdentity(player.getIdentity()) != null) {
+                playerRepository.delete(player);
+                playerRepository.flush();
+            }
         }
         catch (NullPointerException e) {
             return null;
