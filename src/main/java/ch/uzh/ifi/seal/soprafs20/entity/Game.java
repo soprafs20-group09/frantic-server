@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 
@@ -136,6 +137,13 @@ public class Game {
         this.removeFromPlayerList(player);
     }
 
+    private void onGameOver() {
+        for (Player player : this.listOfPlayers) {
+            player.setPoints(0);
+        }
+        GameRepository.removeGame(this.lobbyId);
+    }
+
     public void startTimer(int seconds, boolean gameOver) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
@@ -143,7 +151,7 @@ public class Game {
             @Override
             public void run() {
                 if (gameOver) {
-                    //TODO: End all Websocket connections of a lobby
+                    onGameOver();
                 }
                 else {
                     startNewGameRound();
