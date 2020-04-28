@@ -9,6 +9,7 @@ import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GameRound {
 
@@ -47,9 +48,9 @@ public class GameRound {
 
     //creates Piles & player hands
     public void initializeGameRound() {
-        initEvents();
         this.drawStack = new DrawStack();
         this.discardPile = new DiscardPile();
+        initEvents();
 
         //move 7 initial cards to player hands
         for (Player player : this.listOfPlayers) {
@@ -286,7 +287,7 @@ public class GameRound {
         Player target = getPlayerByUsername(username);
         this.currentAction = new SkipAction(initiator, target);
         timer.cancel();
-        prepareCounterAttack();
+        prepareCounterAttack("skip");
     }
 
     public void storeGiftAction(String identity, int[] cards, String username) {
@@ -294,7 +295,7 @@ public class GameRound {
         Player target = getPlayerByUsername(username);
         this.currentAction = new GiftAction(initiator, target, cards);
         timer.cancel();
-        prepareCounterAttack();
+        prepareCounterAttack("gift");
     }
 
     public void storeExchangeAction(String identity, int[] cards, String username) {
@@ -302,7 +303,7 @@ public class GameRound {
         Player target = getPlayerByUsername(username);
         this.currentAction = new ExchangeAction(initiator, target, cards);
         timer.cancel();
-        prepareCounterAttack();
+        prepareCounterAttack("exchange");
     }
 
     public void storeFantasticAction(String identity, int value, Color color) {
@@ -332,7 +333,7 @@ public class GameRound {
                     (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         }
         timer.cancel();
-        prepareCounterAttack();
+        prepareCounterAttack("fantastic-four");
     }
 
     public void storeEqualityAction(String identity, Color color, String username) {
@@ -341,7 +342,7 @@ public class GameRound {
         this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         timer.cancel();
         if (this.currentAction.getTargets() != null) {
-            prepareCounterAttack();
+            prepareCounterAttack("equality");
         }
         else {
             performAction();
@@ -381,41 +382,31 @@ public class GameRound {
         finishTurn();
     }
 
-    private void prepareCounterAttack() {
+    private void prepareCounterAttack(String attackType) {
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         List<Player> targets = new ArrayList<>();
         Collections.addAll(targets, this.currentAction.getTargets());
-        int targetCount = targets.size();
+        List<String> targetUsernames = targets.stream().map(Player::getUsername).collect(Collectors.toList());
+        String attacker = this.currentAction.getInitiator().getUsername();
 
+        Chat chat = new Chat("event", "special:" + attackType,
+                attacker + " is attacking " + String.join(", ", targetUsernames) + ".");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         for (Player player : this.listOfPlayers) {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
-                this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
+                this.gameService.sendAttackWindow(this.lobbyId, player, cards, 6);
 
-                //TODO: Send new overlay "You are being attacked!"
+                this.gameService.sendOverlay(this.lobbyId, player, "special:" + attackType, attackType,
+                        "You are being attacked by " + attacker, 1);
             }
             else {
                 this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
             }
         }
 
-        // send chat packet for attack.
-        String attackType = this.currentAction.getClass().getName();
-        Chat attackMessage = new Chat("event", "special:" + attackType,
-                this.currentAction.getInitiator().getUsername() + " is attacking ");
-        for(int i = targetCount-1; i >= 0; i--){
-            if (i != 0) {
-                attackMessage.setMessage(attackMessage.getMessage() +
-                        this.currentAction.getTargets()[i].getUsername() + ", ");
-            } else {
-                attackMessage.setMessage(attackMessage.getMessage() +
-                        this.currentAction.getTargets()[i].getUsername());
-            }
-        }
-        this.gameService.sendChatMessage(this.lobbyId, attackMessage);
-
         this.attackState = true;
-        startCounterAttackTimer(5);
+        startCounterAttackTimer(6);
     }
 
     private void prepareNiceTry() {
