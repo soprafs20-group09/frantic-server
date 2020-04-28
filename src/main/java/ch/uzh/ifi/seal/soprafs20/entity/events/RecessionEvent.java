@@ -33,6 +33,9 @@ public class RecessionEvent implements Event {
     }
 
     public List<Chat> performEvent() {
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:recession", this.getMessage()));
+
         Player p = this.currentPlayer;
         List<Player> orderedListOfPlayers = new ArrayList<>();
         orderedListOfPlayers.add(p);
@@ -43,10 +46,15 @@ public class RecessionEvent implements Event {
 
         for (Player player : orderedListOfPlayers) {
             this.gameService.sendRecession(this.lobbyId, player, this.amount);
+            if (amount == 1) {
+                chat.add(new Chat("event", "event:recession", player.getUsername() + " discards " + amount + " card."));
+            }
+            else {
+                chat.add(new Chat("event", "event:recession", player.getUsername() + " discards " + amount + " cards."));
+            }
             amount++;
         }
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:recession", this.getMessage()));
+
         return chat;
     }
 
