@@ -605,7 +605,7 @@ public class GameRound {
         Event communism = new CommunismEvent();
         Event doomsday = new DoomsdayEvent(this.game, this.listOfPlayers, this.currentPlayer);
         Event earthquake = new EarthquakeEvent(this.listOfPlayers);
-        Event expansion = new ExpansionEvent();
+        Event expansion = new ExpansionEvent(this.listOfPlayers, this.currentPlayer, this.drawStack);
         Event finishLine = new FinishLineEvent(game, this.listOfPlayers);
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
         Event gamblingMan = new GamblingManEvent();
