@@ -63,7 +63,7 @@ public class GameRound {
         this.discardPile.push(this.drawStack.pop());
     }
 
-    private void sendInitialGameState() {
+    private void sendCompleteGameState() {
         for (Player player : this.listOfPlayers) {
             this.gameService.sendHand(this.lobbyId, player);
         }
@@ -76,7 +76,7 @@ public class GameRound {
 
     public void startGameRound() {
         initializeGameRound();
-        sendInitialGameState();
+        sendCompleteGameState();
         startTurn();
     }
 
@@ -412,6 +412,7 @@ public class GameRound {
         Event event = this.events.remove(0);
         this.gameService.sendEvent(this.lobbyId, event);
         event.performEvent();
+        sendCompleteGameState();
     }
 
     private int[] getPlayableCards(Player player) {
@@ -594,7 +595,7 @@ public class GameRound {
         Event charity = new CharityEvent();
         Event communism = new CommunismEvent();
         Event doomsday = new DoomsdayEvent(this.game, this.listOfPlayers, this.currentPlayer);
-        Event earthquake = new EarthquakeEvent();
+        Event earthquake = new EarthquakeEvent(this.listOfPlayers);
         Event expansion = new ExpansionEvent();
         Event finishLine = new FinishLineEvent(game, this.listOfPlayers);
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
