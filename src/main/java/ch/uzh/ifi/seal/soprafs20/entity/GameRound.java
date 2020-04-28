@@ -385,23 +385,35 @@ public class GameRound {
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
         List<Player> targets = new ArrayList<>();
         Collections.addAll(targets, this.currentAction.getTargets());
+        int targetCount = targets.size();
 
         for (Player player : this.listOfPlayers) {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
                 this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
-                String attackType = this.currentAction.getClass().getName();
 
-                Chat attackMessage = new Chat("event", "special:" + attackType,
-                        this.currentAction.getInitiator().getUsername() + " is attacking you!");
-
-                this.gameService.sendChatMessage(this.lobbyId, attackMessage);
                 //TODO: Send new overlay "You are being attacked!"
             }
             else {
                 this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
             }
         }
+
+        // send chat packet for attack.
+        String attackType = this.currentAction.getClass().getName();
+        Chat attackMessage = new Chat("event", "special:" + attackType,
+                this.currentAction.getInitiator().getUsername() + " is attacking ");
+        for(int i = targetCount-1; i >= 0; i--){
+            if (i != 0) {
+                attackMessage.setMessage(attackMessage.getMessage() +
+                        this.currentAction.getTargets()[i].getUsername() + ", ");
+            } else {
+                attackMessage.setMessage(attackMessage.getMessage() +
+                        this.currentAction.getTargets()[i].getUsername());
+            }
+        }
+        this.gameService.sendChatMessage(this.lobbyId, attackMessage);
+
         this.attackState = true;
         startCounterAttackTimer(5);
     }
