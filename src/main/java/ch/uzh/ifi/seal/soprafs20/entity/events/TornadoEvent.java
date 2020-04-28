@@ -22,7 +22,7 @@ public class TornadoEvent implements Event {
     public List<Chat> performEvent() {
         // collect cards
         for (Player player : this.listOfPlayers) {
-            if (player.getHandSize() != 0) {
+            while (player.getHandSize() > 0) {
                 this.tornadoStack.push(player.popCard());
             }
         }
@@ -30,9 +30,9 @@ public class TornadoEvent implements Event {
 
         // redistribute cards
         int i = 0;
-        while (this.tornadoStack.size() != 0) {
+        while (this.tornadoStack.size() > 0) {
             this.listOfPlayers.get(i).pushCardToHand(this.tornadoStack.pop());
-            int m = ++i % this.listOfPlayers.size();
+            i = ++i % this.listOfPlayers.size();
         }
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:tornado", this.getMessage()));
