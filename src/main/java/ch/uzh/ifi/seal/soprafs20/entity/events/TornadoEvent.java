@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TornadoEvent implements Event {
@@ -18,7 +19,7 @@ public class TornadoEvent implements Event {
         return "tornado";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         // collect cards
         for (Player player : this.listOfPlayers) {
             if (player.getHandSize() != 0) {
@@ -33,6 +34,9 @@ public class TornadoEvent implements Event {
             this.listOfPlayers.get(i).pushCardToHand(this.tornadoStack.pop());
             int m = ++i % this.listOfPlayers.size();
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:tornado", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

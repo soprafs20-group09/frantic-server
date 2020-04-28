@@ -1,6 +1,10 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TimeBombEvent implements Event {
@@ -14,8 +18,11 @@ public class TimeBombEvent implements Event {
         return "time-bomb";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         gameRound.setTimeBomb();
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:time-bomb", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

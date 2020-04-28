@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class EarthquakeEvent implements Event {
         return "earthquake";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         List<Card> temp = new ArrayList<>();
         int tempSize = this.listOfPlayers.get(0).getHandSize();
         for (int i = 0; i < tempSize; i++) {
@@ -40,6 +41,9 @@ public class EarthquakeEvent implements Event {
         for (int i = 0; i < tempSize; i++) {
             this.listOfPlayers.get(1).pushCardToHand(temp.remove(0));
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:earthquake", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

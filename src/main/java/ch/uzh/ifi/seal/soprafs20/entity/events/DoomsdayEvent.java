@@ -1,8 +1,10 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DoomsdayEvent implements Event {
@@ -21,11 +23,14 @@ public class DoomsdayEvent implements Event {
         return "doomsday";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         for (Player player : listOfPlayers) {
             player.setPoints(player.getPoints() + 50);
         }
         this.game.endGameRound(currentPlayer);
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:doomsday", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

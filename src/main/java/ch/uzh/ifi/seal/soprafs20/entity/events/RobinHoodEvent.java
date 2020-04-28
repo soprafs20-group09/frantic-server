@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class RobinHoodEvent implements Event {
         return "robin-hood";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         int numOfPlayers = this.listOfPlayers.size();
         int currentPlayerIndex = this.listOfPlayers.indexOf(currentPlayer);
         int nextPlayerIndex = (currentPlayerIndex + 1) % numOfPlayers;
@@ -55,6 +56,9 @@ public class RobinHoodEvent implements Event {
                 minCardsPlayer.pushCardToHand(temp.remove(0));
             }
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:robin-hood", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

@@ -2,9 +2,11 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Pile;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VandalismEvent implements Event {
@@ -21,7 +23,7 @@ public class VandalismEvent implements Event {
         return "vandalism";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
 
         int index = 1;
         Card relevant = this.discardPile.peekN(index);
@@ -36,6 +38,9 @@ public class VandalismEvent implements Event {
                 }
             }
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:vandalism", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {
