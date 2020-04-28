@@ -1,10 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpansionEvent implements Event {
@@ -23,7 +21,10 @@ public class ExpansionEvent implements Event {
         return "expansion";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:recession", this.getMessage()));
+
         int numOfPlayers = this.listOfPlayers.size();
         int currentPlayerIndex = this.listOfPlayers.indexOf(currentPlayer);
 
@@ -32,7 +33,10 @@ public class ExpansionEvent implements Event {
             for (int j = 1; j <= i; j++) {
                 playerOfInterest.pushCardToHand(this.drawStack.pop());
             }
+            chat.add(new Chat("event", "avatar:" + playerOfInterest.getUsername(),
+                    playerOfInterest.getUsername() + " drew " + i + " cards"));
         }
+        return chat;
     }
 
     //TODO: make it dynamic
