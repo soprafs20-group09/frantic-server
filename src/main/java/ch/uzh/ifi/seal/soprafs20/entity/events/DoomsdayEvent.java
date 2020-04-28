@@ -23,7 +23,7 @@ public class DoomsdayEvent implements Event {
 
     public void performEvent() {
         for (Player player : listOfPlayers) {
-            player.setPoints(player.calculatePoints() + 50);
+            player.setPoints(player.getPoints() + 50);
         }
         this.game.endGameRound(currentPlayer);
     }
