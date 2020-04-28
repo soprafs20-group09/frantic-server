@@ -1,11 +1,19 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class GamblingManEvent implements Event {
     public String getName() {
         return "gambling-man";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:gambling-man", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

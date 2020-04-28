@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Pile;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MexicanStandoffEvent implements Event {
@@ -22,7 +24,7 @@ public class MexicanStandoffEvent implements Event {
         return "mexican-standoff";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         for (Player player : this.listOfPlayers) {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
                 this.discardPile.push(player.popCard(i));
@@ -33,6 +35,9 @@ public class MexicanStandoffEvent implements Event {
                 }
             }
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:mexican-standoff", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

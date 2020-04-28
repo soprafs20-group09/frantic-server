@@ -82,7 +82,7 @@ public class ExchangeAction implements Action {
         }
 
         chat.add(new Chat("event", "special:exchange", this.initiator.getUsername()
-                + " exchanged 2 chards with " + this.target.getUsername() + "."));
+                + " exchanged 2 cards with " + this.target.getUsername() + "."));
         return chat;
     }
 }

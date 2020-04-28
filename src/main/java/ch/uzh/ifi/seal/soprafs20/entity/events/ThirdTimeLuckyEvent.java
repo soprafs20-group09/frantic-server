@@ -1,10 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ThirdTimeLuckyEvent implements Event {
@@ -21,7 +19,7 @@ public class ThirdTimeLuckyEvent implements Event {
         return "third-time-lucky";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         for (Player player : this.playerList) {
             for (int i = 0; i < 3; i++) {
                 if (!drawStack.empty()) {
@@ -29,6 +27,9 @@ public class ThirdTimeLuckyEvent implements Event {
                 }
             }
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:third-time-lucky", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {

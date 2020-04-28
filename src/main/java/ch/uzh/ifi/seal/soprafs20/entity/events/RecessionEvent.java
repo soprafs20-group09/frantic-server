@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Pile;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -31,7 +32,7 @@ public class RecessionEvent implements Event {
         return "recession";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         Player p = this.currentPlayer;
         List<Player> orderedListOfPlayers = new ArrayList<>();
         orderedListOfPlayers.add(p);
@@ -44,6 +45,9 @@ public class RecessionEvent implements Event {
             this.gameService.sendRecession(this.lobbyId, player, this.amount);
             amount++;
         }
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:recession", this.getMessage()));
+        return chat;
     }
 
     private Player nextPlayer(Player prev) {

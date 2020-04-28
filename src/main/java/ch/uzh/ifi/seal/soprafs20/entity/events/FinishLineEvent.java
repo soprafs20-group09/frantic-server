@@ -1,8 +1,10 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FinishLineEvent implements Event {
@@ -19,7 +21,7 @@ public class FinishLineEvent implements Event {
         return "finish-line";
     }
 
-    public void performEvent() {
+    public List<Chat> performEvent() {
         int maxPoints = 0;
         Player playerWithMaxPoints = this.listOfPlayers.get(0); //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
@@ -31,6 +33,9 @@ public class FinishLineEvent implements Event {
             }
         }
         this.game.endGameRound(playerWithMaxPoints);
+        List<Chat> chat = new ArrayList<>();
+        chat.add(new Chat("event", "event:finish-line", this.getMessage()));
+        return chat;
     }
 
     public String getMessage() {
