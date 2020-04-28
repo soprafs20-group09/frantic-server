@@ -30,8 +30,6 @@ public class EarthquakeEventTest {
 
     @Test
     public void performEventTest() {
-        this.listOfPlayers = new ArrayList<>();
-
         Player player1 = new Player();
         List<Card> player1Cards = new ArrayList<>();
         player1Cards.add(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0));
