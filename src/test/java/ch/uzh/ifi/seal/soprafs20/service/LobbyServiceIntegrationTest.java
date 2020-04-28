@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,6 +115,24 @@ public class LobbyServiceIntegrationTest {
         lobbyService.joinLobby(lobbyId, player2);
         referenceLobby = lobbyRepository.findByLobbyId(lobbyId);
         assertEquals(2, referenceLobby.getPlayers());
+    }
+
+    @Test
+    public void asAdmin_kickPlayer() {
+        player1.setAdmin(true);
+        String lobbyId = lobbyService.createLobby(player1);
+        lobbyService.joinLobby(lobbyId, player2);
+
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        assertEquals(2, lobby.getPlayers());
+
+        KickDTO kickDTO = new KickDTO();
+        kickDTO.setUsername(player2.getUsername());
+        lobbyService.kickPlayer(lobbyId, player1.getIdentity(), kickDTO);
+
+        lobby = lobbyRepository.findByLobbyId(lobbyId);
+        assertEquals(1, lobby.getPlayers());
+        assertEquals(player1.getUsername(), lobby.getListOfPlayers().get(0));
     }
 
     @Test
