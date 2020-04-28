@@ -390,7 +390,13 @@ public class GameRound {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
                 this.gameService.sendAttackWindow(this.lobbyId, player, cards, 5);
-                //TODO: Send new package "You got attacked!"
+                String attackType = this.currentAction.getClass().getName();
+
+                Chat attackMessage = new Chat("event", "special:" + attackType,
+                        this.currentAction.getInitiator().getUsername() + " is attacking you!");
+
+                this.gameService.sendChatMessage(this.lobbyId, attackMessage);
+                //TODO: Send new overlay "You are being attacked!"
             }
             else {
                 this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
