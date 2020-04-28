@@ -9,6 +9,7 @@ import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RecessionAmountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -122,6 +123,13 @@ public class GameService {
         }
     }
 
+    public void recession(String lobbyId, String identity, RecessionDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().performRecession(identity, dto.getCards());
+        }
+    }
+
     public void endTurn(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
@@ -214,6 +222,12 @@ public class GameService {
         dto.setEvent(event.getName());
         dto.setMessage(event.getMessage());
         webSocketService.sendToLobby(lobbyId, "/event", dto);
+    }
+
+    public void sendRecession(String lobbyId, Player player, int amount) {
+        RecessionAmountDTO dto = new RecessionAmountDTO();
+        dto.setAmount(amount);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession" , dto);
     }
 
     public void sendEndRound(String lobbyId, List<Player> players, int pointLimit) {

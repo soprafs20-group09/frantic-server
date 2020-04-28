@@ -96,9 +96,16 @@ public class GameController {
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/nice-try")
-    public void counterAttack(@DestinationVariable String lobbyId,
+    public void niceTry(@DestinationVariable String lobbyId,
                               SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
         String identity = sha.getUser().getName();
         gameService.niceTry(lobbyId, identity, dto);
+    }
+
+    @MessageMapping("/lobby/{lobbyId}/action/recession")
+    public void recession(@DestinationVariable String lobbyId,
+                              SimpMessageHeaderAccessor sha, RecessionDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.recession(lobbyId, identity, dto);
     }
 }
