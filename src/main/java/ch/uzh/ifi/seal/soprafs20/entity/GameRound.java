@@ -451,17 +451,19 @@ public class GameRound {
     }
 
     private void changePlayer() {
-        int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
-        playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
-        this.currentPlayer = this.listOfPlayers.get(playersIndex);
+        if (this.listOfPlayers.size() > 0) {
+            int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+            playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
+            this.currentPlayer = this.listOfPlayers.get(playersIndex);
 
-        //go to the next player, if the current player is skipped
-        if (this.currentPlayer.isBlocked()) {
-            Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
-                    + " is skipped.");
-            this.gameService.sendChatMessage(this.lobbyId, chat);
-            this.currentPlayer.setBlocked(false);
-            changePlayer();
+            //go to the next player, if the current player is skipped
+            if (this.currentPlayer.isBlocked()) {
+                Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
+                        + " is skipped.");
+                this.gameService.sendChatMessage(this.lobbyId, chat);
+                this.currentPlayer.setBlocked(false);
+                changePlayer();
+            }
         }
     }
 

@@ -67,7 +67,7 @@ public class RegisterService {
 
         webSocketService.sendToPlayer(identity, "/queue/register", registeredDTO);
         // wait for player to subscribe to channels
-        Thread.sleep(500);
+        wait(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
         Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");

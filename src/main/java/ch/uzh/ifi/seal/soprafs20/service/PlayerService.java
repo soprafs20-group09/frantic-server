@@ -41,7 +41,7 @@ public class PlayerService {
         return instance;
     }
 
-    public Player createPlayer(String identity, String username) {
+    public synchronized Player createPlayer(String identity, String username) {
 
         Player newPlayer = new Player();
         newPlayer.setUsername(username);
@@ -51,7 +51,7 @@ public class PlayerService {
         return newPlayer;
     }
 
-    public RegisteredDTO registerPlayer(String identity, Player player, String lobbyId) {
+    public synchronized RegisteredDTO registerPlayer(String identity, Player player, String lobbyId) {
 
         player.setIdentity(identity);
         playerRepository.flush();
@@ -63,7 +63,7 @@ public class PlayerService {
         return registeredDTO;
     }
 
-    public String removePlayer(Player player) {
+    public synchronized String removePlayer(Player player) {
 
         Lobby currentLobby = null;
         try {

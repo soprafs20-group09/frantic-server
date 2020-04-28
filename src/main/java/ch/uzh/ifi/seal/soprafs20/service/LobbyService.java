@@ -71,7 +71,7 @@ public class LobbyService {
         return null;
     }
 
-    public String createLobby(Player creator) {
+    public synchronized String createLobby(Player creator) {
 
         String lobbyName = creator.getUsername() + "'s lobby";
 
@@ -93,7 +93,7 @@ public class LobbyService {
         return lobbyId;
     }
 
-    public void joinLobby(String lobbyId, Player player) {
+    public synchronized void joinLobby(String lobbyId, Player player) {
 
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.addPlayer(player);
@@ -105,7 +105,7 @@ public class LobbyService {
                 player.getUsername(), lobby.getName(), lobby.getLobbyId()));
     }
 
-    public void kickPlayer(String lobbyId, String identity, KickDTO dto) {
+    public synchronized void kickPlayer(String lobbyId, String identity, KickDTO dto) {
 
         if (webSocketService.checkSender(lobbyId, identity)) {
             Player admin = playerRepository.findByIdentity(identity);
@@ -166,7 +166,7 @@ public class LobbyService {
         }
     }
 
-    private void setNewHost(String lobbyId, String newHostUsername) {
+    private synchronized void setNewHost(String lobbyId, String newHostUsername) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         Player newHost = playerRepository.findByUsernameAndLobbyId(newHostUsername, lobbyId);
         newHost.setAdmin(true);
@@ -177,7 +177,7 @@ public class LobbyService {
         webSocketService.sendChatMessage(lobbyId, chat);
     }
 
-    public void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO dto) {
+    public synchronized void updateLobbySettings(String lobbyId, String identity, LobbySettingsDTO dto) {
 
         if (webSocketService.checkSender(lobbyId, identity)) {
             Lobby lobbyToUpdate = lobbyRepository.findByLobbyId(lobbyId);

@@ -31,7 +31,7 @@ public class Lobby implements Serializable {
     @Column(nullable = false)
     private int players;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private final List<String> listOfPlayers;
 
     @Column
