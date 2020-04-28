@@ -415,6 +415,15 @@ public class GameRound {
         sendCompleteGameState();
     }
 
+    public void performRecession(String identity, int[] cards) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null) {
+            for (int i = cards.length - 1; i >= 0; i--) {
+                this.discardPile.push(player.popCard(cards[i]));
+            }
+        }
+    }
+
     private int[] getPlayableCards(Player player) {
         return player.getPlayableCards(getRelevantCardOnDiscardPile());
     }
@@ -603,15 +612,15 @@ public class GameRound {
         Event market = new MarketEvent();
         Event matingSeason = new MatingSeasonEvent();
         Event merryChristmas = new MerryChristmasEvent();
-        Event mexicanStandoff = new MexicanStandoffEvent();
-        Event recession = new RecessionEvent();
+        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
+        Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.discardPile, this.gameService);
         Event robinHood = new RobinHoodEvent();
         Event surpriseParty = new SurprisePartyEvent();
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
         Event timeBomb = new TimeBombEvent(this);
         Event tornado = new TornadoEvent(this);
-        Event vandalism = new VandalismEvent();
+        Event vandalism = new VandalismEvent(this.listOfPlayers, this.discardPile);
 
         //add them to the list of all events
         this.events.add(charity);
