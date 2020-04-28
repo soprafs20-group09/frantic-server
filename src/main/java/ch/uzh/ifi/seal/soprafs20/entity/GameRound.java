@@ -614,7 +614,7 @@ public class GameRound {
         Event merryChristmas = new MerryChristmasEvent();
         Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
         Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.discardPile, this.gameService);
-        Event robinHood = new RobinHoodEvent();
+        Event robinHood = new RobinHoodEvent(this.listOfPlayers, this.currentPlayer);
         Event surpriseParty = new SurprisePartyEvent();
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
