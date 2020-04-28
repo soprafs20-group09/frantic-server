@@ -152,8 +152,10 @@ public class LobbyService {
                         lobbyRepository.delete(lobby);
                         GameRepository.removeGame(lobbyId);
                     }
-                    else if (player.isAdmin()) {
-                        setNewHost(lobbyId, playerList.get(0));
+                    else {
+                        if (player.isAdmin()) {
+                            setNewHost(lobbyId, playerList.get(0));
+                        }
                         webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
                     }
                 }
