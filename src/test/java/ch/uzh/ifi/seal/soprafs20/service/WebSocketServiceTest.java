@@ -20,6 +20,10 @@ public class WebSocketServiceTest {
     @Spy
     @InjectMocks
     private WebSocketService webSocketService;
+
+    @Mock
+    private LobbyService lobbyService;
+
     @InjectMocks
     private Lobby testLobby;
     @InjectMocks
@@ -52,7 +56,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    void sendChatMessage_invalidContent_notSendToLobby() {
+    public void sendChatMessage_invalidContent_notSendToLobby() {
         this.chat.setMessage(" ");
 
         webSocketService.sendChatMessage("lobbyId", "identity", this.chat);
@@ -61,11 +65,24 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    void sendChatMessage_validContent_SendToLobby() {
+    public void sendChatMessage_validContent_SendToLobby() {
         this.chat.setMessage("message");
 
         webSocketService.sendChatMessage("lobbyId", "identity", this.chat);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/chat"), Mockito.any());
+    }
+
+    @Test
+    public void parseKickCommandTest() {
+        Mockito.doNothing().when(lobbyService).kickPlayer(Mockito.any(), Mockito.any(), Mockito.any());
+
+        testPlayer.setAdmin(true);
+
+        ChatDTO dto = new ChatDTO();
+        dto.setMessage("/kick testPlayer");
+        webSocketService.sendChatMessage("testLobby", "testIdentity", dto);
+
+        Mockito.verify(lobbyService, Mockito.times(1)).kickPlayer(Mockito.any(), Mockito.matches("testIdentity"), Mockito.any());
     }
 }
