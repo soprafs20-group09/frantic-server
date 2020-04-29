@@ -49,7 +49,7 @@ public class EqualityAction implements Action {
     @Override
     public Player[] getTargets() {
         if (this.target == null) {
-            return null;
+            return new Player[0];
         }
         return new Player[]{this.target};
     }

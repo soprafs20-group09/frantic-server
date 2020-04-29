@@ -30,7 +30,7 @@ public class TornadoEvent implements Event {
 
         // redistribute cards
         int i = 0;
-        while (this.tornadoStack.size() > 0) {
+        while (!this.tornadoStack.isEmpty()) {
             this.listOfPlayers.get(i).pushCardToHand(this.tornadoStack.pop());
             i = ++i % this.listOfPlayers.size();
         }

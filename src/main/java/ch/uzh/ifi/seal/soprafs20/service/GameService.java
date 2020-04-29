@@ -43,12 +43,10 @@ public class GameService {
     }
 
     public void startGame(String lobbyId, String identity) {
-        if (webSocketService.checkSender(lobbyId, identity)) {
-            if (playerRepository.findByIdentity(identity).isAdmin()) {
-                Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
-                sendStartGame(lobbyId);
-                lobby.startGame();
-            }
+        if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
+            Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+            sendStartGame(lobbyId);
+            lobby.startGame();
         }
     }
 

@@ -25,7 +25,7 @@ import java.util.List;
 public class PlayerService {
 
     private static PlayerService instance;
-    private final Logger log = LoggerFactory.getLogger(PlayerService.class);
+
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 

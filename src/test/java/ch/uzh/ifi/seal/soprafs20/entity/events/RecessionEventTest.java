@@ -34,7 +34,7 @@ public class RecessionEventTest {
         listOfPlayers.add(player1);
         listOfPlayers.add(player2);
 
-        recession = new RecessionEvent("abc", player1, listOfPlayers, discardPile, gameService);
+        recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
     }
 
     @Test

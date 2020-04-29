@@ -465,7 +465,7 @@ public class GameRound {
     }
 
     private void changePlayer() {
-        if (this.listOfPlayers.size() > 0) {
+        if (!this.listOfPlayers.isEmpty()) {
             int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
             playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
             this.currentPlayer = this.listOfPlayers.get(playersIndex);
@@ -648,7 +648,7 @@ public class GameRound {
         Event matingSeason = new MatingSeasonEvent();
         Event merryChristmas = new MerryChristmasEvent();
         Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
-        Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.discardPile, this.gameService);
+        Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.gameService);
         Event robinHood = new RobinHoodEvent(this.listOfPlayers, this.currentPlayer);
         Event surpriseParty = new SurprisePartyEvent();
         Event theAllSeeingEye = new TheAllSeeingEyeEvent();

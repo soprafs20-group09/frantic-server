@@ -14,7 +14,6 @@ public class NiceTryAction implements Action {
     private Player[] targets;
     private final Color color;
     private final DiscardPile discardPile;
-    private DrawStack drawStack;
 
     public NiceTryAction(Player initiator, Color color, DiscardPile discardPile) {
         this.initiator = initiator;

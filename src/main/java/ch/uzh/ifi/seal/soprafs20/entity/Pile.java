@@ -16,6 +16,7 @@ public abstract class Pile<E> extends Stack<E> {
         return elements.toArray(new Object[elements.size()]);
     }
 
+    @Override
     public synchronized E push(E item) {
         if (elements.add(item))
             return item;
@@ -23,10 +24,12 @@ public abstract class Pile<E> extends Stack<E> {
             return null;
     }
 
+    @Override
     public synchronized E pop() {
         return elements.remove(elements.size() - 1);
     }
 
+    @Override
     public synchronized E peek() {
         return elements.get(elements.size() - 1);
     }
@@ -35,6 +38,7 @@ public abstract class Pile<E> extends Stack<E> {
         return elements.get(elements.size() - n);
     }
 
+    @Override
     public synchronized int size() {
         return this.elements.size();
     }

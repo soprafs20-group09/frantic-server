@@ -25,11 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * User Service
- * This class is the "worker" and responsible for all functionality related to the user
- * (e.g., it creates, modifies, deletes, finds). The result will be passed back to the caller.
- */
 @Service
 @Transactional
 public class LobbyService {
@@ -63,7 +58,6 @@ public class LobbyService {
         }
         allLobbies.removeIf(lobby -> !lobby.isPublic());
         allLobbies.removeIf(Lobby::isPlaying);
-        log.debug(String.format("Retrieved list of lobbies that contain '%s'", q));
         return allLobbies;
     }
 
@@ -81,8 +75,6 @@ public class LobbyService {
         newLobby.setName(lobbyName);
         newLobby = this.lobbyRepository.save(newLobby);
         this.lobbyRepository.flush();
-        log.debug(String.format("'%s' created lobby '%s' with ID '%s'",
-                creator.getUsername(), newLobby.getName(), newLobby.getLobbyId()));
 
         String lobbyId = newLobby.getLobbyId();
         creator.setLobbyId(lobbyId);
@@ -101,8 +93,6 @@ public class LobbyService {
         player = playerRepository.findByIdentity(player.getIdentity());
         player.setLobbyId(lobbyId);
         playerRepository.flush();
-        log.debug(String.format("'%s' joined lobby '%s' with ID '%s'",
-                player.getUsername(), lobby.getName(), lobby.getLobbyId()));
     }
 
     public synchronized void kickPlayer(String lobbyId, String identity, KickDTO dto) {

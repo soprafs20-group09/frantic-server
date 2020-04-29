@@ -14,16 +14,14 @@ public class RecessionEvent implements Event {
     private String lobbyId;
     private final List<Player> listOfPlayers;
     private Player currentPlayer;
-    private Pile<Card> discardPile;
     private int amount;
 
     private final GameService gameService;
 
-    public RecessionEvent(String lobbyId, Player currentPlayer, List<Player> listOfPlayers, Pile<Card> discardPile, GameService gameService) {
+    public RecessionEvent(String lobbyId, Player currentPlayer, List<Player> listOfPlayers, GameService gameService) {
         this.lobbyId = lobbyId;
         this.currentPlayer = currentPlayer;
         this.listOfPlayers = listOfPlayers;
-        this.discardPile = discardPile;
         this.gameService = gameService;
         this.amount = 1;
     }

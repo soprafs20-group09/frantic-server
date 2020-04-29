@@ -23,7 +23,7 @@ public class ExpansionEvent implements Event {
 
     public List<Chat> performEvent() {
         List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:recession", this.getMessage()));
+        chat.add(new Chat("event", "event:expansion", this.getMessage()));
 
         int numOfPlayers = this.listOfPlayers.size();
         int currentPlayerIndex = this.listOfPlayers.indexOf(currentPlayer);

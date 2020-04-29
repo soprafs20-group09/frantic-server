@@ -14,7 +14,6 @@ public class CounterAttackAction implements Action {
     private Player[] targets;
     private final Color color;
     private final DiscardPile discardPile;
-    private DrawStack drawStack;
 
     public CounterAttackAction(Player initiator, Color color, DiscardPile discardPile) {
         this.initiator = initiator;

@@ -205,7 +205,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyCreate(null);
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.BAD_REQUEST);
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");
@@ -217,7 +217,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyCreate(" ");
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.BAD_REQUEST);
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");
@@ -230,7 +230,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyJoin("abc", "username");
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.NOT_FOUND);
+            assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");
@@ -242,7 +242,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyJoin("abc", "testPlayer");
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.CONFLICT);
+            assertEquals(HttpStatus.CONFLICT, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");
@@ -260,7 +260,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyJoin("abc", "username");
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.GONE);
+            assertEquals(HttpStatus.GONE, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");
@@ -273,7 +273,7 @@ public class LobbyServiceTest {
             lobbyService.checkLobbyJoin("abc", "username");
         }
         catch (ResponseStatusException ex) {
-            assertEquals(ex.getStatus(), HttpStatus.GONE);
+            assertEquals(HttpStatus.GONE, ex.getStatus());
             return;
         }
         fail("ResponseStatusException expected");

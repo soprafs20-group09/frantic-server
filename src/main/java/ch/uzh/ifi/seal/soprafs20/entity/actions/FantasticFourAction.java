@@ -53,7 +53,7 @@ public class FantasticFourAction implements Action {
                 target.getKey().pushCardToHand(c);
             }
             if (target.getValue() == 1) {
-                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew one card."));
+                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));
             }
             else {
                 chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
