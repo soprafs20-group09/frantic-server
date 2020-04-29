@@ -28,6 +28,7 @@ public class GameRound {
     private Pile<Card> discardPile;
     private Action currentAction;
     private boolean isProcessing;
+    private boolean turnIsRunning;
     private boolean attackState;
 
 
@@ -43,6 +44,7 @@ public class GameRound {
         this.currentAction = null;
         this.events = new ArrayList<>();
         this.isProcessing = false;
+        this.turnIsRunning = false;
         this.attackState = false;
     }
 
@@ -103,6 +105,7 @@ public class GameRound {
     }
 
     private void startTurn() {
+        this.turnIsRunning = true;
         this.turnNumber += 1;
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
         this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
@@ -118,6 +121,7 @@ public class GameRound {
     }
 
     public void finishTurn() {
+        this.turnIsRunning = false;
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
@@ -225,7 +229,9 @@ public class GameRound {
                 this.gameService.sendHand(this.lobbyId, potentialWinner);
             }
         }
-        prepareNewTurn();
+        sendGameState();
+        this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
+        startInterTurnTimer(30);
     }
 
     // in a turn, the current player can choose to draw a card
@@ -379,7 +385,12 @@ public class GameRound {
                 this.gameService.sendHand(this.lobbyId, target);
             }
         }
-        finishTurn();
+        if (this.turnIsRunning) {
+            finishTurn();
+        }
+        else {
+            prepareNewTurn();
+        }
     }
 
     private void prepareCounterAttack(String attackType) {
@@ -568,6 +579,19 @@ public class GameRound {
             @Override
             public void run() {
                 onRoundOver();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    //needed for color wish after the nice try was played
+    public void startInterTurnTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                prepareNewTurn();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
