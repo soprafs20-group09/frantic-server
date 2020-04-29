@@ -43,12 +43,12 @@ public class MexicanStandoffEventTest {
         Card c = new Card(Color.RED, 3, 1);
 
         assertEquals(4, this.player1.getHandSize());
-        assertEquals(124, this.drawStack.size());
+        assertEquals(125, this.drawStack.size());
 
         this.mexicanStandoff.performEvent();
         assertEquals(3, this.player1.getHandSize());
         assertEquals(4, this.discardPile.size());
-        assertEquals(121, this.drawStack.size());
+        assertEquals(122, this.drawStack.size());
     }
 
     @Test

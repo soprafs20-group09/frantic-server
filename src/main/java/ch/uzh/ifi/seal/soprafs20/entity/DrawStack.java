@@ -32,7 +32,7 @@ public class DrawStack extends Pile<Card> {
         for (int i = 0; i < 11; i++) {
             this.push(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, orderNr++));
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             this.push(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, orderNr++));
         }
         for (int i = 0; i < 2; i++) {
