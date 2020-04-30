@@ -30,11 +30,17 @@ public class ExpansionEvent implements Event {
 
         for (int i = 1; i <= numOfPlayers; i++) {
             Player playerOfInterest = this.listOfPlayers.get((currentPlayerIndex + i) % numOfPlayers);
+            int drawnCards = 0;
             for (int j = 1; j <= i; j++) {
-                playerOfInterest.pushCardToHand(this.drawStack.pop());
+                if (this.drawStack.size() > 0) {
+                    playerOfInterest.pushCardToHand(this.drawStack.pop());
+                    drawnCards++;
+                }
             }
-            chat.add(new Chat("event", "avatar:" + playerOfInterest.getUsername(),
-                    playerOfInterest.getUsername() + " drew " + i + " cards"));
+            if (drawnCards > 0) {
+                chat.add(new Chat("event", "avatar:" + playerOfInterest.getUsername(),
+                        playerOfInterest.getUsername() + " drew " + drawnCards + " cards"));
+            }
         }
         return chat;
     }
