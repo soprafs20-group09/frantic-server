@@ -207,6 +207,7 @@ public class GameRound {
 
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
                     startCounterAttackTimer(30);
+                    //TODO: send attack-turn package
                     break;
                 }
             }
@@ -232,6 +233,7 @@ public class GameRound {
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
         startInterTurnTimer(30);
+        //TODO: send attack-turn package
     }
 
     // in a turn, the current player can choose to draw a card
@@ -431,7 +433,8 @@ public class GameRound {
     private void performEvent() {
         Event event = this.events.remove(0);
         this.gameService.sendEvent(this.lobbyId, event);
-        event.performEvent();
+        List<Chat> chat = event.performEvent();
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         sendCompleteGameState();
     }
 
