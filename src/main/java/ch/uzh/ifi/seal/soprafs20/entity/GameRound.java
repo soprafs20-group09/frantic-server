@@ -433,7 +433,8 @@ public class GameRound {
     private void performEvent() {
         Event event = this.events.remove(0);
         this.gameService.sendEvent(this.lobbyId, event);
-        event.performEvent();
+        List<Chat> chat = event.performEvent();
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         sendCompleteGameState();
     }
 
