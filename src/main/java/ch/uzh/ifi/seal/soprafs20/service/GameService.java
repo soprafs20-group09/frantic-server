@@ -206,6 +206,14 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/attack-window", dto);
     }
 
+    public void sendAttackTurn(String lobbyId, String currentPlayer, int time, int turn) {
+        AttackTurnDTO dto = new AttackTurnDTO();
+        dto.setCurrentPlayer(currentPlayer);
+        dto.setTime(time);
+        dto.setTurn(turn);
+        webSocketService.sendToLobby(lobbyId, "/attack-turn", dto);
+    }
+
     public void sendOverlay(String lobbyId, Player player, String icon, String title, String message, int duration) {
         OverlayDTO dto = new OverlayDTO();
         dto.setIcon(icon);
