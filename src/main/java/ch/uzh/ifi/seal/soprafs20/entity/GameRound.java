@@ -206,8 +206,8 @@ public class GameRound {
                     sendGameState();
 
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
+                    this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername(), 30, this.turnNumber++);
                     startCounterAttackTimer(30);
-                    //TODO: send attack-turn package
                     break;
                 }
             }
@@ -232,6 +232,7 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
+        this.gameService.sendAttackTurn(this.lobbyId, niceTryPlayer.getUsername(), 30, this.turnNumber++);
         startInterTurnTimer(30);
         //TODO: send attack-turn package
     }
@@ -411,10 +412,10 @@ public class GameRound {
                 this.gameService.sendAttackWindow(this.lobbyId, player, cards, 6);
 
                 this.gameService.sendOverlay(this.lobbyId, player, "special:" + attackType, attackType,
-                        "You are being attacked by " + attacker, 1);
+                        "You are being attacked by " + attacker, 2);
             }
             else {
-                this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 5);
+                this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 6);
             }
         }
 
@@ -431,6 +432,7 @@ public class GameRound {
     }
 
     private void performEvent() {
+        this.timer.cancel();
         Event event = this.events.remove(0);
         this.gameService.sendEvent(this.lobbyId, event);
         List<Chat> chat = event.performEvent();
