@@ -128,6 +128,13 @@ public class GameService {
         }
     }
 
+    public void market(String lobbyId, String identity, MarketDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            //game.getCurrentGameRound();
+        }
+    }
+
     public void endTurn(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
@@ -152,9 +159,13 @@ public class GameService {
     }
 
     public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
+        this.sendGameState(lobbyId, discardPile, players, false);
+    }
+
+    public void sendGameState(String lobbyId, Card discardPile, List<Player> players, boolean up) {
         GameStateDTO dto = new GameStateDTO();
         dto.setDiscardPile(cardToDTO(discardPile));
-        dto.setPlayers(playersToDTO(players));
+        dto.setPlayers(playersToDTO(players, up));
         webSocketService.sendToLobby(lobbyId, "/game-state", dto);
     }
 
@@ -236,6 +247,24 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession" , dto);
     }
 
+    public void sendGamblingMan(String lobbyId, Player player, int time, int[] playable) {
+        GamblingManWindowDTO dto = new GamblingManWindowDTO();
+        dto.setTime(time);
+        dto.setPlayable(playable);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/gambling-man-widndow", dto);
+    }
+
+    public void sendMarketWindow(String lobbyId, Player player, int time, List<Card> cards) {
+        MarketWindowDTO dto = new MarketWindowDTO();
+        dto.setTime(time);
+        CardDTO[] cardDTO = new CardDTO[cards.size()];
+        for (int i = 0; i < cards.size(); i++) {
+            cardDTO[i] = cardToDTO(cards.get(i));
+        }
+        dto.setCards(cardDTO);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);
+    }
+
     public void sendEndRound(String lobbyId, List<Player> players, int pointLimit) {
         EndRoundDTO dto = new EndRoundDTO();
         dto.setPlayers(generatePlayerScoreDTO(players));
@@ -261,17 +290,25 @@ public class GameService {
         return dto;
     }
 
-    private CardDTO[] generateCardBackDTO(Player player) {
+    private CardDTO[] generateCardDTO(Player player, boolean up) {
         CardDTO[] dto = new CardDTO[player.getHandSize()];
         for (int i = 0; i < player.getHandSize(); i++) {
             dto[i] = new CardDTO();
-            dto[i].setType("back");
-            dto[i].setKey(player.peekCard(i).getKey());
+            Card c = player.peekCard(i);
+            if (up) {
+                dto[i].setType(FranticUtils.getStringRepresentation(c.getType()));
+                dto[i].setColor(FranticUtils.getStringRepresentation(c.getColor()));
+                dto[i].setValue(FranticUtils.getStringRepresentation(c.getValue()));
+            }
+            else {
+                dto[i].setType("back");
+            }
+            dto[i].setKey(c.getKey());
         }
         return dto;
     }
 
-    private PlayerStateDTO[] playersToDTO(List<Player> players) {
+    private PlayerStateDTO[] playersToDTO(List<Player> players, boolean up) {
         PlayerStateDTO[] dto = new PlayerStateDTO[players.size()];
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
@@ -279,7 +316,7 @@ public class GameService {
             dto[i].setUsername(player.getUsername());
             dto[i].setPoints(player.getPoints());
             dto[i].setSkipped(player.isBlocked());
-            dto[i].setCards(generateCardBackDTO(player));
+            dto[i].setCards(generateCardDTO(player, up));
         }
         return dto;
     }
