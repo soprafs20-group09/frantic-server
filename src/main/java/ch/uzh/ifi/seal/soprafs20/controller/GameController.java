@@ -108,4 +108,11 @@ public class GameController {
         String identity = sha.getUser().getName();
         gameService.recession(lobbyId, identity, dto);
     }
+
+    @MessageMapping("/lobby/{lobbyId}/action/market")
+    public void market(@DestinationVariable String lobbyId,
+                          SimpMessageHeaderAccessor sha, MarketDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.market(lobbyId, identity, dto);
+    }
 }
