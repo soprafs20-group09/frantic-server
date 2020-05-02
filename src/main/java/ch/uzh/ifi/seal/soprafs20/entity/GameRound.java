@@ -642,7 +642,7 @@ public class GameRound {
     private void initEvents() {
         //initialize all Events
         Event charity = new CharityEvent();
-        Event communism = new CommunismEvent();
+        Event communism = new CommunismEvent(this.listOfPlayers, this.drawStack);
         Event doomsday = new DoomsdayEvent(this.game, this.listOfPlayers, this.currentPlayer);
         Event earthquake = new EarthquakeEvent(this.listOfPlayers);
         Event expansion = new ExpansionEvent(this.listOfPlayers, this.currentPlayer, this.drawStack);
