@@ -650,7 +650,7 @@ public class GameRound {
         Event fridayTheThirteenth = new FridayTheThirteenthEvent();
         Event gamblingMan = new GamblingManEvent();
         Event market = new MarketEvent();
-        Event matingSeason = new MatingSeasonEvent();
+        Event matingSeason = new MatingSeasonEvent(this.listOfPlayers, this.currentPlayer, this.discardPile);
         Event merryChristmas = new MerryChristmasEvent();
         Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
         Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.gameService);
