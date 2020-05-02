@@ -26,10 +26,10 @@ public class ExpansionEvent implements Event {
         chat.add(new Chat("event", "event:expansion", this.getMessage()));
 
         int numOfPlayers = this.listOfPlayers.size();
-        int currentPlayerIndex = this.listOfPlayers.indexOf(currentPlayer);
+        int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 
         for (int i = 1; i <= numOfPlayers; i++) {
-            Player playerOfInterest = this.listOfPlayers.get((currentPlayerIndex + i) % numOfPlayers);
+            Player playerOfInterest = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
             int drawnCards = 0;
             for (int j = 1; j <= i; j++) {
                 if (this.drawStack.size() > 0) {
