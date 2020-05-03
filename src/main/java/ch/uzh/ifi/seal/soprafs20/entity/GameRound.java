@@ -99,6 +99,7 @@ public class GameRound {
             startTurn();
         }
         else {
+            endProcess();
             sendGameState();
             prepareNiceTry();
         }
