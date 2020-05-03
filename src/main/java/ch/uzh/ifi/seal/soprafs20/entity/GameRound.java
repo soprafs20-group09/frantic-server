@@ -403,9 +403,12 @@ public class GameRound {
         List<String> targetUsernames = targets.stream().map(Player::getUsername).collect(Collectors.toList());
         String attacker = this.currentAction.getInitiator().getUsername();
 
-        Chat chat = new Chat("event", "special:" + attackType,
-                attacker + " is attacking " + String.join(", ", targetUsernames) + ".");
-        this.gameService.sendChatMessage(this.lobbyId, chat);
+        if (!targets.isEmpty()) {
+            Chat chat = new Chat("event", "special:" + attackType,
+                    attacker + " is attacking " + String.join(", ", targetUsernames) + ".");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
+        }
+
         for (Player player : this.listOfPlayers) {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
