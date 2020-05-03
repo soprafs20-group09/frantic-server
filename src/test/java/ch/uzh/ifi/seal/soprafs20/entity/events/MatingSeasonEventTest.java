@@ -38,23 +38,23 @@ public class MatingSeasonEventTest {
         this.listOfPlayers.add(player1);
 
         Player player2 = new Player();
-        player2.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.ONE, false, 0));
-        player2.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.ONE, false, 1));
+        player2.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.ONE, false, 4));
+        player2.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.ONE, false, 5));
         this.listOfPlayers.add(player2);
 
         Player player3 = new Player();
-        player3.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, false, 0));
-        player3.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.SEVEN, false, 1));
-        player3.pushCardToHand(new Card(Color.BLUE, Type.SPECIAL, Value.GIFT, false, 2));
+        player3.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, false, 6));
+        player3.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.SEVEN, false, 7));
+        player3.pushCardToHand(new Card(Color.BLUE, Type.SPECIAL, Value.GIFT, false, 8));
         this.listOfPlayers.add(player3);
 
         Player player4 = new Player();
-        player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FIVE, false, 0));
-        player4.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 1));
-        player4.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.FIVE, false, 2));
-        player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 3));
-        player4.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 4));
-        player4.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 5));
+        player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FIVE, false, 9));
+        player4.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 10));
+        player4.pushCardToHand(new Card(Color.YELLOW, Type.NUMBER, Value.FIVE, false, 11));
+        player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 12));
+        player4.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 13));
+        player4.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 14));
         this.listOfPlayers.add(player4);
 
         MatingSeasonEvent m = new MatingSeasonEvent(this.listOfPlayers, player2, this.discardPile);

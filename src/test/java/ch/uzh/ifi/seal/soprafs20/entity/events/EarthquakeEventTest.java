@@ -40,8 +40,8 @@ public class EarthquakeEventTest {
 
         Player player2 = new Player();
         List<Card> player2Cards = new ArrayList<>();
-        player2Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 0));
-        player2Cards.add(new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 1));
+        player2Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 1));
+        player2Cards.add(new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 2));
         for (Card card : player2Cards) {
             player2.pushCardToHand(card);
         }
@@ -49,9 +49,9 @@ public class EarthquakeEventTest {
 
         Player player3 = new Player();
         List<Card> player3Cards = new ArrayList<>();
-        player3Cards.add(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, 0));
-        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 1));
-        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2));
+        player3Cards.add(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, 3));
+        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 4));
+        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 5));
         for (Card card : player3Cards) {
             player3.pushCardToHand(card);
         }

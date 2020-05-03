@@ -83,14 +83,14 @@ public class RobinHoodEventTest {
 
         Player player2 = new Player();
         List<Card> player2Cards = new ArrayList<>();
-        player2Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
+        player2Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 2));
         player2.pushCardToHand(player2Cards.get(0));
         this.listOfPlayers.add(player2);
 
         Player player3 = new Player();
         List<Card> player3Cards = new ArrayList<>();
-        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 0));
-        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 1));
+        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 3));
+        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 4));
         for (Card card : player3Cards) {
             player3.pushCardToHand(card);
         }
@@ -133,8 +133,8 @@ public class RobinHoodEventTest {
 
         Player player2 = new Player();
         List<Card> player2Cards = new ArrayList<>();
-        player2Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
-        player2Cards.add(new Card(Color.BLACK, Type.NUMBER, Value.FOUR, false, 1));
+        player2Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 2));
+        player2Cards.add(new Card(Color.BLACK, Type.NUMBER, Value.FOUR, false, 3));
         for (Card card : player2Cards) {
             player2.pushCardToHand(card);
         }
@@ -142,8 +142,8 @@ public class RobinHoodEventTest {
 
         Player player3 = new Player();
         List<Card> player3Cards = new ArrayList<>();
-        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 0));
-        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 1));
+        player3Cards.add(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 4));
+        player3Cards.add(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 5));
         for (Card card : player3Cards) {
             player3.pushCardToHand(card);
         }
