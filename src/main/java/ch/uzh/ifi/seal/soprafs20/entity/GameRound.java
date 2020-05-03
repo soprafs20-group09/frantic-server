@@ -350,7 +350,7 @@ public class GameRound {
         Player target = getPlayerByUsername(username);
         this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         timer.cancel();
-        if (this.currentAction.getTargets() != null) {
+        if (this.currentAction.getTargets().length != 0) {
             prepareCounterAttack("equality");
         }
         else {
