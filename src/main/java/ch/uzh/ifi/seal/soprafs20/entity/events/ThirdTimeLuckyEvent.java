@@ -7,11 +7,11 @@ import java.util.List;
 
 public class ThirdTimeLuckyEvent implements Event {
 
-    private final List<Player> playerList;
+    private final List<Player> listOfPlayers;
     private final Pile<Card> drawStack;
 
-    public ThirdTimeLuckyEvent(GameRound round, Pile<Card> stack) {
-        this.playerList = round.getListOfPlayers();
+    public ThirdTimeLuckyEvent(List<Player> listOfPlayers, Pile<Card> stack) {
+        this.listOfPlayers = listOfPlayers;
         this.drawStack = stack;
     }
 
@@ -20,7 +20,7 @@ public class ThirdTimeLuckyEvent implements Event {
     }
 
     public List<Chat> performEvent() {
-        for (Player player : this.playerList) {
+        for (Player player : this.listOfPlayers) {
             for (int i = 0; i < 3; i++) {
                 if (!drawStack.empty()) {
                     player.pushCardToHand(drawStack.pop());

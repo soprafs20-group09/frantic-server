@@ -11,8 +11,8 @@ public class TornadoEvent implements Event {
     private final List<Player> listOfPlayers;
     private final List<Card> tornadoList;
 
-    public TornadoEvent(GameRound round) {
-        this.listOfPlayers = round.getListOfPlayers();
+    public TornadoEvent(List<Player> listOfPlayers) {
+        this.listOfPlayers = listOfPlayers;
         this.tornadoList = new ArrayList<>();
     }
 
