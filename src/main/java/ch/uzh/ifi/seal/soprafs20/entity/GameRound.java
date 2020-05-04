@@ -30,7 +30,7 @@ public class GameRound {
     private boolean isProcessing;
     private boolean turnIsRunning;
     private boolean attackState;
-
+    private boolean showCards;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -46,6 +46,7 @@ public class GameRound {
         this.isProcessing = false;
         this.turnIsRunning = false;
         this.attackState = false;
+        this.showCards = false;
     }
 
     //creates Piles & player hands
@@ -74,7 +75,7 @@ public class GameRound {
     }
 
     private void sendGameState() {
-        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers);
+        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
     }
 
     public void startGameRound() {
@@ -639,6 +640,11 @@ public class GameRound {
         return null;
     }
 
+    public void setShowCards(boolean show) {
+        this.showCards = show;
+        sendGameState();
+    }
+
     public List<Player> getListOfPlayers() {
         return this.listOfPlayers;
     }
@@ -660,10 +666,10 @@ public class GameRound {
         Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.gameService);
         Event robinHood = new RobinHoodEvent(this.listOfPlayers, this.currentPlayer);
         Event surpriseParty = new SurprisePartyEvent();
-        Event theAllSeeingEye = new TheAllSeeingEyeEvent();
-        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this, this.drawStack);
+        Event theAllSeeingEye = new TheAllSeeingEyeEvent(this);
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this.listOfPlayers, this.drawStack);
         Event timeBomb = new TimeBombEvent(this);
-        Event tornado = new TornadoEvent(this);
+        Event tornado = new TornadoEvent(this.listOfPlayers);
         Event vandalism = new VandalismEvent(this.listOfPlayers, this.discardPile);
 
         //add them to the list of all events

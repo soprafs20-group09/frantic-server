@@ -256,7 +256,7 @@ public class GameServiceTest {
         players.add(player);
         players.add(player);
 
-        gameService.sendGameState("testLobbyId", card, players);
+        gameService.sendGameState("testLobbyId", card, players, false);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/game-state"), Mockito.any());
     }
