@@ -121,6 +121,20 @@ public class GameService {
         }
     }
 
+    public void surpriseParty(String lobbyId, String identity, SurprisePartyDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            //game.getCurrentGameRound().surpriseParty(identity, dto.getCard(), dto.getTarget());
+        }
+    }
+
+    public void merryChristmas(String lobbyId, String identity, MerryChristmasDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            //game.getCurrentGameRound().merryChristmas(identity, dto.getTargets());
+        }
+    }
+
     public void recession(String lobbyId, String identity, RecessionDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
@@ -131,7 +145,7 @@ public class GameService {
     public void market(String lobbyId, String identity, MarketDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            //game.getCurrentGameRound();
+            //game.getCurrentGameRound().market(dto.getCard());
         }
     }
 
@@ -156,10 +170,6 @@ public class GameService {
 
     public void sendStartGameRound(String lobbyId) {
         webSocketService.sendToLobby(lobbyId, "/start-round");
-    }
-
-    public void sendGameState(String lobbyId, Card discardPile, List<Player> players) {
-        this.sendGameState(lobbyId, discardPile, players, false);
     }
 
     public void sendGameState(String lobbyId, Card discardPile, List<Player> players, boolean up) {

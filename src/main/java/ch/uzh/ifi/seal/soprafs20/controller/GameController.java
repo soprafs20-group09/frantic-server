@@ -102,6 +102,20 @@ public class GameController {
         gameService.niceTry(lobbyId, identity, dto);
     }
 
+    @MessageMapping("/lobby/{lobbyId}/action/surprise-party")
+    public void surpriseParty(@DestinationVariable String lobbyId,
+                          SimpMessageHeaderAccessor sha, SurprisePartyDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.surpriseParty(lobbyId, identity, dto);
+    }
+
+    @MessageMapping("/lobby/{lobbyId}/action/merry-christmas")
+    public void merryChristmas(@DestinationVariable String lobbyId,
+                              SimpMessageHeaderAccessor sha, MerryChristmasDTO dto) {
+        String identity = sha.getUser().getName();
+        gameService.merryChristmas(lobbyId, identity, dto);
+    }
+
     @MessageMapping("/lobby/{lobbyId}/action/recession")
     public void recession(@DestinationVariable String lobbyId,
                               SimpMessageHeaderAccessor sha, RecessionDTO dto) {
