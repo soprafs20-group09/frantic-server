@@ -3,16 +3,17 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TornadoEvent implements Event {
 
     private final List<Player> listOfPlayers;
-    private final Pile<Card> tornadoStack;
+    private final List<Card> tornadoList;
 
     public TornadoEvent(GameRound round) {
         this.listOfPlayers = round.getListOfPlayers();
-        this.tornadoStack = new DiscardPile();
+        this.tornadoList = new ArrayList<>();
     }
 
     public String getName() {
@@ -23,15 +24,15 @@ public class TornadoEvent implements Event {
         // collect cards
         for (Player player : this.listOfPlayers) {
             while (player.getHandSize() > 0) {
-                this.tornadoStack.push(player.popCard());
+                this.tornadoList.add(player.popCard());
             }
         }
-        this.tornadoStack.shuffle();
+        Collections.shuffle(this.tornadoList);
 
         // redistribute cards
         int i = 0;
-        while (!this.tornadoStack.isEmpty()) {
-            this.listOfPlayers.get(i).pushCardToHand(this.tornadoStack.pop());
+        while (!this.tornadoList.isEmpty()) {
+            this.listOfPlayers.get(i).pushCardToHand(this.tornadoList.remove(0));
             i = ++i % this.listOfPlayers.size();
         }
         List<Chat> chat = new ArrayList<>();
