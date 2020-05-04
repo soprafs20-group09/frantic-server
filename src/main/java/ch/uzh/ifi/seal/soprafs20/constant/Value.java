@@ -18,8 +18,8 @@ public enum Value {
     EQUALITY,
     COUNTERATTACK,
     NICETRY,
-    FUCKYOU,
     GIFT,
+    FUCKYOU,
     COLORWISH,
     NUMBERWISH,
     NONE

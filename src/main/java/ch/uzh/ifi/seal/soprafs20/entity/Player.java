@@ -142,7 +142,7 @@ public class Player implements Serializable {
             if (card.getValue().ordinal() < 9) {
                 handPoints += card.getValue().ordinal() + 1;
             }
-            else if (card.getValue().ordinal() < 17) {
+            else if (card.getValue().ordinal() < 18) {
                 handPoints += 7;
             }
             else {
