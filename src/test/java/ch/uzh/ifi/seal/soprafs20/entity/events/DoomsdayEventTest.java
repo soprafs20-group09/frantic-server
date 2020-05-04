@@ -20,32 +20,26 @@ public class DoomsdayEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
     private Player player1 = new Player();
     private Player player2 = new Player();
-    private Event doomsday;
 
     @Mock
     private Game game;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-
-        player1.setPoints(20);
-        listOfPlayers.add(player1);
-        listOfPlayers.add(player2);
-
-        doomsday = new DoomsdayEvent(game, listOfPlayers, player1);
-    }
-
-
     @Test
     public void getNameTest() {
+        Event doomsday = new DoomsdayEvent(game, listOfPlayers, player1);
         assertEquals("doomsday", doomsday.getName());
     }
 
     @Test
     public void performEventTest() {
+        MockitoAnnotations.initMocks(this);
         Mockito.doNothing().when(game).endGameRound(Mockito.any());
 
+        player1.setPoints(20);
+        listOfPlayers.add(player1);
+        listOfPlayers.add(player2);
+
+        Event doomsday = new DoomsdayEvent(game, listOfPlayers, player1);
         doomsday.performEvent();
         assertEquals(70, player1.getPoints());
         assertEquals(50, player2.getPoints());
@@ -54,6 +48,7 @@ public class DoomsdayEventTest {
 
     @Test
     public void getMessageTest() {
+        Event doomsday = new DoomsdayEvent(game, listOfPlayers, player1);
         assertEquals("Rest in peace, everyone is dead. Well, not really, since it's just a game. The round is over and everyone's points increase by 50.", doomsday.getMessage());
     }
 }

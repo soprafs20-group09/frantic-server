@@ -19,32 +19,29 @@ public class FinishLineEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
     private Player player1 = new Player();
     private Player player2 = new Player();
-    private Event finishLine;
 
     @Mock
     private Game game;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-
-        player1.pushCardToHand(new Card(Color.RED, 3, 1));
-        player2.pushCardToHand(new Card(Color.RED, 7, 2));
-        listOfPlayers.add(player1);
-        listOfPlayers.add(player2);
-
-        finishLine = new FinishLineEvent(game, listOfPlayers);
-    }
-
     @Test
     public void getNameTest() {
+        Event finishLine = new FinishLineEvent(game, listOfPlayers);
         assertEquals("finish-line", finishLine.getName());
     }
 
     @Test
     public void performEventTest() {
+        MockitoAnnotations.initMocks(this);
         Mockito.doNothing().when(game).endGameRound(Mockito.any());
 
+        Player player1 = new Player();
+        player1.pushCardToHand(new Card(Color.RED, 3, 1));
+        Player player2 = new Player();
+        player2.pushCardToHand(new Card(Color.RED, 7, 2));
+        listOfPlayers.add(player1);
+        listOfPlayers.add(player2);
+
+        Event finishLine = new FinishLineEvent(game, listOfPlayers);
         finishLine.performEvent();
         assertEquals(3, player1.getPoints());
         assertEquals(7, player2.getPoints());
@@ -53,6 +50,7 @@ public class FinishLineEventTest {
 
     @Test
     public void getMessageTest() {
+        Event finishLine = new FinishLineEvent(game, listOfPlayers);
         assertEquals("Looks like the round is over! Count your points!", finishLine.getMessage());
     }
 }

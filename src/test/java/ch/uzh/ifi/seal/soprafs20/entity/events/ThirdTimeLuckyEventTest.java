@@ -24,35 +24,34 @@ public class ThirdTimeLuckyEventTest {
 
     private List<Player> listOfPlayers = new ArrayList<>();
     private Pile<Card> drawStack = new DrawStack();
-    private Player player1 = new Player();
-    private Player player2 = new Player();
-    private Event thirdTimeLucky;
-
-    @BeforeEach
-    public void setup() {
-        player1.pushCardToHand(new Card(Color.RED, 7, 1));
-        listOfPlayers.add(player1);
-        listOfPlayers.add(player2);
-
-        thirdTimeLucky = new ThirdTimeLuckyEvent(listOfPlayers, drawStack);
-    }
 
     @Test
     public void getNameTest() {
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(listOfPlayers, drawStack);
         assertEquals("third-time-lucky", thirdTimeLucky.getName());
     }
 
     @Test
     public void performEventTest() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        player1.pushCardToHand(new Card(Color.RED, 7, 1));
+        listOfPlayers.add(player1);
+        listOfPlayers.add(player2);
+
         assertEquals(1, player1.getHandSize());
         assertEquals(0, player2.getHandSize());
-        this.thirdTimeLucky.performEvent();
+
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(listOfPlayers, drawStack);
+        thirdTimeLucky.performEvent();
+
         assertEquals(4, player1.getHandSize());
         assertEquals(3, player2.getHandSize());
     }
 
     @Test
     public void getMessageTest() {
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(listOfPlayers, drawStack);
         assertEquals("Three cards for everyone!", thirdTimeLucky.getMessage());
     }
 }

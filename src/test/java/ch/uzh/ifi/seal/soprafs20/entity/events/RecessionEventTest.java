@@ -23,29 +23,27 @@ public class RecessionEventTest {
     private Pile<Card> discardPile = new DiscardPile();
     private Player player1 = new Player();
     private Player player2 = new Player();
-    private Event recession;
 
     @Mock
     private GameService gameService;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        listOfPlayers.add(player1);
-        listOfPlayers.add(player2);
-
-        recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
-    }
-
     @Test
     public void getNameTest() {
+        Event recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
         assertEquals("recession", recession.getName());
     }
 
     @Test
     public void performEventTest() {
+        MockitoAnnotations.initMocks(this);
         Mockito.doNothing().when(gameService).sendRecession(Mockito.any(), Mockito.any(), Mockito.anyInt());
 
+        Player player1 = new Player();
+        listOfPlayers.add(player1);
+        Player player2 = new Player();
+        listOfPlayers.add(player2);
+
+        Event recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
         recession.performEvent();
         Mockito.verify(gameService, Mockito.times(1)).sendRecession(Mockito.matches("abc"), Mockito.any(), Mockito.eq(1));
         Mockito.verify(gameService, Mockito.times(1)).sendRecession(Mockito.matches("abc"), Mockito.any(), Mockito.eq(2));
@@ -53,7 +51,7 @@ public class RecessionEventTest {
 
     @Test
     public void getMessageTest() {
-        //TODO: make it dynamic
+        Event recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
         assertEquals("One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!", recession.getMessage());
     }
 }
