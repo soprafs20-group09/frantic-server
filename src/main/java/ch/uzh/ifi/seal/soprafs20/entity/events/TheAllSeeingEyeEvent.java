@@ -32,7 +32,7 @@ public class TheAllSeeingEyeEvent implements Event {
                 gameRound.setShowCards(false);
             }
         };
-        timer.schedule(timerTask, 1000 * seconds);
+        timer.schedule(timerTask, seconds * 1000);
 
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:the-all-seeing-eye", this.getMessage()));
