@@ -23,27 +23,11 @@ public class TimeBombEventTest {
     private Player player1 = new Player();
     private List<Player> listOfPlayers = new ArrayList<>();
     private Game game;
-    private GameRound gameRound;
-    private Event timeBomb;
 
     @Mock
-    private PlayerRepository playerRepository;
+    private GameRound gameRound;
 
-    @InjectMocks
-    private PlayerService playerService;
-
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        listOfPlayers.add(player1);
-
-        Mockito.when(playerService.getPlayersInLobby(lobbyId)).thenReturn(listOfPlayers);
-        Mockito.when(playerRepository.findByLobbyId(lobbyId)).thenReturn(listOfPlayers);
-
-        this.game = new Game(lobbyId, GameLength.MEDIUM);
-        this.gameRound = new GameRound(game, lobbyId, listOfPlayers, player1);
-        this.timeBomb = new TimeBombEvent(gameRound);
-    }
+    private final Event timeBomb = new TimeBombEvent(gameRound);
 
     @Test
     public void getNameTest() {
@@ -53,10 +37,5 @@ public class TimeBombEventTest {
     @Test
     public void getMessageTest() {
         assertEquals("Tick ... Tick ... Tick ... Boom! Everyone has three turns left! Defuse the Bomb and earn a reward by winning the round or let the Bomb explode and everyone's points in this round get doubled!", timeBomb.getMessage());
-    }
-
-    @Test
-    public void performEventTest() {
-
     }
 }
