@@ -34,15 +34,10 @@ public class RecessionEvent implements Event {
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:recession", this.getMessage()));
 
-        Player p = this.currentPlayer;
-        List<Player> orderedListOfPlayers = new ArrayList<>();
-        orderedListOfPlayers.add(p);
-        for (int i = 0; i < this.listOfPlayers.size(); i++) {
-            p = nextPlayer(p);
-            orderedListOfPlayers.add(p);
-        }
-
-        for (Player player : orderedListOfPlayers) {
+        int numOfPlayers = this.listOfPlayers.size();
+        int initiatorIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+        for (int i = 1; i <= numOfPlayers; i++) {
+            Player player = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
             this.gameService.sendRecession(this.lobbyId, player, this.amount);
             if (amount == 1) {
                 chat.add(new Chat("event", "event:recession", player.getUsername() + " discards " + amount + " card."));
@@ -52,17 +47,9 @@ public class RecessionEvent implements Event {
             }
             amount++;
         }
-
         return chat;
     }
 
-    private Player nextPlayer(Player prev) {
-        int playersIndex = this.listOfPlayers.indexOf(prev);
-        playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
-        return this.listOfPlayers.get(playersIndex);
-    }
-
-    //TODO: make it dynamic
     public String getMessage() {
         return "One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!";
     }

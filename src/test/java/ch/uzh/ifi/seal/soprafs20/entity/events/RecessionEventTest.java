@@ -42,11 +42,14 @@ public class RecessionEventTest {
         listOfPlayers.add(player1);
         Player player2 = new Player();
         listOfPlayers.add(player2);
+        Player player3 = new Player();
+        listOfPlayers.add(player3);
 
         Event recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
         recession.performEvent();
         Mockito.verify(gameService, Mockito.times(1)).sendRecession(Mockito.matches("abc"), Mockito.any(), Mockito.eq(1));
         Mockito.verify(gameService, Mockito.times(1)).sendRecession(Mockito.matches("abc"), Mockito.any(), Mockito.eq(2));
+        Mockito.verify(gameService, Mockito.times(1)).sendRecession(Mockito.matches("abc"), Mockito.any(), Mockito.eq(3));
     }
 
     @Test
