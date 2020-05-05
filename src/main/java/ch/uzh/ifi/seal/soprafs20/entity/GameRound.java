@@ -236,7 +236,6 @@ public class GameRound {
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
         this.gameService.sendAttackTurn(this.lobbyId, niceTryPlayer.getUsername(), 30, this.turnNumber++);
         startInterTurnTimer(30);
-        //TODO: send attack-turn package
     }
 
     // in a turn, the current player can choose to draw a card
@@ -244,6 +243,7 @@ public class GameRound {
         Player player = getPlayerByIdentity(identity);
         if (player != null && player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
+            sendGameState();
             this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
             this.hasCurrentPlayerMadeMove = true;
         }
