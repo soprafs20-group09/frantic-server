@@ -42,6 +42,7 @@ public class ExchangeAction implements Action {
     public List<Chat> perform() {
         List<Chat> chat = new ArrayList<>();
         ArrayList<Card> initiatorCards = new ArrayList<>();
+        boolean twoCardsExchanged = exchangeCards.length == 2;
         for (int i : exchangeCards) {
             Card toPush = this.initiator.peekCard(i);
             if (toPush.getValue() != Value.FUCKYOU) {
@@ -53,6 +54,7 @@ public class ExchangeAction implements Action {
         if (this.target.getHandSize() < 2) {
             Card toInitiator = this.target.popCard(0);
             this.initiator.pushCardToHand(toInitiator);
+            twoCardsExchanged = false;
         }
         else {
             // gernerate random cards to be pushed to the initiator
@@ -82,7 +84,7 @@ public class ExchangeAction implements Action {
         }
 
         chat.add(new Chat("event", "special:exchange", this.initiator.getUsername()
-                + " exchanged 2 cards with " + this.target.getUsername() + "."));
+                + " exchanged " + (twoCardsExchanged ? "2" : "") + " cards with " + this.target.getUsername() + "."));
         return chat;
     }
 }
