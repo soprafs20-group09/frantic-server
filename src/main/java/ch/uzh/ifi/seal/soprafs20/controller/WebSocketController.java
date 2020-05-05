@@ -12,6 +12,10 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
+
+import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
+
 @Controller
 public class WebSocketController {
 
@@ -27,21 +31,21 @@ public class WebSocketController {
 
     @MessageMapping("/register")
     public synchronized void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO dto) throws Exception {
-        String identity = sha.getUser().getName();
-        registerService.joinLobby(identity, dto);
+        registerService.joinLobby(getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/chat")
     public void newChatMessage(@DestinationVariable String lobbyId,
                                SimpMessageHeaderAccessor sha, ChatDTO dto) {
-        String identity = sha.getUser().getName();
-        webSocketService.sendChatMessage(lobbyId, identity, dto);
+        webSocketService.sendChatMessage(lobbyId, getIdentity(sha), dto);
     }
 
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) throws InterruptedException {
-        String identity = event.getUser().getName();
-        Thread.sleep(50);
-        lobbyService.handleDisconnect(identity);
+        Principal p = event.getUser();
+        if (p != null) {
+            Thread.sleep(50);
+            lobbyService.handleDisconnect(p.getName());
+        }
     }
 }

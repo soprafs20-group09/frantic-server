@@ -8,6 +8,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
+import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
+
 @Controller
 public class LobbyController {
 
@@ -20,14 +22,12 @@ public class LobbyController {
     @MessageMapping("/lobby/{lobbyId}/settings")
     public void changeLobbySettings(@DestinationVariable String lobbyId,
                                     SimpMessageHeaderAccessor sha, LobbySettingsDTO dto) {
-        String identity = sha.getUser().getName();
-        lobbyService.updateLobbySettings(lobbyId, identity, dto);
+        lobbyService.updateLobbySettings(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/kick")
     public void kickPlayer(@DestinationVariable String lobbyId,
                            SimpMessageHeaderAccessor sha, KickDTO dto) {
-        String identity = sha.getUser().getName();
-        lobbyService.kickPlayer(lobbyId, identity, dto);
+        lobbyService.kickPlayer(lobbyId, getIdentity(sha), dto);
     }
 }

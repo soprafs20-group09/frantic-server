@@ -4,7 +4,9 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
+import java.security.Principal;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -106,5 +108,15 @@ public class FranticUtils {
             fillValueMap();
         }
         return colorMap.get(card.getColor()) + " " + valueMap.get(card.getValue());
+    }
+
+    public static String getIdentity(SimpMessageHeaderAccessor sha) {
+        Principal p = sha.getUser();
+        if (p != null) {
+            return p.getName();
+        }
+        else {
+            return null;
+        }
     }
 }
