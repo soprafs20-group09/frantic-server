@@ -76,12 +76,7 @@ public class WebSocketService {
     }
 
     protected void sendChatMessage(String lobbyId, Chat chat) {
-        ChatDTO dto = new ChatDTO();
-        dto.setType(chat.getType());
-        dto.setUsername(chat.getUsername());
-        dto.setIcon(chat.getIcon());
-        dto.setMessage(chat.getMessage());
-
+        ChatDTO dto = new ChatDTO(chat.getType(), chat.getUsername(), chat.getIcon(), chat.getMessage());
         sendToLobby(lobbyId, "/chat", dto);
     }
 

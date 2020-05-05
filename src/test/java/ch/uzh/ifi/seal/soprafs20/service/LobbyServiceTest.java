@@ -45,8 +45,6 @@ public class LobbyServiceTest {
     private LobbySettingsDTO testSettings;
     @InjectMocks
     private LobbyStateDTO testState;
-    @InjectMocks
-    private ChatDTO chat;
 
     @BeforeEach
     public void setup() {

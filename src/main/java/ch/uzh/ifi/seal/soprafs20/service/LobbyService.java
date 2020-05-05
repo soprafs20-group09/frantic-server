@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
@@ -14,6 +15,7 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -62,7 +66,21 @@ public class LobbyService {
     }
 
     public List<PlayerScoreDTO> getScores(String lobbyId) {
-        return null;
+        Game game = GameRepository.findByLobbyId(lobbyId);
+        if (game != null) {
+            List<PlayerScoreDTO> response = new ArrayList<>();
+            Map<String, Integer> scores = game.getScores();
+            for (Map.Entry<String, Integer> entry : scores.entrySet()) {
+                PlayerScoreDTO dto = new PlayerScoreDTO();
+                dto.setUsername(entry.getKey());
+                dto.setScore(entry.getValue());
+                response.add(dto);
+            }
+            return response;
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
+        }
     }
 
     public synchronized String createLobby(Player creator) {
@@ -104,8 +122,7 @@ public class LobbyService {
             }
 
             Player toKick = playerRepository.findByUsernameAndLobbyId(dto.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = new DisconnectDTO();
-            disconnectDTO.setReason("You were kicked out of the Lobby.");
+            DisconnectDTO disconnectDTO = new DisconnectDTO("You were kicked out of the Lobby.");
             webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(toKick);
 
@@ -135,8 +152,7 @@ public class LobbyService {
                 else if (playerList.size() == 1) {
                     if (lobby.isPlaying()) {
                         Player last = playerRepository.findByUsernameAndLobbyId(playerList.get(0), lobbyId);
-                        DisconnectDTO disconnectDTO = new DisconnectDTO();
-                        disconnectDTO.setReason("Not enough players to play.");
+                        DisconnectDTO disconnectDTO = new DisconnectDTO("Not enough players to play.");
                         webSocketService.sendToPlayer(last.getIdentity(), "/queue/disconnect", disconnectDTO);
                         playerService.removePlayer(last);
                         lobbyRepository.delete(lobby);
@@ -188,7 +204,6 @@ public class LobbyService {
 
     public LobbyStateDTO getLobbyState(String lobbyId) {
         Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
-        LobbyStateDTO response = new LobbyStateDTO();
 
         LobbyPlayerDTO[] players = new LobbyPlayerDTO[lobby.getPlayers()];
         int c = 0;
@@ -200,14 +215,13 @@ public class LobbyService {
             players[c] = player;
             c++;
         }
-        response.setPlayers(players);
 
         LobbySettingsDTO settings = new LobbySettingsDTO();
         settings.setLobbyName(lobby.getName());
         settings.setDuration(lobby.getGameDuration());
         settings.setPublicLobby(lobby.isPublic());
-        response.setSettings(settings);
-        return response;
+
+        return new LobbyStateDTO(players, settings);
     }
 
     public boolean isUsernameAlreadyInLobby(String lobbyId, String username) {

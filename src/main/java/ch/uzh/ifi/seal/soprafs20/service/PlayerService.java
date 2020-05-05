@@ -56,11 +56,7 @@ public class PlayerService {
         player.setIdentity(identity);
         playerRepository.flush();
 
-        RegisteredDTO registeredDTO = new RegisteredDTO();
-        registeredDTO.setUsername(player.getUsername());
-        registeredDTO.setLobbyId(lobbyId);
-
-        return registeredDTO;
+        return new RegisteredDTO(player.getUsername(), lobbyId);
     }
 
     public synchronized String removePlayer(Player player) {

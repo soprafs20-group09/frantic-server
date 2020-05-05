@@ -60,9 +60,7 @@ public class RegisterControllerTest {
         player.setUsername("player");
         player.setIdentity("player");
 
-        RegisteredDTO registered = new RegisteredDTO();
-        registered.setLobbyId("lobby");
-        registered.setUsername("player");
+        RegisteredDTO registered = new RegisteredDTO("player", "lobby");
 
         // mocks
         //doReturn("player").when(webSocketController).checkAuthentication(Mockito.nullable(String.class));

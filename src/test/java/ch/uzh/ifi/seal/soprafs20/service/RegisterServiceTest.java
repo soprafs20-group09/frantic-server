@@ -48,9 +48,7 @@ public class RegisterServiceTest {
 
     @Test
     public void joinLobbyTest() throws InterruptedException {
-        RegisteredDTO registeredDTO = new RegisteredDTO();
-        registeredDTO.setLobbyId("testLobbyId");
-        registeredDTO.setUsername("testPlayer");
+        RegisteredDTO registeredDTO = new RegisteredDTO("testPlayer", "testLobbyId");
 
         testPlayer = new Player();
         testPlayer.setUsername("testPlayer");
