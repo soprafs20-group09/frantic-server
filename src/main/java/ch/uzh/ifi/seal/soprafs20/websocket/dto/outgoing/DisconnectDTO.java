@@ -4,6 +4,10 @@ public class DisconnectDTO {
 
     private String reason;
 
+    public DisconnectDTO(String reason) {
+        this.reason = reason;
+    }
+
     public String getReason() {
         return reason;
     }

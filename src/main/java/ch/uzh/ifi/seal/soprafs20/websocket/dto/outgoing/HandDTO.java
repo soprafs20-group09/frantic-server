@@ -4,6 +4,10 @@ public class HandDTO {
 
     private CardDTO[] cards;
 
+    public HandDTO(CardDTO[] cards) {
+        this.cards = cards;
+    }
+
     public CardDTO[] getCards() {
         return cards;
     }

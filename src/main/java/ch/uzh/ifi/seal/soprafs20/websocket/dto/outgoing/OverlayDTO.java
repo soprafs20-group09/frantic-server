@@ -10,6 +10,13 @@ public class OverlayDTO {
 
     private int duration;
 
+    public OverlayDTO(String icon, String title, String message, int duration) {
+        this.icon = icon;
+        this.title = title;
+        this.message = message;
+        this.duration = duration;
+    }
+
     public String getIcon() {
         return icon;
     }

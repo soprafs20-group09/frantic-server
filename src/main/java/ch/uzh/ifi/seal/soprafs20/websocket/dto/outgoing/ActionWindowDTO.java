@@ -6,6 +6,11 @@ public class ActionWindowDTO {
 
     private int[] playable;
 
+    public ActionWindowDTO(int time, int[] playable) {
+        this.time = time;
+        this.playable = playable;
+    }
+
     public int getTime() {
         return time;
     }

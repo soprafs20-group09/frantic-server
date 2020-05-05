@@ -8,6 +8,13 @@ public class LobbyStateDTO {
 
     private LobbySettingsDTO settings;
 
+    public LobbyStateDTO() {}
+
+    public LobbyStateDTO(LobbyPlayerDTO[] players, LobbySettingsDTO settings) {
+        this.players = players;
+        this.settings = settings;
+    }
+
     public LobbyPlayerDTO[] getPlayers() {
         return players;
     }

@@ -6,6 +6,10 @@ public class EndGameDTO {
 
     private Map<String, Integer> players;
 
+    public EndGameDTO(Map<String, Integer> players) {
+        this.players = players;
+    }
+
     public Map<String, Integer> getPlayers() {
         return players;
     }

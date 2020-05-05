@@ -6,6 +6,11 @@ public class RegisteredDTO {
 
     private String lobbyId;
 
+    public RegisteredDTO(String username, String lobbyId) {
+        this.username = username;
+        this.lobbyId = lobbyId;
+    }
+
     public String getUsername() {
         return username;
     }

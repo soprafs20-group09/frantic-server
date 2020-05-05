@@ -4,6 +4,12 @@ public class DrawDTO {
 
     private int amount;
 
+    public DrawDTO() {}
+
+    public DrawDTO(int amount) {
+        this.amount = amount;
+    }
+
     public int getAmount() {
         return amount;
     }

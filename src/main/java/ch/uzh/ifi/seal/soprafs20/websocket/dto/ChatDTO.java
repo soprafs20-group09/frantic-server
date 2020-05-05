@@ -10,6 +10,15 @@ public class ChatDTO {
 
     private String message;
 
+    public ChatDTO() {}
+
+    public ChatDTO(String type, String username, String icon, String message) {
+        this.type = type;
+        this.username = username;
+        this.icon = icon;
+        this.message = message;
+    }
+
     public String getType() {
         return type;
     }

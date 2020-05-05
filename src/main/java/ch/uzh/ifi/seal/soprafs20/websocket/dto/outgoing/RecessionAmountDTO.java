@@ -4,6 +4,10 @@ public class RecessionAmountDTO {
 
     private int amount;
 
+    public RecessionAmountDTO(int amount) {
+        this.amount = amount;
+    }
+
     public int getAmount() {
         return amount;
     }

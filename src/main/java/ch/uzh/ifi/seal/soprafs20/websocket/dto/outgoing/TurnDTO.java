@@ -8,6 +8,12 @@ public class TurnDTO {
 
     private int turn;
 
+    public TurnDTO(String currentPlayer, int time, int turn) {
+        this.currentPlayer = currentPlayer;
+        this.time = time;
+        this.turn = turn;
+    }
+
     public String getCurrentPlayer() {
         return currentPlayer;
     }

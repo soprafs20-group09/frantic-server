@@ -6,6 +6,11 @@ public class MarketWindowDTO {
 
     private CardDTO[] cards;
 
+    public MarketWindowDTO(int time, CardDTO[] cards) {
+        this.time = time;
+        this.cards = cards;
+    }
+
     public int getTime() {
         return time;
     }

@@ -6,6 +6,11 @@ public class GameStateDTO {
 
     private PlayerStateDTO[] players;
 
+    public GameStateDTO(CardDTO discardPile, PlayerStateDTO[] players) {
+        this.discardPile = discardPile;
+        this.players = players;
+    }
+
     public CardDTO getDiscardPile() {
         return discardPile;
     }

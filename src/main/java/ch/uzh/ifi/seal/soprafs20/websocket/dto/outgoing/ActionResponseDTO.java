@@ -4,6 +4,10 @@ public class ActionResponseDTO {
 
     private String action;
 
+    public ActionResponseDTO(String action) {
+        this.action = action;
+    }
+
     public String getAction() {
         return action;
     }

@@ -4,6 +4,10 @@ public class PlayableCardsDTO {
 
     private int[] playable;
 
+    public PlayableCardsDTO(int[] playable) {
+        this.playable = playable;
+    }
+
     public int[] getPlayable() {
         return playable;
     }
