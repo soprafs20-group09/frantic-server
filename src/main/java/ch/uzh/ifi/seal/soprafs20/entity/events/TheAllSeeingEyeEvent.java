@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,12 @@ import java.util.TimerTask;
 public class TheAllSeeingEyeEvent implements Event {
 
     private final GameRound gameRound;
+    private final GameService gameService;
     private final int seconds;
 
     public TheAllSeeingEyeEvent(GameRound gameRound) {
         this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
         seconds = 30;
     }
 
@@ -22,7 +25,7 @@ public class TheAllSeeingEyeEvent implements Event {
         return "the-all-seeing-eye";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
 
         this.gameRound.setShowCards(true);
         Timer timer = new Timer();
@@ -36,7 +39,10 @@ public class TheAllSeeingEyeEvent implements Event {
 
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:the-all-seeing-eye", this.getMessage()));
-        return chat;
+
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

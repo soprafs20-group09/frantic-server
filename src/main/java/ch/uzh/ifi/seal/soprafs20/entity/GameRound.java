@@ -67,7 +67,7 @@ public class GameRound {
         this.discardPile.push(this.drawStack.pop());
     }
 
-    private void sendCompleteGameState() {
+    public void sendCompleteGameState() {
         for (Player player : this.listOfPlayers) {
             this.gameService.sendHand(this.lobbyId, player);
         }
@@ -164,7 +164,9 @@ public class GameRound {
                             if (cardToPlay.getColor() == Color.BLACK) {
                                 prepareEvent();
                             }
-                            finishTurn();
+                            else {
+                                finishTurn();
+                            }
                         }
                         else if (cardToPlay.getType() == Type.SPECIAL) {
                             Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
@@ -250,7 +252,7 @@ public class GameRound {
     }
 
     // moves #amount cards from Stack to players hand
-    private void drawCardFromStack(Player player, int amount) {
+    public void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
             if (this.drawStack.size() <= 0) {
@@ -442,7 +444,8 @@ public class GameRound {
         try {
             wait(1000);
         }
-        catch (InterruptedException ignored) {}
+        catch (InterruptedException ignored) {
+        }
         Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
         startAnimationTimer(11);
@@ -450,9 +453,7 @@ public class GameRound {
 
     private void performEvent() {
         Event event = this.events.remove(0);
-        List<Chat> chat = event.performEvent();
-        this.gameService.sendChatMessage(this.lobbyId, chat);
-        sendCompleteGameState();
+        event.performEvent();
     }
 
     public void performRecession(String identity, int[] cards) {
@@ -671,28 +672,44 @@ public class GameRound {
         return this.listOfPlayers;
     }
 
+    public Player getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    public GameService getGameService() {
+        return this.gameService;
+    }
+
+    public String getLobbyId() {
+        return this.lobbyId;
+    }
+
+    public Pile<Card> getDiscardPile() {
+        return this.discardPile;
+    }
+
     private void initEvents() {
         //initialize all Events
-        Event charity = new CharityEvent(this.listOfPlayers, this.currentPlayer);
-        Event communism = new CommunismEvent(this.listOfPlayers, this.drawStack);
-        Event doomsday = new DoomsdayEvent(this.game, this.listOfPlayers, this.currentPlayer);
-        Event earthquake = new EarthquakeEvent(this.listOfPlayers);
-        Event expansion = new ExpansionEvent(this.listOfPlayers, this.currentPlayer, this.drawStack);
-        Event finishLine = new FinishLineEvent(game, this.listOfPlayers);
-        Event fridayTheThirteenth = new FridayTheThirteenthEvent();
-        Event gamblingMan = new GamblingManEvent();
-        Event market = new MarketEvent();
-        Event matingSeason = new MatingSeasonEvent(this.listOfPlayers, this.currentPlayer);
-        Event merryChristmas = new MerryChristmasEvent();
-        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, drawStack);
-        Event recession = new RecessionEvent(this.lobbyId, this.currentPlayer, this.listOfPlayers, this.gameService);
-        Event robinHood = new RobinHoodEvent(this.listOfPlayers, this.currentPlayer);
-        Event surpriseParty = new SurprisePartyEvent();
+        Event charity = new CharityEvent(this);
+        Event communism = new CommunismEvent(this);
+        Event doomsday = new DoomsdayEvent(this.game, this);
+        Event earthquake = new EarthquakeEvent(this);
+        Event expansion = new ExpansionEvent(this);
+        Event finishLine = new FinishLineEvent(game, this);
+        Event fridayTheThirteenth = new FridayTheThirteenthEvent(this);
+        Event gamblingMan = new GamblingManEvent(this);
+        Event market = new MarketEvent(this);
+        Event matingSeason = new MatingSeasonEvent(this);
+        Event merryChristmas = new MerryChristmasEvent(this);
+        Event mexicanStandoff = new MexicanStandoffEvent(this);
+        Event recession = new RecessionEvent(this);
+        Event robinHood = new RobinHoodEvent(this);
+        Event surpriseParty = new SurprisePartyEvent(this);
         Event theAllSeeingEye = new TheAllSeeingEyeEvent(this);
-        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this.listOfPlayers, this.drawStack);
+        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this);
         Event timeBomb = new TimeBombEvent(this);
-        Event tornado = new TornadoEvent(this.listOfPlayers);
-        Event vandalism = new VandalismEvent(this.listOfPlayers, this.discardPile);
+        Event tornado = new TornadoEvent(this);
+        Event vandalism = new VandalismEvent(this);
 
         //add them to the list of all events
         this.events.add(charity);

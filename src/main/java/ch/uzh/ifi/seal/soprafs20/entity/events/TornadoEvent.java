@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +9,15 @@ import java.util.List;
 
 public class TornadoEvent implements Event {
 
+    private final GameRound gameRound;
+    private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final List<Card> tornadoList;
 
-    public TornadoEvent(List<Player> listOfPlayers) {
-        this.listOfPlayers = listOfPlayers;
+    public TornadoEvent(GameRound gameRound) {
+        this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
+        this.listOfPlayers = gameRound.getListOfPlayers();
         this.tornadoList = new ArrayList<>();
     }
 
@@ -20,7 +25,7 @@ public class TornadoEvent implements Event {
         return "tornado";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
         // collect cards
         for (Player player : this.listOfPlayers) {
             while (player.getHandSize() > 0) {
@@ -37,7 +42,10 @@ public class TornadoEvent implements Event {
         }
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:tornado", this.getMessage()));
-        return chat;
+
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

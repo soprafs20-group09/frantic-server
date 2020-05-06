@@ -2,27 +2,34 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class TimeBombEvent implements Event {
+
     private final GameRound gameRound;
+    private final GameService gameService;
 
     public TimeBombEvent(GameRound gameRound) {
         this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
     }
 
     public String getName() {
         return "time-bomb";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
         gameRound.setTimeBomb();
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:time-bomb", this.getMessage()));
-        return chat;
+
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

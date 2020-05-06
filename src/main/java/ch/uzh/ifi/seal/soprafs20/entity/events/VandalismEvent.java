@@ -1,29 +1,31 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VandalismEvent implements Event {
 
+    private final GameRound gameRound;
+    private final GameService gameService;
     private final List<Player> listOfPlayers;
     private Pile<Card> discardPile;
 
-    public VandalismEvent(List<Player> playerList, Pile<Card> discardPile) {
-        this.listOfPlayers = playerList;
-        this.discardPile = discardPile;
+    public VandalismEvent(GameRound gameRound) {
+        this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
+        this.listOfPlayers = gameRound.getListOfPlayers();
+        this.discardPile = gameRound.getDiscardPile();
     }
 
     public String getName() {
         return "vandalism";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
 
         int index = 1;
         Card relevant = this.discardPile.peekN(index);
@@ -40,7 +42,10 @@ public class VandalismEvent implements Event {
         }
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:vandalism", this.getMessage()));
-        return chat;
+
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

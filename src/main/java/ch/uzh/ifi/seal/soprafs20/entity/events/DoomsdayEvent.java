@@ -2,7 +2,9 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,27 +12,32 @@ import java.util.List;
 public class DoomsdayEvent implements Event {
 
     private final Game game;
+    private final GameRound gameRound;
+    private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Player currentPlayer;
 
-    public DoomsdayEvent(Game game, List<Player> listOfPlayers, Player currentPlayer) {
+    public DoomsdayEvent(Game game, GameRound gameRound) {
         this.game = game;
-        this.listOfPlayers = listOfPlayers;
-        this.currentPlayer = currentPlayer;
+        this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
+        this.listOfPlayers = gameRound.getListOfPlayers();
+        this.currentPlayer = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
         return "doomsday";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
         for (Player player : listOfPlayers) {
             player.setPoints(player.getPoints() + 50);
         }
-        this.game.endGameRound(currentPlayer);
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:doomsday", this.getMessage()));
-        return chat;
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+
+        this.game.endGameRound(currentPlayer);
     }
 
     public String getMessage() {

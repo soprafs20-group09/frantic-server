@@ -1,10 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,19 +11,23 @@ import java.util.Map;
 
 public class MatingSeasonEvent implements Event {
 
+    private final GameRound gameRound;
+    private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Player initiator;
 
-    public MatingSeasonEvent(List<Player> listOfPlayers, Player currentPlayer) {
-        this.listOfPlayers = listOfPlayers;
-        this.initiator = currentPlayer;
+    public MatingSeasonEvent(GameRound gameRound) {
+        this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
+        this.listOfPlayers = gameRound.getListOfPlayers();
+        this.initiator = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
         return "mating-season";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:mating-season", this.getMessage()));
 
@@ -60,7 +62,9 @@ public class MatingSeasonEvent implements Event {
                         playerOfInterest.getUsername() + " discarded " + discardedCards + " cards"));
             }
         }
-        return chat;
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

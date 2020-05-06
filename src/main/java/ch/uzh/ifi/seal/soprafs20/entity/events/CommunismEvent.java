@@ -1,30 +1,31 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommunismEvent implements Event {
 
+    private final GameRound gameRound;
+    private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Pile<Card> drawStack;
 
-    public CommunismEvent(List<Player> listOfPlayers, Pile<Card> drawStack) {
-        this.listOfPlayers = listOfPlayers;
-        this.drawStack = drawStack;
+    public CommunismEvent(GameRound gameRound) {
+        this.gameRound = gameRound;
+        this.gameService = gameRound.getGameService();
+        this.listOfPlayers = gameRound.getListOfPlayers();
     }
 
     public String getName() {
         return "communism";
     }
 
-    public List<Chat> performEvent() {
+    public void performEvent() {
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:communism", this.getMessage()));
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
 
         int maxCards = 0;
         for (Player player : this.listOfPlayers) {
@@ -34,20 +35,13 @@ public class CommunismEvent implements Event {
         }
 
         for (Player player : this.listOfPlayers) {
-            int drawnCards = 0;
             if (player.getHandSize() < maxCards) {
                 int toDraw = maxCards - player.getHandSize();
-                for (int i = 1; i <= toDraw; i++) {
-                    if (this.drawStack.size() > 0) {
-                        player.pushCardToHand(this.drawStack.pop());
-                        drawnCards++;
-                    }
-                }
-                chat.add(new Chat("event", "avatar:" + player.getUsername(),
-                        player.getUsername() + " drew " + drawnCards + " cards"));
+                this.gameRound.drawCardFromStack(player, toDraw);
             }
         }
-        return chat;
+        this.gameRound.sendCompleteGameState();
+        this.gameRound.finishTurn();
     }
 
     public String getMessage() {

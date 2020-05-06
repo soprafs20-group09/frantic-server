@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface Event {
     String getName();
-    List<Chat> performEvent();
+    void performEvent();
     String getMessage();
 }
