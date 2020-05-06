@@ -162,7 +162,7 @@ public class GameRound {
                                     this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getColor() == Color.BLACK) {
-                                //performEvent();
+                                performEvent();
                             }
                             finishTurn();
                         }
@@ -675,19 +675,19 @@ public class GameRound {
         //add them to the list of all events
         this.events.add(charity);
         this.events.add(communism);
-        this.events.add(doomsday);
+        //this.events.add(doomsday);
         this.events.add(earthquake);
         this.events.add(expansion);
-        this.events.add(finishLine);
+        //this.events.add(finishLine);
         this.events.add(fridayTheThirteenth);
-        this.events.add(gamblingMan);
-        this.events.add(market);
-        this.events.add(merryChristmas);
+        //this.events.add(gamblingMan);
+        //this.events.add(market);
+        //this.events.add(merryChristmas);
         this.events.add(matingSeason);
         this.events.add(mexicanStandoff);
         this.events.add(recession);
         this.events.add(robinHood);
-        this.events.add(surpriseParty);
+        //this.events.add(surpriseParty);
         this.events.add(theAllSeeingEye);
         this.events.add(thirdTimeLucky);
         this.events.add(timeBomb);
