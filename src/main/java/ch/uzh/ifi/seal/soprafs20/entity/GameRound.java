@@ -162,7 +162,7 @@ public class GameRound {
                                     this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getColor() == Color.BLACK) {
-                                performEvent();
+                                prepareEvent();
                             }
                             finishTurn();
                         }
@@ -436,10 +436,15 @@ public class GameRound {
         startNiceTryTimer(5);
     }
 
-    private void performEvent() {
+    private void prepareEvent() {
         this.timer.cancel();
-        Event event = this.events.remove(0);
+        Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
+        startAnimationTimer(11);
+    }
+
+    private void performEvent() {
+        Event event = this.events.remove(0);
         List<Chat> chat = event.performEvent();
         this.gameService.sendChatMessage(this.lobbyId, chat);
         sendCompleteGameState();
@@ -602,6 +607,18 @@ public class GameRound {
             @Override
             public void run() {
                 prepareNewTurn();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startAnimationTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                performEvent();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
