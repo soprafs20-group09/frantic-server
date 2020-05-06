@@ -20,14 +20,21 @@ public class ThirdTimeLuckyEvent implements Event {
     }
 
     public List<Chat> performEvent() {
+        List<Chat> chat = new ArrayList<>();
         for (Player player : this.listOfPlayers) {
+            int drawnCards = 0;
             for (int i = 0; i < 3; i++) {
                 if (!drawStack.empty()) {
                     player.pushCardToHand(drawStack.pop());
+                    drawnCards++;
                 }
             }
+            if (drawnCards > 0) {
+                chat.add(new Chat("event", "avatar:" + player.getUsername(),
+                        player.getUsername() + " drew " + drawnCards + " cards"));
+            }
         }
-        List<Chat> chat = new ArrayList<>();
+
         chat.add(new Chat("event", "event:third-time-lucky", this.getMessage()));
         return chat;
     }
