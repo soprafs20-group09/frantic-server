@@ -438,6 +438,11 @@ public class GameRound {
 
     private void prepareEvent() {
         this.timer.cancel();
+        sendGameState();
+        try {
+            wait(1000);
+        }
+        catch (InterruptedException ignored) {}
         Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
         startAnimationTimer(11);
