@@ -164,7 +164,9 @@ public class GameRound {
                             if (cardToPlay.getColor() == Color.BLACK) {
                                 prepareEvent();
                             }
-                            finishTurn();
+                            else {
+                                finishTurn();
+                            }
                         }
                         else if (cardToPlay.getType() == Type.SPECIAL) {
                             Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
@@ -448,6 +450,7 @@ public class GameRound {
         List<Chat> chat = event.performEvent();
         this.gameService.sendChatMessage(this.lobbyId, chat);
         sendCompleteGameState();
+        finishTurn();
     }
 
     public void performRecession(String identity, int[] cards) {
