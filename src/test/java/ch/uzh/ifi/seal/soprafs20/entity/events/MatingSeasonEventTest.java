@@ -14,17 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MatingSeasonEventTest {
 
     private List<Player> listOfPlayers = new ArrayList<>();
-    private final Pile<Card> discardPile = new DiscardPile();
 
     @Test
     public void getNameTest() {
-        MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.listOfPlayers, new Player(), this.discardPile);
+        MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.listOfPlayers, new Player());
         assertEquals("mating-season", matingSeason.getName());
     }
 
     @Test
     public void getMessageTest() {
-        MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.listOfPlayers, new Player(), this.discardPile);
+        MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.listOfPlayers, new Player());
         assertEquals("It's valentines day! Well, at least for your cards! Discard numeral pairs, triples and so on.", matingSeason.getMessage());
     }
 
@@ -57,7 +56,7 @@ public class MatingSeasonEventTest {
         player4.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 14));
         this.listOfPlayers.add(player4);
 
-        MatingSeasonEvent m = new MatingSeasonEvent(this.listOfPlayers, player2, this.discardPile);
+        MatingSeasonEvent m = new MatingSeasonEvent(this.listOfPlayers, player2);
         m.performEvent();
 
         assertEquals(2, player1.getHandSize());

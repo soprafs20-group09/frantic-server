@@ -17,12 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MexicanStandoffEventTest {
 
     private List<Player> listOfPlayers = new ArrayList<>();
-    private Pile<Card> discardPile = new DiscardPile();
     private Pile<Card> drawStack = new DrawStack();
 
     @Test
     public void getNameTest() {
-        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
+        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, drawStack);
         assertEquals("mexican-standoff", mexicanStandoff.getName());
     }
 
@@ -38,17 +37,16 @@ public class MexicanStandoffEventTest {
         assertEquals(4, player1.getHandSize());
         assertEquals(125, this.drawStack.size());
 
-        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
+        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, drawStack);
         mexicanStandoff.performEvent();
 
         assertEquals(3, player1.getHandSize());
-        assertEquals(4, this.discardPile.size());
         assertEquals(122, this.drawStack.size());
     }
 
     @Test
     public void getMessageTest() {
-        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, discardPile, drawStack);
+        Event mexicanStandoff = new MexicanStandoffEvent(listOfPlayers, drawStack);
         assertEquals("Show your skills off! Everyone gets rid of their cards and gets three new ones! Who can finish first?", mexicanStandoff.getMessage());
     }
 }

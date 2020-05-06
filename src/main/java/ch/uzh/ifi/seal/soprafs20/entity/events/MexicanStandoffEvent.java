@@ -11,12 +11,10 @@ import java.util.List;
 public class MexicanStandoffEvent implements Event {
 
     private final List<Player> listOfPlayers;
-    private Pile<Card> discardPile;
     private Pile<Card> drawStack;
 
-    public MexicanStandoffEvent(List<Player> listOfPlayers, Pile<Card> discardPile, Pile<Card> drawStack) {
+    public MexicanStandoffEvent(List<Player> listOfPlayers, Pile<Card> drawStack) {
         this.listOfPlayers = listOfPlayers;
-        this.discardPile = discardPile;
         this.drawStack = drawStack;
     }
 
@@ -27,7 +25,7 @@ public class MexicanStandoffEvent implements Event {
     public List<Chat> performEvent() {
         for (Player player : this.listOfPlayers) {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
-                this.discardPile.push(player.popCard(i));
+                player.popCard(i);
             }
             for (int i = 0; i < 3; i++) {
                 if (!drawStack.empty()) {

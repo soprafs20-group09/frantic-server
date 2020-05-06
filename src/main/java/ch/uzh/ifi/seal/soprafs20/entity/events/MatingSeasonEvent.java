@@ -15,12 +15,10 @@ public class MatingSeasonEvent implements Event {
 
     private final List<Player> listOfPlayers;
     private final Player initiator;
-    private final Pile<Card> discardPile;
 
-    public MatingSeasonEvent(List<Player> listOfPlayers, Player currentPlayer, Pile<Card> discardPile) {
+    public MatingSeasonEvent(List<Player> listOfPlayers, Player currentPlayer) {
         this.listOfPlayers = listOfPlayers;
         this.initiator = currentPlayer;
-        this.discardPile = discardPile;
     }
 
     public String getName() {
@@ -52,7 +50,7 @@ public class MatingSeasonEvent implements Event {
                 Card card = playerOfInterest.peekCard(i);
                 Value cardValue = card.getValue();
                 if (mappedValues.containsKey(cardValue) && mappedValues.get(cardValue) > 1) {
-                    discardPile.push(playerOfInterest.popCard(i));
+                    playerOfInterest.popCard(i);
                     discardedCards++;
                 }
             }

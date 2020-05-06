@@ -34,7 +34,7 @@ public class VandalismEvent implements Event {
         for (Player player : this.listOfPlayers) {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
                 if (player.peekCard(i).getColor().equals(relevant.getColor())) {
-                    this.discardPile.push(player.popCard(i));
+                    player.popCard(i);
                 }
             }
         }
