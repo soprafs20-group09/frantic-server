@@ -47,6 +47,6 @@ public class ExpansionEvent implements Event {
 
     //TODO: make it dynamic
     public String getMessage() {
-        return "One, Two, Three, ... Since you are the 3rd to draw, you have to draw 3 cards!";
+        return "Cards are selling like hot cakes! Grab one or two or three ...";
     }
 }
