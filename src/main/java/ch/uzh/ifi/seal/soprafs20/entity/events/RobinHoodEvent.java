@@ -58,7 +58,7 @@ public class RobinHoodEvent implements Event {
         }
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:robin-hood", this.getMessage()));
-        chat.add(new Chat("event", "event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped cards"));
+        chat.add(new Chat("event", "event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped all cards"));
         return chat;
     }
 
