@@ -39,6 +39,8 @@ public class GameRound {
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
+        this.drawStack = new DrawStack();
+        this.discardPile = new DiscardPile();
         this.turnNumber = 0;
         this.timeBomb = false;
         this.bombMap = new HashMap<>();
@@ -53,8 +55,6 @@ public class GameRound {
 
     //creates Piles & player hands
     public void initializeGameRound() {
-        this.drawStack = new DrawStack();
-        this.discardPile = new DiscardPile();
         initEvents();
 
         //move 7 initial cards to player hands
@@ -720,6 +720,10 @@ public class GameRound {
 
     public Pile<Card> getDiscardPile() {
         return this.discardPile;
+    }
+
+    public int getDrawStackSize() {
+        return this.drawStack.size();
     }
 
     private void initEvents() {
