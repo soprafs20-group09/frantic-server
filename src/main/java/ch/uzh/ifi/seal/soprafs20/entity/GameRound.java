@@ -924,7 +924,7 @@ public class GameRound {
         //initialize all Events and add them to the list
         this.events.add(new CharityEvent(this));
         this.events.add(new CommunismEvent(this));
-        //this.events.add(new DoomsdayEvent(this.game, this));
+        this.events.add(new DoomsdayEvent(this.game, this));
         this.events.add(new EarthquakeEvent(this));
         this.events.add(new ExpansionEvent(this));
         //this.events.add(new FinishLineEvent(game, this));
