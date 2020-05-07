@@ -2,21 +2,10 @@ package ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing;
 
 public class MarketWindowDTO {
 
-    private int time;
-
     private CardDTO[] cards;
 
-    public MarketWindowDTO(int time, CardDTO[] cards) {
-        this.time = time;
+    public MarketWindowDTO(CardDTO[] cards) {
         this.cards = cards;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
     }
 
     public CardDTO[] getCards() {
