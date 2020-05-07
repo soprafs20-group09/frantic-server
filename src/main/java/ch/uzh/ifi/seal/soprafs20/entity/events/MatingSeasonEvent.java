@@ -30,12 +30,8 @@ public class MatingSeasonEvent implements Event {
     public void performEvent() {
         List<Chat> chat = new ArrayList<>();
 
-        int numOfPlayers = this.listOfPlayers.size();
-        int initiatorIndex = this.listOfPlayers.indexOf(this.initiator);
-
-        for (int p = 1; p <= numOfPlayers; p++) {
+        for (Player playerOfInterest : this.listOfPlayers) {
             Map<Value, Integer> mappedValues = new HashMap<>();
-            Player playerOfInterest = this.listOfPlayers.get((initiatorIndex + p) % numOfPlayers);
 
             for (int i = 0; i < playerOfInterest.getHandSize(); i++) {
                 Card card = playerOfInterest.peekCard(i);
