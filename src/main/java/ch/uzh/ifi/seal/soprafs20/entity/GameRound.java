@@ -32,6 +32,7 @@ public class GameRound {
     private boolean attackState;
     private boolean showCards;
     private int eventResponses;
+    private Map<Player, Card> surpriseParty;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -51,6 +52,7 @@ public class GameRound {
         this.attackState = false;
         this.showCards = false;
         this.eventResponses = 0;
+        this.surpriseParty = new HashMap<>();
     }
 
     //creates Piles & player hands
@@ -489,7 +491,29 @@ public class GameRound {
         if (this.eventResponses == this.listOfPlayers.size()) {
             this.timer.cancel();
             finishTurn();
+            this.eventResponses = 0;
         }
+    }
+
+    public void prepareSurpriseParty(String identity, int card, String targetUsername) {
+        Player player = getPlayerByIdentity(identity);
+        Player target = getPlayerByUsername(targetUsername);
+        if (player != null && target != null) {
+            this.eventResponses++;
+            this.surpriseParty.put(target, player.popCard(card));
+        }
+        if (this.eventResponses == this.listOfPlayers.size()) {
+            performSurpriseParty();
+        }
+    }
+
+    public void performSurpriseParty() {
+        timer.cancel();
+        for (Map.Entry<Player, Card> entry : this.surpriseParty.entrySet()) {
+            entry.getKey().pushCardToHand(entry.getValue());
+        }
+        this.eventResponses = 0;
+        finishTurn();
     }
 
     private int[] getPlayableCards(Player player) {
@@ -654,13 +678,38 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startEventTimer(int seconds) {
+    public void startAllSeeingEyeTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 finishTurn();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startRecessionTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                eventResponses = 0;
+                finishTurn();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startSurprisePartyTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                performSurpriseParty();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
@@ -729,49 +778,27 @@ public class GameRound {
     }
 
     private void initEvents() {
-        //initialize all Events
-        Event charity = new CharityEvent(this);
-        Event communism = new CommunismEvent(this);
-        Event doomsday = new DoomsdayEvent(this.game, this);
-        Event earthquake = new EarthquakeEvent(this);
-        Event expansion = new ExpansionEvent(this);
-        Event finishLine = new FinishLineEvent(game, this);
-        Event fridayTheThirteenth = new FridayTheThirteenthEvent(this);
-        Event gamblingMan = new GamblingManEvent(this);
-        Event market = new MarketEvent(this);
-        Event matingSeason = new MatingSeasonEvent(this);
-        Event merryChristmas = new MerryChristmasEvent(this);
-        Event mexicanStandoff = new MexicanStandoffEvent(this);
-        Event recession = new RecessionEvent(this);
-        Event robinHood = new RobinHoodEvent(this);
-        Event surpriseParty = new SurprisePartyEvent(this);
-        Event theAllSeeingEye = new TheAllSeeingEyeEvent(this);
-        Event thirdTimeLucky = new ThirdTimeLuckyEvent(this);
-        Event timeBomb = new TimeBombEvent(this);
-        Event tornado = new TornadoEvent(this);
-        Event vandalism = new VandalismEvent(this);
-
-        //add them to the list of all events
-        this.events.add(charity);
-        this.events.add(communism);
-        //this.events.add(doomsday);
-        this.events.add(earthquake);
-        this.events.add(expansion);
-        //this.events.add(finishLine);
-        this.events.add(fridayTheThirteenth);
-        //this.events.add(gamblingMan);
-        //this.events.add(market);
-        //this.events.add(merryChristmas);
-        this.events.add(matingSeason);
-        this.events.add(mexicanStandoff);
-        this.events.add(recession);
-        this.events.add(robinHood);
-        //this.events.add(surpriseParty);
-        this.events.add(theAllSeeingEye);
-        this.events.add(thirdTimeLucky);
-        this.events.add(timeBomb);
-        this.events.add(tornado);
-        this.events.add(vandalism);
+        //initialize all Events and add them to the list
+        this.events.add(new CharityEvent(this));
+        this.events.add(new CommunismEvent(this));
+        //this.events.add(new DoomsdayEvent(this.game, this));
+        this.events.add(new EarthquakeEvent(this));
+        this.events.add(new ExpansionEvent(this));
+        //this.events.add(new FinishLineEvent(game, this));
+        this.events.add(new FridayTheThirteenthEvent(this));
+        //this.events.add(new GamblingManEvent(this));
+        //this.events.add(new MarketEvent(this));
+        //this.events.add(new MerryChristmasEvent(this));
+        this.events.add(new MatingSeasonEvent(this));
+        this.events.add(new MexicanStandoffEvent(this));
+        this.events.add(new RecessionEvent(this));
+        this.events.add(new RobinHoodEvent(this));
+        //this.events.add(new SurprisePartyEvent(this));
+        this.events.add(new TheAllSeeingEyeEvent(this));
+        this.events.add(new ThirdTimeLuckyEvent(this));
+        this.events.add(new TimeBombEvent(this));
+        this.events.add(new TornadoEvent(this));
+        this.events.add(new VandalismEvent(this));
 
         Collections.shuffle(this.events);
     }

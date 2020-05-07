@@ -124,7 +124,7 @@ public class GameService {
     public void surpriseParty(String lobbyId, String identity, SurprisePartyDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            //game.getCurrentGameRound().surpriseParty(identity, dto.getCard(), dto.getTarget());
+            game.getCurrentGameRound().prepareSurpriseParty(identity, dto.getCard(), dto.getTarget());
         }
     }
 
