@@ -316,6 +316,7 @@ public class GameService {
             dto[i].setPoints(player.getPoints());
             dto[i].setSkipped(player.isBlocked());
             dto[i].setCards(generateCardDTO(player, up));
+            dto[i].setAdmin(player.isAdmin());
         }
         return dto;
     }

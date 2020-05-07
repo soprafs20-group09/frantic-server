@@ -10,6 +10,8 @@ public class PlayerStateDTO {
 
     private Boolean skipped;
 
+    private Boolean admin;
+
     public String getUsername() {
         return username;
     }
@@ -43,4 +45,11 @@ public class PlayerStateDTO {
     }
 
 
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
 }
