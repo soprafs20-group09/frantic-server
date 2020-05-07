@@ -26,32 +26,39 @@ public class EarthquakeEvent implements Event {
     }
 
     public void performEvent() {
-        List<Card> temp = new ArrayList<>();
-        int tempSize = this.listOfPlayers.get(0).getHandSize();
-        for (int i = 0; i < tempSize; i++) {
-            temp.add(this.listOfPlayers.get(0).popCard());
+
+        List<List<Card>> allCards = new ArrayList<>();
+        for (int i = 0; i < this.listOfPlayers.size(); i++) {
+            Player player = this.listOfPlayers.get(i);
+            allCards.add(new ArrayList<>());
+            for (int j = player.getHandSize() - 1; j >= 0; j--) {
+                allCards.get(i).add(player.popCard(j));
+            }
+        }
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
+        this.gameRound.sendCompleteGameState();
+
+        try {
+            Thread.sleep(500);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        int numOfPlayers = this.listOfPlayers.size();
-        for (int i = numOfPlayers - 1; i > 0; i--) {
-            Player fromPlayer = this.listOfPlayers.get(i);
-            int toPlayerIndex = (i + 1) % numOfPlayers;
-            Player toPlayer = this.listOfPlayers.get(toPlayerIndex);
-
-            int numOfCards = fromPlayer.getHandSize();
-            for (int j = 0; j < numOfCards; j++) {
-                toPlayer.pushCardToHand(fromPlayer.popCard());
+        for (int i = 0; i < this.listOfPlayers.size(); i++) {
+            Player toPlayer = this.listOfPlayers.get((i + 1) % this.listOfPlayers.size());
+            for (Card card : allCards.get(i)) {
+                toPlayer.pushCardToHand(card);
             }
         }
 
-        for (int i = 0; i < tempSize; i++) {
-            this.listOfPlayers.get(1).pushCardToHand(temp.remove(0));
-        }
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
+        this.gameRound.sendCompleteGameState();
+
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:earthquake", this.getMessage()));
 
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-        this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }
 

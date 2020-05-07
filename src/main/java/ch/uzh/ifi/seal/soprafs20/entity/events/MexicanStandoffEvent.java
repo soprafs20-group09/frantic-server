@@ -27,10 +27,16 @@ public class MexicanStandoffEvent implements Event {
         chat.add(new Chat("event", "event:mexican-standoff", this.getMessage()));
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
 
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
         for (Player player : this.listOfPlayers) {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
                 player.popCard(i);
             }
+            this.gameService.sendHand(this.gameRound.getLobbyId(), player);
+        }
+
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
+        for (Player player : this.listOfPlayers) {
             this.gameRound.drawCardFromStack(player, 3);
         }
 
