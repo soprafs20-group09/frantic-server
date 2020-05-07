@@ -3,11 +3,13 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +18,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommunismEventTest {
 
+    @Mock
+    private GameService gameService;
+    @Mock
+    private GameRound gameRound;
+
     private List<Player> listOfPlayers = new ArrayList<>();
-    private final Pile<Card> drawStack = new DrawStack();
+
+    @BeforeEach
+    public void setup() {
+        this.listOfPlayers = new ArrayList<>();
+
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
+        Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+    }
 
     @Test
     public void getNameTest() {
-        CommunismEvent communism = new CommunismEvent(this.listOfPlayers, this.drawStack);
+        CommunismEvent communism = new CommunismEvent(this.gameRound);
         assertEquals("communism", communism.getName());
     }
 
     @Test
     public void getMessageTest() {
-        CommunismEvent communism = new CommunismEvent(this.listOfPlayers, this.drawStack);
+        CommunismEvent communism = new CommunismEvent(this.gameRound);
         assertEquals("Everybody is equal, now isn't that great?", communism.getMessage());
     }
 
@@ -57,16 +72,13 @@ public class CommunismEventTest {
         player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 11));
         this.listOfPlayers.add(player4);
 
-        assertEquals(125, this.drawStack.size());
-
-        CommunismEvent c = new CommunismEvent(this.listOfPlayers, this.drawStack);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player2);
+        CommunismEvent c = new CommunismEvent(this.gameRound);
         c.performEvent();
 
-        assertEquals(6, player1.getHandSize());
-        assertEquals(6, player2.getHandSize());
-        assertEquals(6, player3.getHandSize());
-        assertEquals(6, player4.getHandSize());
-
-        assertEquals(113, this.drawStack.size());
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player1, 5);
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player2, 4);
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player3, 3);
+        Mockito.verify(this.gameRound, Mockito.times(0)).drawCardFromStack(player4, 0);
     }
 }

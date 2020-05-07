@@ -3,11 +3,13 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.DrawStack;
-import ch.uzh.ifi.seal.soprafs20.entity.Pile;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +18,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExpansionEventTest {
 
+    @Mock
+    private GameService gameService;
+    @Mock
+    private GameRound gameRound;
+
     private List<Player> listOfPlayers = new ArrayList<>();
-    private final Pile<Card> drawStack = new DrawStack();
+
+    @BeforeEach
+    public void setup() {
+        this.listOfPlayers = new ArrayList<>();
+
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
+        Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+    }
 
     @Test
     public void getNameTest() {
-        ExpansionEvent expansion = new ExpansionEvent(this.listOfPlayers, new Player(), this.drawStack);
+        ExpansionEvent expansion = new ExpansionEvent(this.gameRound);
         assertEquals("expansion", expansion.getName());
     }
 
     @Test
     public void getMessageTest() {
-        ExpansionEvent expansion = new ExpansionEvent(this.listOfPlayers, new Player(), this.drawStack);
-        //TODO: make it dynamic
+        ExpansionEvent expansion = new ExpansionEvent(this.gameRound);
         assertEquals("One, Two, Three, ... Since you are the 3rd to draw, you have to draw 3 cards!", expansion.getMessage());
     }
 
@@ -60,12 +74,14 @@ public class ExpansionEventTest {
         player4.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 13));
         this.listOfPlayers.add(player4);
 
-        ExpansionEvent e = new ExpansionEvent(this.listOfPlayers, player2, this.drawStack);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player2);
+
+        ExpansionEvent e = new ExpansionEvent(this.gameRound);
         e.performEvent();
 
-        assertEquals(7, player1.getHandSize());
-        assertEquals(6, player2.getHandSize());
-        assertEquals(4, player3.getHandSize());
-        assertEquals(7, player4.getHandSize());
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player1, 3);
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player2, 4);
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player3, 1);
+        Mockito.verify(this.gameRound, Mockito.times(1)).drawCardFromStack(player4, 2);
     }
 }

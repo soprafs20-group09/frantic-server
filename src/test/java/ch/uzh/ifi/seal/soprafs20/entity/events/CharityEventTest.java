@@ -3,9 +3,11 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +16,31 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CharityEventTest {
 
+    @Mock
+    private GameService gameService;
+    @Mock
+    private GameRound gameRound;
+    
     private List<Player> listOfPlayers = new ArrayList<>();
+    
+    @BeforeEach
+    public void setup() {
+        this.listOfPlayers = new ArrayList<>();
+
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
+        Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+    }
 
     @Test
     public void getNameTest() {
-        CharityEvent charity = new CharityEvent(this.listOfPlayers, new Player());
+        CharityEvent charity = new CharityEvent(this.gameRound);
         assertEquals("charity", charity.getName());
     }
 
     @Test
     public void getMessageTest() {
-        CharityEvent charity = new CharityEvent(this.listOfPlayers, new Player());
+        CharityEvent charity = new CharityEvent(this.gameRound);
         assertEquals("How noble of you! You pick a card from the player with the most cards!", charity.getMessage());
     }
 
@@ -57,7 +73,9 @@ public class CharityEventTest {
         player4.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 14));
         this.listOfPlayers.add(player4);
 
-        CharityEvent c = new CharityEvent(this.listOfPlayers, player2);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player2);
+
+        CharityEvent c = new CharityEvent(this.gameRound);
         c.performEvent();
 
         assertEquals(3, player1.getHandSize());
@@ -85,7 +103,9 @@ public class CharityEventTest {
         player4.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 4));
         this.listOfPlayers.add(player4);
 
-        CharityEvent c = new CharityEvent(this.listOfPlayers, player2);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player2);
+
+        CharityEvent c = new CharityEvent(this.gameRound);
         c.performEvent();
 
         assertEquals(2, player1.getHandSize());

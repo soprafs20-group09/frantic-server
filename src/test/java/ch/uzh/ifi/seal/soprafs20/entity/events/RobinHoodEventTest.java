@@ -4,8 +4,15 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.Game;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +21,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RobinHoodEventTest {
 
+    @Mock
+    private GameService gameService;
+    @Mock
+    private GameRound gameRound;
+
     private List<Player> listOfPlayers = new ArrayList<>();
+
+    @BeforeEach
+    public void setup() {
+        this.listOfPlayers = new ArrayList<>();
+
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
+        Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+    }
 
     @Test
     public void getNameTest() {
-        RobinHoodEvent robinHood = new RobinHoodEvent(this.listOfPlayers, new Player());
+        RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         assertEquals("robin-hood", robinHood.getName());
     }
 
     @Test
     public void getMessageTest() {
-        RobinHoodEvent robinHood = new RobinHoodEvent(this.listOfPlayers, new Player());
+        RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         assertEquals("Some call him a hero, some call him a thief! The player with the least cards has to swap cards with the player holding the most!", robinHood.getMessage());
     }
 
@@ -51,7 +72,8 @@ public class RobinHoodEventTest {
         }
         this.listOfPlayers.add(player3);
 
-        RobinHoodEvent robinHood = new RobinHoodEvent(this.listOfPlayers, player1);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player1);
+        RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         robinHood.performEvent();
 
         assertEquals(2, player1.getHandSize());
@@ -96,7 +118,8 @@ public class RobinHoodEventTest {
         }
         this.listOfPlayers.add(player3);
 
-        RobinHoodEvent robinHood = new RobinHoodEvent(this.listOfPlayers, player1);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player1);
+        RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         robinHood.performEvent();
 
         assertEquals(2, player1.getHandSize());
@@ -149,7 +172,8 @@ public class RobinHoodEventTest {
         }
         this.listOfPlayers.add(player3);
 
-        RobinHoodEvent robinHood = new RobinHoodEvent(this.listOfPlayers, player1);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player1);
+        RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         robinHood.performEvent();
 
         assertEquals(2, player1.getHandSize());

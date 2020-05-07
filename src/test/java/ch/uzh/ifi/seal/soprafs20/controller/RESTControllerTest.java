@@ -119,27 +119,6 @@ public class RESTControllerTest {
     }
 
     @Test
-    public void getPlayersInLobby_returnsListOfPlayersInLobby() throws Exception {
-
-        PlayerScoreDTO player = new PlayerScoreDTO();
-        player.setUsername("foo");
-        player.setScore(168);
-
-        List<PlayerScoreDTO> allScores = Collections.singletonList(player);
-
-        given(lobbyService.getScores(Mockito.any())).willReturn(allScores);
-
-        // when
-        MockHttpServletRequestBuilder getRequest = get("/lobbies/1")
-                .contentType(MediaType.APPLICATION_JSON);
-        // then
-        mockMvc.perform(getRequest).andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].username", is(player.getUsername())))
-                .andExpect(jsonPath("$[0].score", is(player.getScore())));
-    }
-
-    @Test
     public void put_validUsername_returnsAuthToken() throws Exception {
 
         PlayerUsernameDTO username = new PlayerUsernameDTO();

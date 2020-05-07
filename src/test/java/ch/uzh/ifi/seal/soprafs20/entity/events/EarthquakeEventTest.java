@@ -4,8 +4,14 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +20,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EarthquakeEventTest {
 
+    @Mock
+    private GameService gameService;
+    @Mock
+    private GameRound gameRound;
+
     private List<Player> listOfPlayers = new ArrayList<>();
+
+    @BeforeEach
+    public void setup() {
+        this.listOfPlayers = new ArrayList<>();
+
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
+        Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+    }
 
     @Test
     public void getNameTest() {
-        EarthquakeEvent earthquake = new EarthquakeEvent(this.listOfPlayers);
+        EarthquakeEvent earthquake = new EarthquakeEvent(this.gameRound);
         assertEquals("earthquake", earthquake.getName());
     }
 
     @Test
     public void getMessageTest() {
-        EarthquakeEvent earthquake = new EarthquakeEvent(this.listOfPlayers);
+        EarthquakeEvent earthquake = new EarthquakeEvent(this.gameRound);
         assertEquals("Oh no! Everything is shaken up! Good luck with your new cards!", earthquake.getMessage());
     }
 
     @Test
     public void performEventTest() {
+        
         Player player1 = new Player();
         List<Card> player1Cards = new ArrayList<>();
         player1Cards.add(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0));
@@ -57,7 +78,9 @@ public class EarthquakeEventTest {
         }
         this.listOfPlayers.add(player3);
 
-        EarthquakeEvent e = new EarthquakeEvent(this.listOfPlayers);
+        Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player1);
+
+        EarthquakeEvent e = new EarthquakeEvent(this.gameRound);
         e.performEvent();
 
         assertEquals(player1Cards.size(), player2.getHandSize());
