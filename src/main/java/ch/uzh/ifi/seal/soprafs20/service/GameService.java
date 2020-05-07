@@ -9,6 +9,7 @@ import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.CardDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RecessionAmountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -145,7 +146,14 @@ public class GameService {
     public void market(String lobbyId, String identity, MarketDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            //game.getCurrentGameRound().market(dto.getCard());
+            game.getCurrentGameRound().prepareMarket(identity, dto.getCard());
+        }
+    }
+
+    public void gamblingMan(String lobbyId, String identity, GamblingManDTO dto) {
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.getCurrentGameRound().prepareGamblingMan(identity, dto.getCard());
         }
     }
 
@@ -245,17 +253,17 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession" , dto);
     }
 
-    public void sendGamblingMan(String lobbyId, Player player, int time, int[] playable) {
-        GamblingManWindowDTO dto = new GamblingManWindowDTO(time, playable);
+    public void sendGamblingMan(String lobbyId, Player player, int[] playable) {
+        GamblingManWindowDTO dto = new GamblingManWindowDTO(playable);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/gambling-man-window", dto);
     }
 
-    public void sendMarketWindow(String lobbyId, Player player, int time, List<Card> cards) {
+    public void sendMarketWindow(String lobbyId, Player player, List<Card> cards) {
         CardDTO[] cardDTO = new CardDTO[cards.size()];
         for (int i = 0; i < cards.size(); i++) {
             cardDTO[i] = cardToDTO(cards.get(i));
         }
-        MarketWindowDTO dto = new MarketWindowDTO(time, cardDTO);
+        MarketWindowDTO dto = new MarketWindowDTO(cardDTO);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);
     }
 

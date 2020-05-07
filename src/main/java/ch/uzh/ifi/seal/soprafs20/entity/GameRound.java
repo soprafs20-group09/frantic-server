@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
 import ch.uzh.ifi.seal.soprafs20.entity.events.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.PlayableDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +33,9 @@ public class GameRound {
     private boolean attackState;
     private boolean showCards;
     private int eventResponses;
-    private Map<Player, List<Card>> eventMap;
+    private Map<Player, Card> eventMap;
+    private Map<Player, List<Card>> christmasMap;
+    private List<Card> marketList;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -53,6 +56,8 @@ public class GameRound {
         this.showCards = false;
         this.eventResponses = 0;
         this.eventMap = new HashMap<>();
+        this.christmasMap = new HashMap<>();
+        this.marketList = new ArrayList<>();
     }
 
     //creates Piles & player hands
@@ -500,17 +505,17 @@ public class GameRound {
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
             this.eventResponses++;
-            this.eventMap.put(target, Collections.singletonList(player.popCard(card)));
+            this.eventMap.put(target, player.popCard(card));
         }
         if (this.eventResponses == this.listOfPlayers.size()) {
             performSurpriseParty();
         }
     }
 
-    public void performSurpriseParty() {
+    private void performSurpriseParty() {
         timer.cancel();
-        for (Map.Entry<Player, List<Card>> entry : this.eventMap.entrySet()) {
-            entry.getKey().pushCardToHand(entry.getValue().get(0));
+        for (Map.Entry<Player, Card> entry : this.eventMap.entrySet()) {
+            entry.getKey().pushCardToHand(entry.getValue());
         }
         this.eventResponses = 0;
         this.eventMap = new HashMap<>();
@@ -527,7 +532,7 @@ public class GameRound {
                 for (int i = 0; i < entry.getValue().length; i++) {
                     cards.add(player.peekCard(entry.getValue()[i]));
                 }
-                this.eventMap.put(target, cards);
+                this.christmasMap.put(target, cards);
             }
             player.clearHand();
         }
@@ -536,16 +541,85 @@ public class GameRound {
         }
     }
 
-    public void performMerryChristmas() {
+    private void performMerryChristmas() {
         timer.cancel();
         this.gameService.sendAnimationSpeed(this.lobbyId, 0);
         sendCompleteGameState();
-        for (Map.Entry<Player, List<Card>> entry : this.eventMap.entrySet()) {
+        for (Map.Entry<Player, List<Card>> entry : this.christmasMap.entrySet()) {
             for (Card card : entry.getValue()) {
                 entry.getKey().pushCardToHand(card);
             }
         }
         this.gameService.sendAnimationSpeed(this.lobbyId, 500);
+        sendCompleteGameState();
+        this.eventResponses = 0;
+        this.christmasMap = new HashMap<>();
+        finishTurn();
+    }
+
+    public void prepareMarket(String identity, int card) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null) {
+            Card choice = this.marketList.remove(card);
+            performMarket(player, choice);
+        }
+    }
+
+    private void prepareRandomMarket(Player player) {
+        Card choice = this.marketList.remove(FranticUtils.random.nextInt(this.marketList.size()));
+        performMarket(player, choice);
+    }
+
+    private void performMarket(Player player, Card choice) {
+        player.pushCardToHand(choice);
+        this.sendCompleteGameState();
+
+        if (!this.marketList.isEmpty()) {
+            int numOfPlayers = this.listOfPlayers.size();
+            int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
+            Player nextPlayer = this.listOfPlayers.get((initiatorIndex + 1) % numOfPlayers);
+            this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketList);
+            this.gameService.sendTimer(this.lobbyId, 15);
+        }
+        else {
+            this.marketList = new ArrayList<>();
+            finishTurn();
+        }
+    }
+
+    public void prepareGamblingMan(String identity, int card) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null) {
+            this.eventResponses++;
+            this.eventMap.put(player, player.popCard(card));
+        }
+        if (this.eventResponses == this.listOfPlayers.size()) {
+            performGamblingMan();
+        }
+    }
+
+    private void performGamblingMan() {
+        Value max = Value.ONE;
+        List<Player> highest = new ArrayList<>();
+        for (Map.Entry<Player, Card> entry : this.eventMap.entrySet()) {
+            Card card = entry.getValue();
+            if (card.getValue().ordinal() > max.ordinal()) {
+                max = card.getValue();
+                highest.add(entry.getKey());
+            }
+        }
+        Player loser;
+        if (highest.size() > 1) {
+            loser = highest.get(FranticUtils.random.nextInt(highest.size()));
+        }
+        else {
+            loser = highest.get(0);
+        }
+        Chat chat = new Chat("event", "event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.eventMap.size() + "cards.");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        for (Card card : this.eventMap.values()) {
+            loser.pushCardToHand(card);
+        }
         sendCompleteGameState();
         this.eventResponses = 0;
         this.eventMap = new HashMap<>();
@@ -563,6 +637,10 @@ public class GameRound {
             mappedPlayers.put(player, handSize);
         }
         return mappedPlayers;
+    }
+
+    public void setMarketList(List<Card> cards) {
+        this.marketList = cards;
     }
 
     public void setTimeBomb() {
@@ -763,6 +841,18 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
+    public void startMarketTimer(int seconds, Player player) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                prepareRandomMarket(player);
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
     //Helper method to make sure only one action (invoked by a player) is processed at a time
     private synchronized boolean startProcess() {
         if (this.isProcessing) {
@@ -819,6 +909,10 @@ public class GameRound {
 
     public Pile<Card> getDiscardPile() {
         return this.discardPile;
+    }
+
+    public Pile<Card> getDrawStack() {
+        return this.drawStack;
     }
 
     public int getDrawStackSize() {

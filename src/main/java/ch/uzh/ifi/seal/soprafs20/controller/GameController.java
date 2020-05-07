@@ -113,4 +113,10 @@ public class GameController {
                           SimpMessageHeaderAccessor sha, MarketDTO dto) {
         gameService.market(lobbyId, getIdentity(sha), dto);
     }
+
+    @MessageMapping("/lobby/{lobbyId}/action/gambling-man")
+    public void gamblingMan(@DestinationVariable String lobbyId,
+                       SimpMessageHeaderAccessor sha, GamblingManDTO dto) {
+        gameService.gamblingMan(lobbyId, getIdentity(sha), dto);
+    }
 }
