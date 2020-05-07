@@ -30,4 +30,10 @@ public class LobbyController {
                            SimpMessageHeaderAccessor sha, KickDTO dto) {
         lobbyService.kickPlayer(lobbyId, getIdentity(sha), dto);
     }
+
+    @MessageMapping("/lobby/{lobbyId}/rematch")
+    public void rematch(@DestinationVariable String lobbyId,
+                        SimpMessageHeaderAccessor sha) {
+        lobbyService.rematch(lobbyId, getIdentity(sha));
+    }
 }

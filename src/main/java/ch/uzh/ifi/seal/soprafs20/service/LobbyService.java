@@ -184,6 +184,13 @@ public class LobbyService {
         }
     }
 
+    public void rematch(String lobbyId, String identity) {
+
+        if (webSocketService.checkSender(lobbyId, identity)) {
+            webSocketService.sendToPlayerInLobby(lobbyId, identity, "lobby-state", getLobbyState(lobbyId));
+        }
+    }
+
     public LobbyStateDTO getLobbyState(String lobbyId) {
         Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
 
