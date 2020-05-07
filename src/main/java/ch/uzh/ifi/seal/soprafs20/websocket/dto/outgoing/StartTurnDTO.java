@@ -4,8 +4,8 @@ public class StartTurnDTO extends TurnDTO {
 
     private int timebombRounds;
 
-    public StartTurnDTO(String currentPlayer, int time, int turn, int timebombRounds) {
-        super(currentPlayer, time, turn);
+    public StartTurnDTO(String currentPlayer, int timebombRounds) {
+        super(currentPlayer);
         this.timebombRounds = timebombRounds;
     }
 

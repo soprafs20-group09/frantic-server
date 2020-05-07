@@ -4,14 +4,8 @@ public class TurnDTO {
 
     private String currentPlayer;
 
-    private int time;
-
-    private int turn;
-
-    public TurnDTO(String currentPlayer, int time, int turn) {
+    public TurnDTO(String currentPlayer) {
         this.currentPlayer = currentPlayer;
-        this.time = time;
-        this.turn = turn;
     }
 
     public String getCurrentPlayer() {
@@ -20,21 +14,5 @@ public class TurnDTO {
 
     public void setCurrentPlayer(String currentPlayer) {
         this.currentPlayer = currentPlayer;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
-    }
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void setTurn(int turn) {
-        this.turn = turn;
     }
 }
