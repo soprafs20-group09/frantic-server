@@ -186,18 +186,28 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/hand", dto);
     }
 
-    public void sendStartTurn(String lobbyId, String currentPlayer, int time, int turn) {
-        sendStartTurn(lobbyId, currentPlayer, time, turn, 0);
+    public void sendStartTurn(String lobbyId, String currentPlayer) {
+        sendStartTurn(lobbyId, currentPlayer, 0);
     }
 
-    public void sendStartTurn(String lobbyId, String currentPlayer, int time, int turn, int timebombRounds) {
-        StartTurnDTO dto = new StartTurnDTO(currentPlayer, time, turn, timebombRounds);
+    public void sendStartTurn(String lobbyId, String currentPlayer, int timebombRounds) {
+        StartTurnDTO dto = new StartTurnDTO(currentPlayer, timebombRounds);
         webSocketService.sendToLobby(lobbyId, "/start-turn", dto);
     }
 
-    public void sendPlayableCards(String lobbyId, Player player, int[] playable) {
-        PlayableCardsDTO dto = new PlayableCardsDTO(playable);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable-cards", dto);
+    public void sendPlayable(String lobbyId, Player player, int[] cards, boolean canDraw, boolean canEnd) {
+        PlayableDTO dto = new PlayableDTO(cards, canDraw, canEnd);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/playable", dto);
+    }
+
+    public void sendTimer(String lobbyId, int seconds) {
+        TimerDTO dto = new TimerDTO(seconds);
+        webSocketService.sendToLobby(lobbyId, "/timer", dto);
+    }
+
+    public void sendAnimationSpeed(String lobbyId, int hand) {
+        AnimationSpeedDTO dto = new AnimationSpeedDTO(hand);
+        webSocketService.sendToLobby(lobbyId, "/animation-speed", dto);
     }
 
     public void sendDrawAnimation(String lobbyId, int amount) {
@@ -210,13 +220,8 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
     }
 
-    public void sendAttackWindow(String lobbyId, Player player, int[] playable, int time) {
-        AttackWindowDTO dto = new AttackWindowDTO(time, playable);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/attack-window", dto);
-    }
-
-    public void sendAttackTurn(String lobbyId, String currentPlayer, int time, int turn) {
-        AttackTurnDTO dto = new AttackTurnDTO(currentPlayer, time, turn);
+    public void sendAttackTurn(String lobbyId, String currentPlayer) {
+        AttackTurnDTO dto = new AttackTurnDTO(currentPlayer);
         webSocketService.sendToLobby(lobbyId, "/attack-turn", dto);
     }
 
