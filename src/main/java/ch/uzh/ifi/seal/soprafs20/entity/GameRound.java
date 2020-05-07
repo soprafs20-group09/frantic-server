@@ -675,6 +675,7 @@ public class GameRound {
     }
 
     public void onRoundOver() {
+        this.timer.cancel();
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
