@@ -1,5 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
@@ -35,14 +39,28 @@ public class TheAllSeeingEyeEventTest {
     }
 
     @Test
-    public void getNameTest() {
-        TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
-        assertEquals("the-all-seeing-eye", theAllSeeingEye.getName());
-    }
-
-    @Test
     public void getMessageTest() {
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
         assertEquals("You can't run! You can't hide! The all-seeing eye is here! Take a good look at everyone cards!", theAllSeeingEye.getMessage());
+    }
+
+    @Test
+    public void performEventTest() {
+        Mockito.doNothing().when(gameService).sendGameState(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+        Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
+
+        Player player1 = new Player();
+        this.listOfPlayers.add(player1);
+
+        TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
+        theAllSeeingEye.performEvent();
+
+        Mockito.verify(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
+    }
+
+    @Test
+    public void getNameTest() {
+        TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
+        assertEquals("the-all-seeing-eye", theAllSeeingEye.getName());
     }
 }

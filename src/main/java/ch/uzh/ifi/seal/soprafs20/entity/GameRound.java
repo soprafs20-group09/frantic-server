@@ -7,7 +7,6 @@ import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
 import ch.uzh.ifi.seal.soprafs20.entity.events.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.PlayableDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,12 +20,11 @@ public class GameRound {
     private Player currentPlayer;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
-    private int turnNumber;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
     private final HashMap<Player, Integer> bombMap;
     private final List<Event> events;
-    private Pile<Card> drawStack;
-    private Pile<Card> discardPile;
+    private final Pile<Card> drawStack;
+    private final Pile<Card> discardPile;
     private Action currentAction;
     private boolean isProcessing;
     private boolean turnIsRunning;
@@ -45,7 +43,6 @@ public class GameRound {
         this.gameService = GameService.getInstance();
         this.drawStack = new DrawStack();
         this.discardPile = new DiscardPile();
-        this.turnNumber = 0;
         this.timeBomb = false;
         this.bombMap = new HashMap<>();
         this.currentAction = null;
@@ -121,7 +118,6 @@ public class GameRound {
 
     private void startTurn() {
         this.turnIsRunning = true;
-        this.turnNumber += 1;
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), Collections.max(this.bombMap.values()));
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
         this.gameService.sendTimer(this.lobbyId, 30);

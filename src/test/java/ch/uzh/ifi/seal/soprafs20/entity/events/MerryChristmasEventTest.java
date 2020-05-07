@@ -40,6 +40,17 @@ public class MerryChristmasEventTest {
     }
 
     @Test
+    public void performEventTest() {
+        Mockito.doNothing().when(gameService).sendEventActionResponse(Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
+
+        MerryChristmasEvent merryChristmas = new MerryChristmasEvent(this.gameRound);
+        merryChristmas.performEvent();
+
+        Mockito.verify(gameService).sendEventActionResponse(Mockito.any(), Mockito.eq("merry-christmas"));
+    }
+
+    @Test
     public void getMessageTest() {
         MerryChristmasEvent merryChristmas = new MerryChristmasEvent(this.gameRound);
         assertEquals("Merry christmas everyone! It's that time of the year again. Give presents to your loved ones!", merryChristmas.getMessage());

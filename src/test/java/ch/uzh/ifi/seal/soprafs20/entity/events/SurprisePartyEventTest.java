@@ -40,6 +40,17 @@ public class SurprisePartyEventTest {
     }
 
     @Test
+    public void performEventTest() {
+        Mockito.doNothing().when(gameService).sendEventActionResponse(Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
+
+        SurprisePartyEvent surpriseParty = new SurprisePartyEvent(this.gameRound);
+        surpriseParty.performEvent();
+
+        Mockito.verify(gameService).sendEventActionResponse(Mockito.any(), Mockito.eq("surprise-party"));
+    }
+
+    @Test
     public void getMessageTest() {
         SurprisePartyEvent surpriseParty = new SurprisePartyEvent(this.gameRound);
         assertEquals("Surprise another player by gifting them one of your cards!", surpriseParty.getMessage());

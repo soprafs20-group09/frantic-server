@@ -31,7 +31,7 @@ public class MarketEvent implements Event {
     public void performEvent() {
         List<Card> cards = new ArrayList<>();
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
-            if (!this.drawStack.isEmpty()) {
+            if (this.drawStack.size() > 0) {
                 cards.add(this.drawStack.pop());
             }
             else {
