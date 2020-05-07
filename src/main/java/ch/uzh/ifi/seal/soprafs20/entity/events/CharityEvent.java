@@ -27,7 +27,6 @@ public class CharityEvent implements Event {
 
     public void performEvent() {
         List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:charity", this.getMessage()));
 
         int maxCards = 0;
         for (Player player : this.listOfPlayers) {

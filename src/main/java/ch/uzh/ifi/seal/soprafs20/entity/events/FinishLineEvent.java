@@ -39,9 +39,6 @@ public class FinishLineEvent implements Event {
                 playerWithMaxPoints = player;
             }
         }
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:finish-line", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.game.endGameRound(playerWithMaxPoints);
     }
 

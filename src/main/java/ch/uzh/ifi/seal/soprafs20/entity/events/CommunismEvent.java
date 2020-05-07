@@ -23,10 +23,6 @@ public class CommunismEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:communism", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-
         int maxCards = 0;
         for (Player player : this.listOfPlayers) {
             if (player.getHandSize() > maxCards) {

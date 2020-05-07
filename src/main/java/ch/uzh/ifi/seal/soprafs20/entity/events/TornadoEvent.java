@@ -45,10 +45,6 @@ public class TornadoEvent implements Event {
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
         this.gameRound.sendCompleteGameState();
 
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:tornado", this.getMessage()));
-
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.finishTurn();
     }
 

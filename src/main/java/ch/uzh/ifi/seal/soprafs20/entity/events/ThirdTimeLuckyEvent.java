@@ -23,10 +23,6 @@ public class ThirdTimeLuckyEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:third-time-lucky", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-
         for (Player player : this.listOfPlayers) {
             this.gameRound.drawCardFromStack(player, 3);
         }

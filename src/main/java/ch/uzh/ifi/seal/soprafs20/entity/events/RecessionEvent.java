@@ -31,19 +31,15 @@ public class RecessionEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:recession", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(this.currentPlayer);
         for (int i = 1; i <= numOfPlayers; i++) {
             Player player = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
-            this.gameService.sendRecession(this.gameRound.getLobbyId(), player, this.amount);
+            this.gameService.sendRecession(this.gameRound.getLobbyId(), player, Math.min(this.amount, player.getHandSize()));
             this.amount++;
         }
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-        this.gameRound.startEventTimer(seconds);
+        this.gameRound.startRecessionTimer(seconds);
     }
 
     public String getMessage() {

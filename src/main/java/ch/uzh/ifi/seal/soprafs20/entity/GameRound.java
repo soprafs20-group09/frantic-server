@@ -464,6 +464,8 @@ public class GameRound {
 
     private void performEvent() {
         Event event = this.events.remove(0);
+        Chat chat = new Chat("event", "event:" + event.getName(), event.getMessage());
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         event.performEvent();
     }
 

@@ -22,10 +22,6 @@ public class FridayTheThirteenthEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:friday-the-13th", this.getMessage()));
-
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.finishTurn();
     }
 

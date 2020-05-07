@@ -24,10 +24,6 @@ public class TimeBombEvent implements Event {
 
     public void performEvent() {
         gameRound.setTimeBomb();
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:time-bomb", this.getMessage()));
-
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }

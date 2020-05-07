@@ -22,9 +22,7 @@ public class MarketEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:market", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+
     }
 
     public String getMessage() {

@@ -22,10 +22,7 @@ public class MerryChristmasEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:merry-christmas", this.getMessage()));
 
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
     }
 
     public String getMessage() {

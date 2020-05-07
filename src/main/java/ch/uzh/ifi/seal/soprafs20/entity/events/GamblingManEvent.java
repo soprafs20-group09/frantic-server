@@ -22,9 +22,7 @@ public class GamblingManEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:gambling-man", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+
     }
 
     public String getMessage() {

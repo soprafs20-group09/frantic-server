@@ -23,10 +23,6 @@ public class MexicanStandoffEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:mexican-standoff", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
         for (Player player : this.listOfPlayers) {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {

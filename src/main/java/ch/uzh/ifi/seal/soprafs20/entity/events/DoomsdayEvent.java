@@ -33,9 +33,6 @@ public class DoomsdayEvent implements Event {
         for (Player player : listOfPlayers) {
             player.setPoints(player.getPoints() + 50);
         }
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:doomsday", this.getMessage()));
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
 
         this.game.endGameRound(currentPlayer);
     }

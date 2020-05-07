@@ -29,7 +29,6 @@ public class MatingSeasonEvent implements Event {
 
     public void performEvent() {
         List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:mating-season", this.getMessage()));
 
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(this.initiator);

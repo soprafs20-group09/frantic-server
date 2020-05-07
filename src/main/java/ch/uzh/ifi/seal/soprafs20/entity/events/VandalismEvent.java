@@ -26,7 +26,6 @@ public class VandalismEvent implements Event {
     }
 
     public void performEvent() {
-
         int index = 1;
         Card relevant = this.discardPile.peekN(index);
         while (relevant.getColor().equals(Color.BLACK) || relevant.getColor().equals(Color.MULTICOLOR)) {
@@ -40,10 +39,7 @@ public class VandalismEvent implements Event {
                 }
             }
         }
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:vandalism", this.getMessage()));
 
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }

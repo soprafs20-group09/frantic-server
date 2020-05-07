@@ -25,9 +25,6 @@ public class ExpansionEvent implements Event {
     }
 
     public void performEvent() {
-        List<Chat> chat = new ArrayList<>();
-        chat.add(new Chat("event", "event:expansion", this.getMessage()));
-
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 
@@ -36,7 +33,6 @@ public class ExpansionEvent implements Event {
             this.gameRound.drawCardFromStack(playerOfInterest, i);
         }
 
-        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }
