@@ -284,7 +284,7 @@ public class GameServiceTest {
 
         gameService.sendPlayable("testLobbyId", player, playable, false, false);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/playable-cards"), Mockito.any());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/playable"), Mockito.any());
     }
 
     @Test
