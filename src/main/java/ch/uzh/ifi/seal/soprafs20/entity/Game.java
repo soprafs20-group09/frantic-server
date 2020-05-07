@@ -72,7 +72,7 @@ public class Game {
         }
     }
 
-    public Map<String, Integer> getScores() {
+    private Map<String, Integer> getScores() {
         Map<String, Integer> mappedPlayers = new HashMap<>();
         for (Player player : this.listOfPlayers) {
             int points = player.getPoints();

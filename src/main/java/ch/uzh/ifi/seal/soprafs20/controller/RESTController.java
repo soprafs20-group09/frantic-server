@@ -52,16 +52,6 @@ public class RESTController {
         return response;
     }
 
-    @GetMapping("/lobbies/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public List<PlayerScoreDTO> getAllPlayerScores(@PathVariable String id) {
-
-        log.debug("GET /lobbies/{}", id);
-
-        return lobbyService.getScores(id);
-    }
-
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody

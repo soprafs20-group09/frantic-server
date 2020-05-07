@@ -65,24 +65,6 @@ public class LobbyService {
         return allLobbies;
     }
 
-    public List<PlayerScoreDTO> getScores(String lobbyId) {
-        Game game = GameRepository.findByLobbyId(lobbyId);
-        if (game != null) {
-            List<PlayerScoreDTO> response = new ArrayList<>();
-            Map<String, Integer> scores = game.getScores();
-            for (Map.Entry<String, Integer> entry : scores.entrySet()) {
-                PlayerScoreDTO dto = new PlayerScoreDTO();
-                dto.setUsername(entry.getKey());
-                dto.setScore(entry.getValue());
-                response.add(dto);
-            }
-            return response;
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found.");
-        }
-    }
-
     public synchronized String createLobby(Player creator) {
 
         String lobbyName = creator.getUsername() + "'s lobby";
