@@ -28,21 +28,13 @@ public class TheAllSeeingEyeEvent implements Event {
     public void performEvent() {
 
         this.gameRound.setShowCards(true);
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                gameRound.setShowCards(false);
-            }
-        };
-        timer.schedule(timerTask, seconds * 1000L);
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
 
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:the-all-seeing-eye", this.getMessage()));
 
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-        this.gameRound.sendCompleteGameState();
-        this.gameRound.finishTurn();
+        this.gameRound.startEventTimer(seconds);
     }
 
     public String getMessage() {

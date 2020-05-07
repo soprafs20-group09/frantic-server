@@ -5,6 +5,8 @@ import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class RecessionEvent implements Event {
 
@@ -13,6 +15,7 @@ public class RecessionEvent implements Event {
     private final List<Player> listOfPlayers;
     private final Player currentPlayer;
     private int amount;
+    private final int seconds;
 
     public RecessionEvent(GameRound gameRound) {
         this.gameRound = gameRound;
@@ -20,6 +23,7 @@ public class RecessionEvent implements Event {
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.currentPlayer = gameRound.getCurrentPlayer();
         this.amount = 1;
+        this.seconds = 30;
     }
 
     public String getName() {
@@ -36,14 +40,10 @@ public class RecessionEvent implements Event {
         for (int i = 1; i <= numOfPlayers; i++) {
             Player player = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
             this.gameService.sendRecession(this.gameRound.getLobbyId(), player, this.amount);
-            if (amount == 1) {
-                chat.add(new Chat("event", "event:recession", player.getUsername() + " discards " + amount + " card."));
-            }
-            else {
-                chat.add(new Chat("event", "event:recession", player.getUsername() + " discards " + amount + " cards."));
-            }
-            amount++;
+            this.amount++;
         }
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+        this.gameRound.startEventTimer(seconds);
     }
 
     public String getMessage() {
