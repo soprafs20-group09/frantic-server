@@ -517,6 +517,41 @@ public class GameRound {
         finishTurn();
     }
 
+    public void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null) {
+            this.eventResponses++;
+            for (Map.Entry<String, Integer[]> entry : targets.entrySet()) {
+                Player target = getPlayerByUsername(entry.getKey());
+                List<Card> cards = new ArrayList<>();
+                for (int i = 0; i < entry.getValue().length; i++) {
+                    cards.add(player.peekCard(entry.getValue()[i]));
+                }
+                this.eventMap.put(target, cards);
+            }
+            player.clearHand();
+        }
+        if (this.eventResponses == this.listOfPlayers.size()) {
+            performMerryChristmas();
+        }
+    }
+
+    public void performMerryChristmas() {
+        timer.cancel();
+        this.gameService.sendAnimationSpeed(this.lobbyId, 0);
+        sendCompleteGameState();
+        for (Map.Entry<Player, List<Card>> entry : this.eventMap.entrySet()) {
+            for (Card card : entry.getValue()) {
+                entry.getKey().pushCardToHand(card);
+            }
+        }
+        this.gameService.sendAnimationSpeed(this.lobbyId, 500);
+        sendCompleteGameState();
+        this.eventResponses = 0;
+        this.eventMap = new HashMap<>();
+        finishTurn();
+    }
+
     private int[] getPlayableCards(Player player) {
         return player.getPlayableCards(getRelevantCardOnDiscardPile());
     }
@@ -711,6 +746,18 @@ public class GameRound {
             @Override
             public void run() {
                 performSurpriseParty();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startMerryChristmasTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                performMerryChristmas();
             }
         };
         this.timer.schedule(timerTask, milliseconds);

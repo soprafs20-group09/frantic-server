@@ -131,7 +131,7 @@ public class GameService {
     public void merryChristmas(String lobbyId, String identity, MerryChristmasDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            //game.getCurrentGameRound().merryChristmas(identity, dto.getTargets());
+            game.getCurrentGameRound().prepareMerryChristmas(identity, dto.getTargets());
         }
     }
 
@@ -218,6 +218,11 @@ public class GameService {
     public void sendActionResponse(String lobbyId, Player player, Card card) {
         ActionResponseDTO dto = new ActionResponseDTO(FranticUtils.getStringRepresentation(card.getValue()));
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/action-response", dto);
+    }
+
+    public void sendEventActionResponse(String lobbyId, String event) {
+        ActionResponseDTO dto = new ActionResponseDTO(event);
+        webSocketService.sendToLobby(lobbyId, "/action-response", dto);
     }
 
     public void sendAttackTurn(String lobbyId, String currentPlayer) {

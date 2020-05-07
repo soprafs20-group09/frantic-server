@@ -11,10 +11,12 @@ public class MerryChristmasEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
+    private final int seconds;
 
     public MerryChristmasEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
+        this.seconds = 30;
     }
 
     public String getName() {
@@ -22,7 +24,9 @@ public class MerryChristmasEvent implements Event {
     }
 
     public void performEvent() {
-
+        this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+        this.gameRound.startMerryChristmasTimer(seconds);
     }
 
     public String getMessage() {
