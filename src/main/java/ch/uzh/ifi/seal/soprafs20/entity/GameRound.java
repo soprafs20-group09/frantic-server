@@ -32,7 +32,7 @@ public class GameRound {
     private boolean attackState;
     private boolean showCards;
     private int eventResponses;
-    private Map<Player, Card> surpriseParty;
+    private Map<Player, List<Card>> eventMap;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -52,7 +52,7 @@ public class GameRound {
         this.attackState = false;
         this.showCards = false;
         this.eventResponses = 0;
-        this.surpriseParty = new HashMap<>();
+        this.eventMap = new HashMap<>();
     }
 
     //creates Piles & player hands
@@ -500,7 +500,7 @@ public class GameRound {
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
             this.eventResponses++;
-            this.surpriseParty.put(target, player.popCard(card));
+            this.eventMap.put(target, Collections.singletonList(player.popCard(card)));
         }
         if (this.eventResponses == this.listOfPlayers.size()) {
             performSurpriseParty();
@@ -509,10 +509,11 @@ public class GameRound {
 
     public void performSurpriseParty() {
         timer.cancel();
-        for (Map.Entry<Player, Card> entry : this.surpriseParty.entrySet()) {
-            entry.getKey().pushCardToHand(entry.getValue());
+        for (Map.Entry<Player, List<Card>> entry : this.eventMap.entrySet()) {
+            entry.getKey().pushCardToHand(entry.getValue().get(0));
         }
         this.eventResponses = 0;
+        this.eventMap = new HashMap<>();
         finishTurn();
     }
 
