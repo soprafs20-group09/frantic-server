@@ -31,6 +31,7 @@ public class GameRound {
     private boolean turnIsRunning;
     private boolean attackState;
     private boolean showCards;
+    private int eventResponses;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -47,6 +48,7 @@ public class GameRound {
         this.turnIsRunning = false;
         this.attackState = false;
         this.showCards = false;
+        this.eventResponses = 0;
     }
 
     //creates Piles & player hands
@@ -65,6 +67,10 @@ public class GameRound {
 
         //move initial card to discardPile
         this.discardPile.push(this.drawStack.pop());
+
+        for (Player player : this.listOfPlayers) {
+            this.bombMap.put(player, 0);
+        }
     }
 
     public void sendCompleteGameState() {
@@ -74,7 +80,7 @@ public class GameRound {
         sendGameState();
     }
 
-    private void sendGameState() {
+    public void sendGameState() {
         this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
     }
 
@@ -109,8 +115,9 @@ public class GameRound {
     private void startTurn() {
         this.turnIsRunning = true;
         this.turnNumber += 1;
-        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 30, turnNumber);
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), Collections.max(this.bombMap.values()));
+        this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
+        this.gameService.sendTimer(this.lobbyId, 30);
         startTurnTimer(30);
     }
 
@@ -123,13 +130,16 @@ public class GameRound {
     }
 
     public void finishTurn() {
+        if (this.showCards) {
+            setShowCards(false);
+        }
         this.turnIsRunning = false;
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
         this.timer.cancel();
         //return empty playable cards after turn finished
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
+        this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         prepareNewTurn();
     }
 
@@ -137,7 +147,7 @@ public class GameRound {
         this.hasCurrentPlayerMadeMove = false;
         this.gameService.sendHand(this.lobbyId, this.currentPlayer);
         sendGameState();
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, this.getPlayableCards(this.currentPlayer));
+        this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
     }
 
     public void playCard(String identity, int index) {
@@ -180,6 +190,7 @@ public class GameRound {
                             }
                             else {
                                 sendGameState();
+                                this.gameService.sendTimer(this.lobbyId, 30);
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                             }
                         }
@@ -202,7 +213,7 @@ public class GameRound {
                     this.timer.cancel();
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
-                    this.gameService.sendPlayableCards(this.lobbyId, counterAttacker, new int[0]);
+                    this.gameService.sendPlayable(this.lobbyId, counterAttacker, new int[0], false, false);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
@@ -210,7 +221,7 @@ public class GameRound {
                     sendGameState();
 
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-                    this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername(), 30, this.turnNumber++);
+                    this.gameService.sendTimer(this.lobbyId, 30);
                     startCounterAttackTimer(30);
                     break;
                 }
@@ -222,7 +233,7 @@ public class GameRound {
         this.timer.cancel();
         Card cardToPlay = niceTryPlayer.popCard(index);
         this.discardPile.push(cardToPlay);
-        this.gameService.sendPlayableCards(this.lobbyId, niceTryPlayer, new int[0]);
+        this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
         this.gameService.sendHand(this.lobbyId, niceTryPlayer);
         Chat chat = new Chat("event", "avatar:" + niceTryPlayer.getUsername(),
                 niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
@@ -236,7 +247,7 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
-        this.gameService.sendAttackTurn(this.lobbyId, niceTryPlayer.getUsername(), 30, this.turnNumber++);
+        this.gameService.sendTimer(this.lobbyId, 30);
         startInterTurnTimer(30);
     }
 
@@ -246,7 +257,7 @@ public class GameRound {
         if (player != null && player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
             sendGameState();
-            this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer));
+            this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), false, true);
             this.hasCurrentPlayerMadeMove = true;
         }
     }
@@ -401,7 +412,7 @@ public class GameRound {
     }
 
     private void prepareCounterAttack(String attackType) {
-        this.gameService.sendPlayableCards(this.lobbyId, this.currentPlayer, new int[0]);
+        this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         List<Player> targets = new ArrayList<>();
         Collections.addAll(targets, this.currentAction.getTargets());
         List<String> targetUsernames = targets.stream().map(Player::getUsername).collect(Collectors.toList());
@@ -416,15 +427,13 @@ public class GameRound {
         for (Player player : this.listOfPlayers) {
             if (targets.contains(player)) {
                 int[] cards = player.hasCounterAttack();
-                this.gameService.sendAttackWindow(this.lobbyId, player, cards, 6);
+                this.gameService.sendPlayable(this.lobbyId, player, cards, false, false);
 
                 this.gameService.sendOverlay(this.lobbyId, player, "special:" + attackType, attackType,
                         "You are being attacked by " + attacker, 2);
             }
-            else {
-                this.gameService.sendAttackWindow(this.lobbyId, player, new int[0], 6);
-            }
         }
+        this.gameService.sendTimer(this.lobbyId, 6);
 
         this.attackState = true;
         startCounterAttackTimer(6);
@@ -433,16 +442,18 @@ public class GameRound {
     private void prepareNiceTry() {
         for (Player player : this.listOfPlayers) {
             int[] card = player.hasNiceTry();
-            this.gameService.sendAttackWindow(this.lobbyId, player, card, 5);
+            this.gameService.sendPlayable(this.lobbyId, player, card, false, false);
         }
+        this.gameService.sendTimer(this.lobbyId, 5);
         startNiceTryTimer(5);
     }
 
     private void prepareEvent() {
         this.timer.cancel();
+        this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         sendGameState();
         try {
-            wait(1000);
+            Thread.sleep(1000);
         }
         catch (InterruptedException ignored) {
         }
@@ -458,10 +469,24 @@ public class GameRound {
 
     public void performRecession(String identity, int[] cards) {
         Player player = getPlayerByIdentity(identity);
-        if (player != null) {
+        if (player != null && cards.length > 0) {
+            this.eventResponses++;
             for (int i = cards.length - 1; i >= 0; i--) {
-                this.discardPile.push(player.popCard(cards[i]));
+                player.popCard(cards[i]);
             }
+            Chat chat;
+            if (cards.length == 1) {
+                chat = new Chat("event", "event:recession", player.getUsername() + " discards 1 card.");
+            }
+            else {
+                chat = new Chat("event", "event:recession", player.getUsername() + " discards " + cards.length + " cards.");
+            }
+            this.gameService.sendChatMessage(this.lobbyId, chat);
+            sendCompleteGameState();
+        }
+        if (this.eventResponses == this.listOfPlayers.size()) {
+            this.timer.cancel();
+            finishTurn();
         }
     }
 
@@ -480,9 +505,6 @@ public class GameRound {
 
     public void setTimeBomb() {
         this.timeBomb = true;
-        for (Player player : this.listOfPlayers) {
-            this.bombMap.put(player, 0);
-        }
     }
 
     private void changePlayer() {
@@ -625,6 +647,18 @@ public class GameRound {
             @Override
             public void run() {
                 performEvent();
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startEventTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                finishTurn();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
