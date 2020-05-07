@@ -33,6 +33,8 @@ public class TornadoEvent implements Event {
             }
         }
         Collections.shuffle(this.tornadoList);
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
+        this.gameRound.sendCompleteGameState();
 
         // redistribute cards
         int i = 0;
@@ -40,11 +42,13 @@ public class TornadoEvent implements Event {
             this.listOfPlayers.get(i).pushCardToHand(this.tornadoList.remove(0));
             i = ++i % this.listOfPlayers.size();
         }
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
+        this.gameRound.sendCompleteGameState();
+
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("event", "event:tornado", this.getMessage()));
 
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
-        this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }
 
