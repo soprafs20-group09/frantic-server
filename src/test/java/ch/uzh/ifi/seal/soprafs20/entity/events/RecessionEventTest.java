@@ -55,6 +55,6 @@ public class RecessionEventTest {
     @Test
     public void getMessageTest() {
         Event recession = new RecessionEvent("abc", player1, listOfPlayers, gameService);
-        assertEquals("One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!", recession.getMessage());
+        assertEquals("Card Stocks are going down! Dispose one or two or three ...", recession.getMessage());
     }
 }

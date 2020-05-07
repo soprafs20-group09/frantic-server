@@ -45,7 +45,6 @@ public class ExpansionEvent implements Event {
         return chat;
     }
 
-    //TODO: make it dynamic
     public String getMessage() {
         return "Cards are selling like hot cakes! Grab one or two or three ...";
     }
