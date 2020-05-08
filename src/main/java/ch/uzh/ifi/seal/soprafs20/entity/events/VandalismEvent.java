@@ -30,7 +30,7 @@ public class VandalismEvent implements Event {
         Card relevant = this.discardPile.peekN(index);
         while (relevant.getColor().equals(Color.BLACK) || relevant.getColor().equals(Color.MULTICOLOR)) {
             if (this.discardPile.size() > index) {
-                relevant = this.discardPile.peekN(index++);
+                relevant = this.discardPile.peekN(++index);
             }
             else {
                 this.gameRound.finishTurn();

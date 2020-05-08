@@ -63,10 +63,10 @@ public class RobinHoodEvent implements Event {
             this.gameRound.sendCompleteGameState();
 
             for (int i = 0; i < minCards; i++) {
-                maxCardsPlayer.pushCardToHand(minTemp.get(0));
+                maxCardsPlayer.pushCardToHand(minTemp.get(i));
             }
             for (int i = 0; i < maxCards; i++) {
-                minCardsPlayer.pushCardToHand(maxTemp.get(0));
+                minCardsPlayer.pushCardToHand(maxTemp.get(i));
             }
         }
         Chat chat = new Chat("event", "event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped all cards");

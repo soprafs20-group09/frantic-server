@@ -34,7 +34,7 @@ public class GamblingManEvent implements Event {
         Color relevant = this.discardPile.peekN(index).getColor();
         while (relevant.equals(Color.BLACK) || relevant.equals(Color.MULTICOLOR) || relevant.equals(Color.NONE)) {
             if (this.discardPile.size() > index) {
-                relevant = this.discardPile.peekN(index++).getColor();
+                relevant = this.discardPile.peekN(++index).getColor();
             }
             else {
                 this.gameRound.finishTurn();
