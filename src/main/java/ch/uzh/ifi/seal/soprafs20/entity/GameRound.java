@@ -120,7 +120,11 @@ public class GameRound {
 
     private void startTurn() {
         this.turnIsRunning = true;
-        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), Collections.max(this.bombMap.values()));
+        int timeBomb = Collections.max(this.bombMap.values());
+        if (timeBomb > 0) {
+            timeBomb = - timeBomb + 4;
+        }
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBomb);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
         this.gameService.sendTimer(this.lobbyId, 30);
         startTurnTimer(30);
@@ -197,6 +201,7 @@ public class GameRound {
                                 sendGameState();
                                 this.gameService.sendTimer(this.lobbyId, 30);
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                                startTurnTimer(30);
                             }
                         }
                     }
@@ -960,16 +965,16 @@ public class GameRound {
         this.events.add(new DoomsdayEvent(this.game, this));
         this.events.add(new EarthquakeEvent(this));
         this.events.add(new ExpansionEvent(this));
-        //this.events.add(new FinishLineEvent(game, this));
+        this.events.add(new FinishLineEvent(game, this));
         this.events.add(new FridayTheThirteenthEvent(this));
-        //this.events.add(new GamblingManEvent(this));
-        //this.events.add(new MarketEvent(this));
-        //this.events.add(new MerryChristmasEvent(this));
+        this.events.add(new GamblingManEvent(this));
+        this.events.add(new MarketEvent(this));
+        this.events.add(new MerryChristmasEvent(this));
         this.events.add(new MatingSeasonEvent(this));
         this.events.add(new MexicanStandoffEvent(this));
         this.events.add(new RecessionEvent(this));
         this.events.add(new RobinHoodEvent(this));
-        //this.events.add(new SurprisePartyEvent(this));
+        this.events.add(new SurprisePartyEvent(this));
         this.events.add(new TheAllSeeingEyeEvent(this));
         this.events.add(new ThirdTimeLuckyEvent(this));
         this.events.add(new TimeBombEvent(this));
