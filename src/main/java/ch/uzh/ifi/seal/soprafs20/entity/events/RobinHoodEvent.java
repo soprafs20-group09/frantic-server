@@ -47,24 +47,32 @@ public class RobinHoodEvent implements Event {
         }
 
         if (!minCardsPlayer.equals(maxCardsPlayer)) {
-            List<Card> temp = new ArrayList<>();
+            List<Card> maxTemp = new ArrayList<>();
+            List<Card> minTemp = new ArrayList<>();
             int maxCards = maxCardsPlayer.getHandSize();
             int minCards = minCardsPlayer.getHandSize();
 
             for (int i = 0; i < maxCards; i++) {
-                temp.add(maxCardsPlayer.popCard());
+                maxTemp.add(maxCardsPlayer.popCard());
             }
             for (int i = 0; i < minCards; i++) {
-                maxCardsPlayer.pushCardToHand(minCardsPlayer.popCard());
+                minTemp.add(minCardsPlayer.popCard());
             }
-            int tempSize = temp.size();
-            for (int i = 0; i < tempSize; i++) {
-                minCardsPlayer.pushCardToHand(temp.remove(0));
+
+            this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
+            this.gameRound.sendCompleteGameState();
+
+            for (int i = 0; i < minCards; i++) {
+                maxCardsPlayer.pushCardToHand(minTemp.get(0));
+            }
+            for (int i = 0; i < maxCards; i++) {
+                minCardsPlayer.pushCardToHand(maxTemp.get(0));
             }
         }
         Chat chat = new Chat("event", "event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped all cards");
-
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
+
+        this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }
