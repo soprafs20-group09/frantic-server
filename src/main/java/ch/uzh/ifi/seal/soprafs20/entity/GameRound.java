@@ -30,9 +30,10 @@ public class GameRound {
     private boolean turnIsRunning;
     private boolean attackState;
     private boolean showCards;
-    private int eventResponses;
-    private Map<Player, Card> eventMap;
+    private List<Player> eventResponses;
+    private Map<Player, Card> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
+    private Map<Player, Integer> gamblingManMap;
     private List<Card> marketList;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
@@ -51,9 +52,10 @@ public class GameRound {
         this.turnIsRunning = false;
         this.attackState = false;
         this.showCards = false;
-        this.eventResponses = 0;
-        this.eventMap = new HashMap<>();
+        this.eventResponses = new ArrayList<>();
+        this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
+        this.gamblingManMap = new HashMap<>();
         this.marketList = new ArrayList<>();
     }
 
@@ -475,7 +477,7 @@ public class GameRound {
     public void performRecession(String identity, int[] cards) {
         Player player = getPlayerByIdentity(identity);
         if (player != null && cards.length > 0) {
-            this.eventResponses++;
+            this.eventResponses.add(player);
             for (int i = cards.length - 1; i >= 0; i--) {
                 player.popCard(cards[i]);
             }
@@ -489,10 +491,10 @@ public class GameRound {
             this.gameService.sendChatMessage(this.lobbyId, chat);
             sendCompleteGameState();
         }
-        if (this.eventResponses == this.listOfPlayers.size()) {
+        if (this.eventResponses.size() == this.listOfPlayers.size()) {
             this.timer.cancel();
             finishTurn();
-            this.eventResponses = 0;
+            this.eventResponses = new ArrayList<>();
         }
     }
 
@@ -500,28 +502,29 @@ public class GameRound {
         Player player = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
-            this.eventResponses++;
-            this.eventMap.put(target, player.popCard(card));
+            this.eventResponses.add(player);
+            this.surprisePartyMap.put(target, player.popCard(card));
         }
-        if (this.eventResponses == this.listOfPlayers.size()) {
+        if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performSurpriseParty();
         }
     }
 
     private void performSurpriseParty() {
         timer.cancel();
-        for (Map.Entry<Player, Card> entry : this.eventMap.entrySet()) {
+        for (Map.Entry<Player, Card> entry : this.surprisePartyMap.entrySet()) {
             entry.getKey().pushCardToHand(entry.getValue());
         }
-        this.eventResponses = 0;
-        this.eventMap = new HashMap<>();
+        sendCompleteGameState();
+        this.eventResponses = new ArrayList<>();
+        this.surprisePartyMap = new HashMap<>();
         finishTurn();
     }
 
     public void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
-            this.eventResponses++;
+            this.eventResponses.add(player);
             for (Map.Entry<String, Integer[]> entry : targets.entrySet()) {
                 Player target = getPlayerByUsername(entry.getKey());
                 List<Card> cards = new ArrayList<>();
@@ -532,7 +535,7 @@ public class GameRound {
             }
             player.clearHand();
         }
-        if (this.eventResponses == this.listOfPlayers.size()) {
+        if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performMerryChristmas();
         }
     }
@@ -548,7 +551,7 @@ public class GameRound {
         }
         this.gameService.sendAnimationSpeed(this.lobbyId, 500);
         sendCompleteGameState();
-        this.eventResponses = 0;
+        this.eventResponses = new ArrayList<>();
         this.christmasMap = new HashMap<>();
         finishTurn();
     }
@@ -586,10 +589,10 @@ public class GameRound {
     public void prepareGamblingMan(String identity, int card) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
-            this.eventResponses++;
-            this.eventMap.put(player, player.popCard(card));
+            this.eventResponses.add(player);
+            this.gamblingManMap.put(player, card);
         }
-        if (this.eventResponses == this.listOfPlayers.size()) {
+        if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performGamblingMan();
         }
     }
@@ -597,11 +600,14 @@ public class GameRound {
     private void performGamblingMan() {
         Value max = Value.ONE;
         List<Player> highest = new ArrayList<>();
-        for (Map.Entry<Player, Card> entry : this.eventMap.entrySet()) {
-            Card card = entry.getValue();
-            if (card.getValue().ordinal() > max.ordinal()) {
-                max = card.getValue();
-                highest.add(entry.getKey());
+        for (Player player : this.listOfPlayers) {
+            if (this.gamblingManMap.containsKey(player)) {
+                Integer cardIndex = this.gamblingManMap.get(player);
+                Card card = player.peekCard(cardIndex);
+                if (card.getValue().ordinal() > max.ordinal()) {
+                    max = card.getValue();
+                    highest.add(player);
+                }
             }
         }
         Player loser;
@@ -611,14 +617,17 @@ public class GameRound {
         else {
             loser = highest.get(0);
         }
-        Chat chat = new Chat("event", "event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.eventMap.size() + "cards.");
+        Chat chat = new Chat("event", "event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.gamblingManMap.size() + " cards.");
         this.gameService.sendChatMessage(this.lobbyId, chat);
-        for (Card card : this.eventMap.values()) {
-            loser.pushCardToHand(card);
+        for (Map.Entry<Player, Integer> entry : this.gamblingManMap.entrySet()) {
+            if (!entry.getKey().equals(loser)) {
+                loser.pushCardToHand(entry.getKey().popCard(entry.getValue()));
+            }
         }
+
         sendCompleteGameState();
-        this.eventResponses = 0;
-        this.eventMap = new HashMap<>();
+        this.eventResponses = new ArrayList<>();
+        this.surprisePartyMap = new HashMap<>();
         finishTurn();
     }
 
@@ -633,6 +642,22 @@ public class GameRound {
             mappedPlayers.put(player, handSize);
         }
         return mappedPlayers;
+    }
+
+    public void addEventResponses(Player player) {
+        this.eventResponses.add(player);
+    }
+
+    public int getEventResponsesSize() {
+        return this.eventResponses.size();
+    }
+
+    public void clearEventResponses() {
+        this.eventResponses = new ArrayList<>();
+    }
+
+    public void setGamblingManMap(Player player, int card) {
+        this.gamblingManMap.put(player, card);
     }
 
     public void setMarketList(List<Card> cards) {
@@ -807,7 +832,7 @@ public class GameRound {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                eventResponses = 0;
+                eventResponses = new ArrayList<>();
                 finishTurn();
             }
         };
@@ -845,6 +870,18 @@ public class GameRound {
             @Override
             public void run() {
                 prepareRandomMarket(player);
+            }
+        };
+        this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void startGamblingManTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                performGamblingMan();
             }
         };
         this.timer.schedule(timerTask, milliseconds);
