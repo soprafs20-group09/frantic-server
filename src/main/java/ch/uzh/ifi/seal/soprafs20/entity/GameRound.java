@@ -199,6 +199,7 @@ public class GameRound {
                             }
                             else {
                                 sendGameState();
+                                this.timer.cancel();
                                 this.gameService.sendTimer(this.lobbyId, 30);
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                                 startTurnTimer(30);
