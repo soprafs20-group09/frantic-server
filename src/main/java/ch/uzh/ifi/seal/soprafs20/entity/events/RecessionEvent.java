@@ -43,6 +43,6 @@ public class RecessionEvent implements Event {
     }
 
     public String getMessage() {
-        return "One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!";
+        return "Card Stocks are going down! Dispose one or two or three ...";
     }
 }

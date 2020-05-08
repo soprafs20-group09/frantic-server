@@ -43,7 +43,7 @@ public class ExpansionEventTest {
     @Test
     public void getMessageTest() {
         ExpansionEvent expansion = new ExpansionEvent(this.gameRound);
-        assertEquals("One, Two, Three, ... Since you are the 3rd to draw, you have to draw 3 cards!", expansion.getMessage());
+        assertEquals("Cards are selling like hot cakes! Grab one or two or three ...", expansion.getMessage());
     }
 
     @Test

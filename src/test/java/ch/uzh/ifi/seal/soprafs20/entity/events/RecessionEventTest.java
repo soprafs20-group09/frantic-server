@@ -45,7 +45,7 @@ public class RecessionEventTest {
     @Test
     public void getMessageTest() {
         Event recession = new RecessionEvent(this.gameRound);
-        assertEquals("One, two, three, ... Since you are the 3rd to discard, you can discard 3 cards!", recession.getMessage());
+        assertEquals("Card Stocks are going down! Dispose one or two or three ...", recession.getMessage());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class RecessionEventTest {
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 1));
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 2));
         this.listOfPlayers.add(player1);
-        
+
         Player player2 = new Player();
         player2.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 3));
         player2.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 4));
@@ -68,9 +68,9 @@ public class RecessionEventTest {
         Mockito.when(this.gameRound.getCurrentPlayer()).thenReturn(player1);
         Event recession = new RecessionEvent(this.gameRound);
         recession.performEvent();
-
         Mockito.verify(gameService, Mockito.times(1)).sendRecession("abc", player1, 2);
         Mockito.verify(gameService, Mockito.times(1)).sendRecession("abc", player2, 1);
         Mockito.verify(gameService, Mockito.times(1)).sendRecession("abc", player3, 1);
     }
+
 }
