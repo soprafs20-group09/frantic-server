@@ -45,7 +45,7 @@ public class EarthquakeEventTest {
     @Test
     public void getMessageTest() {
         EarthquakeEvent earthquake = new EarthquakeEvent(this.gameRound);
-        assertEquals("Oh no! Everything is shaken up! Good luck with your new cards!", earthquake.getMessage());
+        assertEquals("Oh no! Everything is shaken up! Good luck with the cards of your neighbor!", earthquake.getMessage());
     }
 
     @Test

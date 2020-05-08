@@ -58,6 +58,6 @@ public class EarthquakeEvent implements Event {
     }
 
     public String getMessage() {
-        return "Oh no! Everything is shaken up! Good luck with your new cards!";
+        return "Oh no! Everything is shaken up! Good luck with the cards of your neighbor!";
     }
 }
