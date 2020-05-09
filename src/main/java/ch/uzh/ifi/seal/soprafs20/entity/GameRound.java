@@ -31,7 +31,8 @@ public class GameRound {
     private boolean attackState;
     private boolean showCards;
     private List<Player> eventResponses;
-    private Map<Player, Card> surprisePartyMap;
+    private List<Chat> eventLogs;
+    private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
     private Map<Player, Integer> gamblingManMap;
     private List<Card> marketList;
@@ -53,6 +54,7 @@ public class GameRound {
         this.attackState = false;
         this.showCards = false;
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
         this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
         this.gamblingManMap = new HashMap<>();
@@ -122,7 +124,7 @@ public class GameRound {
         this.turnIsRunning = true;
         int timeBomb = Collections.max(this.bombMap.values());
         if (timeBomb > 0) {
-            timeBomb = - timeBomb + 4;
+            timeBomb = -timeBomb + 4;
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBomb);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
@@ -509,7 +511,8 @@ public class GameRound {
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
             this.eventResponses.add(player);
-            this.surprisePartyMap.put(target, player.popCard(card));
+            this.surprisePartyMap.put(player.popCard(card), target);
+            this.eventLogs.add(new Chat("event", "event:surprise-party", player.getUsername() + " gave " + target.getUsername() + " a card."));
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performSurpriseParty();
@@ -518,11 +521,13 @@ public class GameRound {
 
     private void performSurpriseParty() {
         timer.cancel();
-        for (Map.Entry<Player, Card> entry : this.surprisePartyMap.entrySet()) {
-            entry.getKey().pushCardToHand(entry.getValue());
+        for (Map.Entry<Card, Player> entry : this.surprisePartyMap.entrySet()) {
+            entry.getValue().pushCardToHand(entry.getKey());
         }
+        this.gameService.sendChatMessage(this.lobbyId, this.eventLogs);
         sendCompleteGameState();
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
         this.surprisePartyMap = new HashMap<>();
         finishTurn();
     }
@@ -981,7 +986,7 @@ public class GameRound {
         this.events.add(new TimeBombEvent(this));
         this.events.add(new TornadoEvent(this));
         this.events.add(new VandalismEvent(this));
-
+        
         Collections.shuffle(this.events);
     }
 }
