@@ -65,6 +65,9 @@ public class Card {
             if (other.getValue().equals(Value.FANTASTIC) || other.getValue().equals(Value.FANTASTICFOUR)) {
                 return true;
             }
+            else if (this.getValue() == Value.FUCKYOU) {
+                return true;
+            }
             else {
                 return !this.getColor().equals(Color.BLACK);
             }
