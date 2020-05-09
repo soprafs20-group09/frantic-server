@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.security.Principal;
 import java.util.EnumMap;
@@ -117,6 +118,15 @@ public class FranticUtils {
         }
         else {
             return null;
+        }
+    }
+
+    public static void wait(int ms) {
+        try {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
     }
 }
