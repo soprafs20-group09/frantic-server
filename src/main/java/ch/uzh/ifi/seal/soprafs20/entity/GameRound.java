@@ -465,11 +465,9 @@ public class GameRound {
         this.timer.cancel();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         sendGameState();
-        try {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException ignored) {
-        }
+
+        FranticUtils.wait(1000);
+
         Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
         startAnimationTimer(11);

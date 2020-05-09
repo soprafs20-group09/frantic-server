@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class RegisterService {
         authMap.put(authToken, new String[]{username, lobbyId});
     }
 
-    public synchronized void joinLobby(String identity, RegisterDTO register) throws InterruptedException {
+    public synchronized void joinLobby(String identity, RegisterDTO register) {
         String username = getUsernameFromAuthToken(register.getToken());
         if (username == null) {
             throw new PlayerServiceException("Player not authenticated.");
@@ -67,7 +68,7 @@ public class RegisterService {
 
         webSocketService.sendToPlayer(identity, "/queue/register", registeredDTO);
         // wait for player to subscribe to channels
-        wait(500);
+        FranticUtils.wait(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
         Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");

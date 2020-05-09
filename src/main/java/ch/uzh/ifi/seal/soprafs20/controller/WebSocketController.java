@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
 import ch.uzh.ifi.seal.soprafs20.service.WebSocketService;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
 import org.springframework.context.event.EventListener;
@@ -41,10 +42,10 @@ public class WebSocketController {
     }
 
     @EventListener
-    public void handleSessionDisconnect(SessionDisconnectEvent event) throws InterruptedException {
+    public void handleSessionDisconnect(SessionDisconnectEvent event) {
         Principal p = event.getUser();
         if (p != null) {
-            Thread.sleep(50);
+            FranticUtils.wait(50);
             lobbyService.handleDisconnect(p.getName());
         }
     }

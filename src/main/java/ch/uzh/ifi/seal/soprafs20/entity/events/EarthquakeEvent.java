@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +39,7 @@ public class EarthquakeEvent implements Event {
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 0);
         this.gameRound.sendCompleteGameState();
 
-        try {
-            Thread.sleep(500);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        FranticUtils.wait(500);
 
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
             Player toPlayer = this.listOfPlayers.get((i + 1) % this.listOfPlayers.size());
