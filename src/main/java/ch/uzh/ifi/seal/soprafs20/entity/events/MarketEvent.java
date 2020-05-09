@@ -12,7 +12,7 @@ public class MarketEvent implements Event {
     private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Pile<Card> drawStack;
-    private final Player currentPlayer;
+    private Player currentPlayer;
     private final int seconds;
 
     public MarketEvent(GameRound gameRound) {
@@ -20,7 +20,6 @@ public class MarketEvent implements Event {
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.drawStack = gameRound.getDrawStack();
-        this.currentPlayer = gameRound.getCurrentPlayer();
         this.seconds = 15;
     }
 
@@ -29,6 +28,7 @@ public class MarketEvent implements Event {
     }
 
     public void performEvent() {
+        this.currentPlayer = this.gameRound.getCurrentPlayer();
         List<Card> cards = new ArrayList<>();
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
             if (this.drawStack.size() > 0) {

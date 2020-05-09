@@ -11,13 +11,12 @@ public class ExpansionEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player currentPlayer;
+    private Player currentPlayer;
 
     public ExpansionEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.currentPlayer = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
@@ -25,6 +24,8 @@ public class ExpansionEvent implements Event {
     }
 
     public void performEvent() {
+        this.currentPlayer = this.gameRound.getCurrentPlayer();
+
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 

@@ -13,7 +13,7 @@ public class RecessionEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player currentPlayer;
+    private Player currentPlayer;
     private int amount;
     private final int seconds;
 
@@ -21,7 +21,6 @@ public class RecessionEvent implements Event {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.currentPlayer = gameRound.getCurrentPlayer();
         this.amount = 1;
         this.seconds = 30;
     }
@@ -31,6 +30,7 @@ public class RecessionEvent implements Event {
     }
 
     public void performEvent() {
+        this.currentPlayer = this.gameRound.getCurrentPlayer();
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(this.currentPlayer);
         for (int i = 1; i <= numOfPlayers; i++) {

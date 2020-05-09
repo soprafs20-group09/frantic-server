@@ -12,13 +12,12 @@ public class CharityEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player initiator;
+    private Player initiator;
 
     public CharityEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.initiator = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
@@ -26,6 +25,7 @@ public class CharityEvent implements Event {
     }
 
     public void performEvent() {
+        this.initiator = this.gameRound.getCurrentPlayer();
         List<Chat> chat = new ArrayList<>();
 
         int maxCards = 0;
