@@ -568,6 +568,7 @@ public class GameRound {
     public void prepareMarket(String identity, int card) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
+            this.timer.cancel();
             Card choice = this.marketList.remove(card);
             performMarket(player, choice);
         }
@@ -580,14 +581,18 @@ public class GameRound {
 
     private void performMarket(Player player, Card choice) {
         player.pushCardToHand(choice);
+        Chat chat = new Chat("event", "event:market", player.getUsername() + " took a card");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         this.sendCompleteGameState();
 
         if (!this.marketList.isEmpty()) {
             int numOfPlayers = this.listOfPlayers.size();
             int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
-            Player nextPlayer = this.listOfPlayers.get((initiatorIndex + 1) % numOfPlayers);
+            int numOfPreviousPlayers = this.listOfPlayers.size() - this.marketList.size();
+            Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
             this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketList);
             this.gameService.sendTimer(this.lobbyId, 15);
+            startMarketTimer(15, nextPlayer);
         }
         else {
             this.marketList = new ArrayList<>();
@@ -985,6 +990,7 @@ public class GameRound {
         this.events.add(new TornadoEvent(this));
         this.events.add(new VandalismEvent(this));
         
+
         Collections.shuffle(this.events);
     }
 }
