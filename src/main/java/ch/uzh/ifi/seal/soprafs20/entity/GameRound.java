@@ -567,7 +567,11 @@ public class GameRound {
 
     public void prepareMarket(String identity, int card) {
         Player player = getPlayerByIdentity(identity);
-        if (player != null) {
+        int numOfPlayers = this.listOfPlayers.size();
+        int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
+        int numOfPreviousPlayers = this.listOfPlayers.size() - this.marketList.size();
+        Player expectedPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
+        if (player != null && player == expectedPlayer) {
             this.timer.cancel();
             Card choice = this.marketList.remove(card);
             performMarket(player, choice);
@@ -990,7 +994,6 @@ public class GameRound {
         this.events.add(new TornadoEvent(this));
         this.events.add(new VandalismEvent(this));
         
-
         Collections.shuffle(this.events);
     }
 }
