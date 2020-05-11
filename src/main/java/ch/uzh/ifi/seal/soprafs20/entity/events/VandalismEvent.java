@@ -26,6 +26,8 @@ public class VandalismEvent implements Event {
     }
 
     public void performEvent() {
+        List<Chat> chat = new ArrayList<>();
+
         int index = 1;
         Card relevant = this.discardPile.peekN(index);
         while (relevant.getColor().equals(Color.BLACK) || relevant.getColor().equals(Color.MULTICOLOR)) {
@@ -39,13 +41,20 @@ public class VandalismEvent implements Event {
         }
 
         for (Player player : this.listOfPlayers) {
+            int discardedCards = 0;
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
                 if (player.peekCard(i).getColor().equals(relevant.getColor())) {
                     player.popCard(i);
+                    discardedCards++;
                 }
+            }
+            if (discardedCards > 0) {
+                chat.add(new Chat("event", "avatar:" + player.getUsername(),
+                        player.getUsername() + " discarded " + discardedCards + (discardedCards == 1 ? " card" : " cards")));
             }
         }
 
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
     }
