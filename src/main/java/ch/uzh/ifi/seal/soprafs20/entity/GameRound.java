@@ -191,7 +191,8 @@ public class GameRound {
                         }
                         else if (cardToPlay.getType() == Type.SPECIAL) {
                             Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+                                    this.currentPlayer.getUsername() + " played " + (cardToPlay.getColor().ordinal() < 4 ? (FranticUtils.getStringRepresentation(cardToPlay.getColor()) + " ") : "")
+                                            + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getValue() == Value.FUCKYOU) {
                                 finishTurn();
@@ -993,7 +994,7 @@ public class GameRound {
         this.events.add(new TimeBombEvent(this));
         this.events.add(new TornadoEvent(this));
         this.events.add(new VandalismEvent(this));
-        
+
         Collections.shuffle(this.events);
     }
 }
