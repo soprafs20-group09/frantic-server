@@ -27,6 +27,7 @@ public class EarthquakeEvent implements Event {
     }
 
     public void performEvent() {
+        List<Chat> chat = new ArrayList<>();
 
         List<List<Card>> allCards = new ArrayList<>();
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
@@ -42,12 +43,15 @@ public class EarthquakeEvent implements Event {
         FranticUtils.wait(500);
 
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
+            Player fromPlayer = this.listOfPlayers.get((i) % this.listOfPlayers.size());
             Player toPlayer = this.listOfPlayers.get((i + 1) % this.listOfPlayers.size());
             for (Card card : allCards.get(i)) {
                 toPlayer.pushCardToHand(card);
             }
+            chat.add(new Chat("event", "event:earthquake", fromPlayer.getUsername() + " gave all cards to " + toPlayer.getUsername() + "."));
         }
 
+        this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
