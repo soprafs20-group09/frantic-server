@@ -38,7 +38,7 @@ public class DoomsdayEvent implements Event {
             player.setPoints(player.getPoints() + 50);
         }
 
-        String message = "This round is over! Watch everyone's standings and wait for the next round to start!";
+        String message = "Doomsday killed everyone! Watch everyone's standings and wait for the next round to start!";
         this.game.endGameRound(currentPlayer, changes, "event:doomsday", message);
     }
 
