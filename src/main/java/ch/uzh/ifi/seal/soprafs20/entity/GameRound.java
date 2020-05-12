@@ -32,6 +32,7 @@ public class GameRound {
     private boolean showCards;
     private List<Player> eventResponses;
     private List<Chat> eventLogs;
+    private Map<Player, Integer> recessionMap;
     private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
     private Map<Player, Integer> gamblingManMap;
@@ -55,6 +56,7 @@ public class GameRound {
         this.showCards = false;
         this.eventResponses = new ArrayList<>();
         this.eventLogs = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
         this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
         this.gamblingManMap = new HashMap<>();
@@ -481,31 +483,37 @@ public class GameRound {
         event.performEvent();
     }
 
-    public void performRecession(String identity, int[] cards) {
+    public synchronized void prepareRecession(String identity, int[] cards) {
         Player player = getPlayerByIdentity(identity);
         if (player != null && cards.length > 0) {
             this.eventResponses.add(player);
             for (int i = cards.length - 1; i >= 0; i--) {
                 player.popCard(cards[i]);
             }
-            Chat chat;
-            if (cards.length == 1) {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards 1 card.");
-            }
-            else {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards " + cards.length + " cards.");
-            }
-            this.gameService.sendChatMessage(this.lobbyId, chat);
-            sendCompleteGameState();
+            this.recessionMap.put(player, cards.length);
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
-            this.timer.cancel();
-            finishTurn();
-            this.eventResponses = new ArrayList<>();
+            performRecession();
         }
     }
 
-    public void prepareSurpriseParty(String identity, int card, String targetUsername) {
+    public void performRecession() {
+        this.timer.cancel();
+        List<Chat> chat = new ArrayList<>();
+        for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
+            chat.add(new Chat("event", "event:recession",
+                    entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " card.")));
+        }
+
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        sendCompleteGameState();
+        this.eventResponses = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
+        finishTurn();
+
+    }
+
+    public synchronized void prepareSurpriseParty(String identity, int card, String targetUsername) {
         Player player = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
@@ -531,7 +539,7 @@ public class GameRound {
         finishTurn();
     }
 
-    public void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
+    public synchronized void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
             this.eventResponses.add(player);
