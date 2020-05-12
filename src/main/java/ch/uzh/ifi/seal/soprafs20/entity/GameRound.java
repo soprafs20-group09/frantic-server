@@ -24,6 +24,7 @@ public class GameRound {
     private final HashMap<Player, Integer> bombMap;
     private final List<Event> events;
     private final Pile<Card> drawStack;
+    private boolean isDrawStackLow;
     private final Pile<Card> discardPile;
     private Action currentAction;
     private boolean isProcessing;
@@ -45,6 +46,7 @@ public class GameRound {
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
         this.drawStack = new DrawStack();
+        this.isDrawStackLow = false;
         this.discardPile = new DiscardPile();
         this.timeBomb = false;
         this.bombMap = new HashMap<>();
@@ -92,6 +94,12 @@ public class GameRound {
 
     public void sendGameState() {
         this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
+
+        if (!this.isDrawStackLow && this.drawStack.size() <= 10) {
+            Chat chat = new Chat("event", "misc:warning", "There are only " + this.drawStack.size() + " cards left.");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
+            this.isDrawStackLow = true;
+        }
     }
 
     public void startGameRound() {
