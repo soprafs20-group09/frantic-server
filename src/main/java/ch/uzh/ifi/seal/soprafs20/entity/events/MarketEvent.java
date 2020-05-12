@@ -44,8 +44,8 @@ public class MarketEvent implements Event {
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 
         Player firstPlayer = this.listOfPlayers.get((initiatorIndex + 1) % numOfPlayers);
-        this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cards);
         this.gameService.sendAttackTurn(this.gameRound.getLobbyId(), firstPlayer.getUsername());
+        this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cards);
         this.gameRound.setMarketList(cards);
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
         this.gameRound.startMarketTimer(seconds, firstPlayer);
