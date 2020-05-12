@@ -51,7 +51,7 @@ public class DoomsdayEventTest {
 
     @Test
     public void performEventTest() {
-        Mockito.doNothing().when(game).endGameRound(Mockito.any());
+        Mockito.doNothing().when(game).endGameRound(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
         Player player1 = new Player();
         player1.setPoints(20);
@@ -66,6 +66,6 @@ public class DoomsdayEventTest {
         doomsday.performEvent();
         assertEquals(70, player1.getPoints());
         assertEquals(50, player2.getPoints());
-        Mockito.verify(game).endGameRound(Mockito.any());
+        Mockito.verify(game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.any());
     }
 }
