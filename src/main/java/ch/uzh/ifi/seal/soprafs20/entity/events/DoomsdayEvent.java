@@ -7,7 +7,9 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DoomsdayEvent implements Event {
 
@@ -30,11 +32,14 @@ public class DoomsdayEvent implements Event {
     }
 
     public void performEvent() {
+        Map<String, Integer> changes = new HashMap<>();
         for (Player player : listOfPlayers) {
+            changes.put(player.getUsername(), 50);
             player.setPoints(player.getPoints() + 50);
         }
 
-        this.game.endGameRound(currentPlayer);
+        String message = "This round is over! Watch everyone's standings and wait for the next round to start!";
+        this.game.endGameRound(currentPlayer, changes, "event:doomsday", message);
     }
 
     public String getMessage() {

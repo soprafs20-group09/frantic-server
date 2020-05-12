@@ -7,7 +7,9 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FinishLineEvent implements Event {
 
@@ -30,16 +32,19 @@ public class FinishLineEvent implements Event {
 
     public void performEvent() {
         int maxPoints = 0;
+        Map<String, Integer> changes = new HashMap<>();
         Player playerWithMaxPoints = this.listOfPlayers.get(0); //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
+            changes.put(player.getUsername(), playersPoints);
             player.setPoints(player.getPoints() + playersPoints);
             if (playersPoints >= maxPoints) {
                 maxPoints = playersPoints;
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String message = "This round is over! Watch everyone's standings and wait for the next round to start!";
+        this.game.endGameRound(playerWithMaxPoints, changes, "event:finish-line", message);
     }
 
     public String getMessage() {

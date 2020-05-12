@@ -205,9 +205,14 @@ public class GameRound {
                             else {
                                 sendGameState();
                                 this.timer.cancel();
-                                this.gameService.sendTimer(this.lobbyId, 30);
+                                int seconds = 30;
+                                // fantastic four action is given more time to perform
+                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                                    seconds = 45;
+                                }
+                                this.gameService.sendTimer(this.lobbyId, seconds);
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                startTurnTimer(30);
+                                startTurnTimer(seconds);
                             }
                         }
                     }
@@ -236,9 +241,14 @@ public class GameRound {
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
+                    int seconds = 30;
+                    // fantastic four action is given more time to perform
+                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                        seconds = 45;
+                    }
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-                    this.gameService.sendTimer(this.lobbyId, 30);
-                    startCounterAttackTimer(30);
+                    this.gameService.sendTimer(this.lobbyId, seconds);
+                    startCounterAttackTimer(seconds);
                     break;
                 }
             }
@@ -549,7 +559,14 @@ public class GameRound {
                 for (int i = 0; i < entry.getValue().length; i++) {
                     cards.add(player.peekCard(entry.getValue()[i]));
                 }
-                this.christmasMap.put(target, cards);
+                if (this.christmasMap.containsKey(target)) {
+                    List<Card> previous = this.christmasMap.get(target);
+                    previous.addAll(cards);
+                    this.christmasMap.put(target, previous);
+                }
+                else {
+                    this.christmasMap.put(target, cards);
+                }
             }
             player.clearHand();
         }
@@ -726,19 +743,23 @@ public class GameRound {
     public void onRoundOver() {
         this.timer.cancel();
         int maxPoints = 0;
+        Map<String, Integer> changes = new HashMap<>();
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
             player.setBlocked(false);
 
             int playersPoints = player.calculatePoints();
             if (!this.timeBomb) {
+                changes.put(player.getUsername(), playersPoints);
                 player.setPoints(player.getPoints() + playersPoints);
             }
             else {
                 if (playersPoints == 0) {
+                    changes.put(player.getUsername(), -10);
                     player.setPoints(player.getPoints() - 10);
                 }
                 else {
+                    changes.put(player.getUsername(), playersPoints + 10);
                     player.setPoints(player.getPoints() + playersPoints + 10);
                 }
             }
@@ -748,14 +769,25 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String icon = null;
+        String message;
+        if (this.timeBomb) {
+            icon = "event:time-bomb";
+            message = this.currentPlayer.getUsername() + " defused the bomb! Watch everyone's standings and wait for the next round to start!";
+        }
+        else {
+            message = this.currentPlayer.getUsername() + "played his last card and won! Watch everyone's standings and wait for the next round to start!";
+        }
+        this.game.endGameRound(playerWithMaxPoints, changes, icon, message);
     }
 
     private void bombExploded() {
         int maxPoints = 0;
+        Map<String, Integer> changes = new HashMap<>();
         Player playerWithMaxPoints = this.currentPlayer;
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
+            changes.put(player.getUsername(), 2 * playersPoints);
             player.setPoints(player.getPoints() + 2 * playersPoints);
 
             if (playersPoints >= maxPoints) {
@@ -763,7 +795,8 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String message = "The bomb exploded! Watch everyone's standings and wait for the next round to start!";
+        this.game.endGameRound(playerWithMaxPoints, changes, "event:time-bomb", message);
     }
 
     public void playerLostConnection(Player player) {
