@@ -596,6 +596,7 @@ public class GameRound {
             int numOfPreviousPlayers = this.listOfPlayers.size() - this.marketList.size();
             Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
             this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketList);
+            this.gameService.sendAttackTurn(this.lobbyId, nextPlayer.getUsername());
             this.gameService.sendTimer(this.lobbyId, 15);
             startMarketTimer(15, nextPlayer);
         }
