@@ -222,14 +222,14 @@ public class GameRound {
         }
     }
 
-    private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
+    private synchronized void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
         if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
             for (Player target : this.currentAction.getTargets()) {
+                this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
                 if (counterAttacker.equals(target)) {
                     this.timer.cancel();
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
-                    this.gameService.sendPlayable(this.lobbyId, counterAttacker, new int[0], false, false);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
@@ -703,6 +703,7 @@ public class GameRound {
 
             //go to the next player, if the current player is skipped
             if (this.currentPlayer.isBlocked()) {
+                this.gameService.sendOverlay(this.lobbyId, this.currentPlayer, "special:skip", "skip", "You are skipped!", 2);
                 Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
                         + " is skipped.");
                 this.gameService.sendChatMessage(this.lobbyId, chat);
