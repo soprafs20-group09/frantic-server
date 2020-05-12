@@ -48,7 +48,7 @@ public class FinishLineEventTest {
 
     @Test
     public void performEventTest() {
-        Mockito.doNothing().when(game).endGameRound(Mockito.any());
+        Mockito.doNothing().when(game).endGameRound(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.RED, 3, 1));
@@ -64,6 +64,6 @@ public class FinishLineEventTest {
 
         assertEquals(3, player1.getPoints());
         assertEquals(7, player2.getPoints());
-        Mockito.verify(this.game).endGameRound(Mockito.any());
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.any());
     }
 }

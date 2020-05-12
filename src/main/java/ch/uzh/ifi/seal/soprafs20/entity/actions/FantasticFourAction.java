@@ -49,8 +49,9 @@ public class FantasticFourAction implements Action {
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
             for (int i = 0; i < target.getValue(); i++) {
-                Card c = drawStack.pop();
-                target.getKey().pushCardToHand(c);
+                if (this.drawStack.size() > 0) {
+                    target.getKey().pushCardToHand(drawStack.pop());
+                }
             }
             if (target.getValue() == 1) {
                 chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));

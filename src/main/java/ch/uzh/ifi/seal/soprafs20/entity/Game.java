@@ -45,12 +45,12 @@ public class Game {
         this.currentGameRound.startGameRound();
     }
 
-    public void endGameRound(Player playerWithMaxPoints) {
+    public void endGameRound(Player playerWithMaxPoints, Map<String, Integer> changes, String icon, String message) {
         setFirstPlayer(playerWithMaxPoints);
         removeCardsFromHands();
         if (!gameOver()) {
-            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, calculateMaxPoints());
-            startTimer(30);
+            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, calculateMaxPoints(), 20, icon, message);
+            startTimer(20);
         }
         else {
             this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers);

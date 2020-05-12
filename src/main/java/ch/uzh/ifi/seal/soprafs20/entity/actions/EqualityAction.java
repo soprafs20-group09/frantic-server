@@ -30,7 +30,7 @@ public class EqualityAction implements Action {
     public List<Chat> perform() {
         List<Chat> chat = new ArrayList<>();
         if (this.target != null) {
-            while (this.initiator.getHandSize() > this.target.getHandSize()) {
+            while (this.initiator.getHandSize() > this.target.getHandSize() && this.drawStack.size() > 0) {
                 this.target.pushCardToHand(drawStack.pop());
                 this.cardsDrawn += 1;
             }

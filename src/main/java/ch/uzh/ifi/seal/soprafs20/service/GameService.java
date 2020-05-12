@@ -139,7 +139,7 @@ public class GameService {
     public void recession(String lobbyId, String identity, RecessionDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().performRecession(identity, dto.getCards());
+            game.getCurrentGameRound().prepareRecession(identity, dto.getCards());
         }
     }
 
@@ -267,8 +267,8 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);
     }
 
-    public void sendEndRound(String lobbyId, List<Player> players, int pointLimit) {
-        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), pointLimit);
+    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, int seconds, String icon, String message) {
+        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, pointLimit, seconds, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 

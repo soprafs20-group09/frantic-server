@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameServiceTest {
@@ -309,7 +310,7 @@ public class GameServiceTest {
 
     @Test
     public void sendEndRoundTest() {
-        gameService.sendEndRound("testLobbyId", Collections.singletonList(player), 154);
+        gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154, 20,null, null);
 
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }

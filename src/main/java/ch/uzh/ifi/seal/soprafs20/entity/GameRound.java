@@ -32,6 +32,7 @@ public class GameRound {
     private boolean showCards;
     private List<Player> eventResponses;
     private List<Chat> eventLogs;
+    private Map<Player, Integer> recessionMap;
     private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
     private Map<Player, Integer> gamblingManMap;
@@ -55,6 +56,7 @@ public class GameRound {
         this.showCards = false;
         this.eventResponses = new ArrayList<>();
         this.eventLogs = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
         this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
         this.gamblingManMap = new HashMap<>();
@@ -203,9 +205,14 @@ public class GameRound {
                             else {
                                 sendGameState();
                                 this.timer.cancel();
-                                this.gameService.sendTimer(this.lobbyId, 30);
+                                int seconds = 30;
+                                // fantastic four action is given more time to perform
+                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                                    seconds = 45;
+                                }
+                                this.gameService.sendTimer(this.lobbyId, seconds);
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                startTurnTimer(30);
+                                startTurnTimer(seconds);
                             }
                         }
                     }
@@ -220,24 +227,29 @@ public class GameRound {
         }
     }
 
-    private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
+    private synchronized void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
         if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
             for (Player target : this.currentAction.getTargets()) {
+                this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
                 if (counterAttacker.equals(target)) {
                     this.timer.cancel();
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
-                    this.gameService.sendPlayable(this.lobbyId, counterAttacker, new int[0], false, false);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
+                    int seconds = 30;
+                    // fantastic four action is given more time to perform
+                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                        seconds = 45;
+                    }
+                    this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-                    this.gameService.sendTimer(this.lobbyId, 30);
-                    startCounterAttackTimer(30);
-                    break;
+                    this.gameService.sendTimer(this.lobbyId, seconds);
+                    startCounterAttackTimer(seconds);
                 }
             }
         }
@@ -481,31 +493,37 @@ public class GameRound {
         event.performEvent();
     }
 
-    public void performRecession(String identity, int[] cards) {
+    public synchronized void prepareRecession(String identity, int[] cards) {
         Player player = getPlayerByIdentity(identity);
         if (player != null && cards.length > 0) {
             this.eventResponses.add(player);
             for (int i = cards.length - 1; i >= 0; i--) {
                 player.popCard(cards[i]);
             }
-            Chat chat;
-            if (cards.length == 1) {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards 1 card.");
-            }
-            else {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards " + cards.length + " cards.");
-            }
-            this.gameService.sendChatMessage(this.lobbyId, chat);
-            sendCompleteGameState();
+            this.recessionMap.put(player, cards.length);
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
-            this.timer.cancel();
-            finishTurn();
-            this.eventResponses = new ArrayList<>();
+            performRecession();
         }
     }
 
-    public void prepareSurpriseParty(String identity, int card, String targetUsername) {
+    public void performRecession() {
+        this.timer.cancel();
+        List<Chat> chat = new ArrayList<>();
+        for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
+            chat.add(new Chat("event", "event:recession",
+                    entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " card.")));
+        }
+
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        sendCompleteGameState();
+        this.eventResponses = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
+        finishTurn();
+
+    }
+
+    public synchronized void prepareSurpriseParty(String identity, int card, String targetUsername) {
         Player player = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
@@ -531,7 +549,7 @@ public class GameRound {
         finishTurn();
     }
 
-    public void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
+    public synchronized void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
             this.eventResponses.add(player);
@@ -541,7 +559,14 @@ public class GameRound {
                 for (int i = 0; i < entry.getValue().length; i++) {
                     cards.add(player.peekCard(entry.getValue()[i]));
                 }
-                this.christmasMap.put(target, cards);
+                if (this.christmasMap.containsKey(target)) {
+                    List<Card> previous = this.christmasMap.get(target);
+                    previous.addAll(cards);
+                    this.christmasMap.put(target, previous);
+                }
+                else {
+                    this.christmasMap.put(target, cards);
+                }
             }
             player.clearHand();
         }
@@ -696,6 +721,7 @@ public class GameRound {
 
             //go to the next player, if the current player is skipped
             if (this.currentPlayer.isBlocked()) {
+                this.gameService.sendOverlay(this.lobbyId, this.currentPlayer, "special:skip", "skip", "You are skipped!", 2);
                 Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
                         + " is skipped.");
                 this.gameService.sendChatMessage(this.lobbyId, chat);
@@ -718,19 +744,23 @@ public class GameRound {
     public void onRoundOver() {
         this.timer.cancel();
         int maxPoints = 0;
+        Map<String, Integer> changes = new HashMap<>();
         Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
         for (Player player : listOfPlayers) {
             player.setBlocked(false);
 
             int playersPoints = player.calculatePoints();
             if (!this.timeBomb) {
+                changes.put(player.getUsername(), playersPoints);
                 player.setPoints(player.getPoints() + playersPoints);
             }
             else {
                 if (playersPoints == 0) {
+                    changes.put(player.getUsername(), -10);
                     player.setPoints(player.getPoints() - 10);
                 }
                 else {
+                    changes.put(player.getUsername(), playersPoints + 10);
                     player.setPoints(player.getPoints() + playersPoints + 10);
                 }
             }
@@ -740,14 +770,25 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String icon = null;
+        String message;
+        if (this.timeBomb) {
+            icon = "event:time-bomb";
+            message = this.currentPlayer.getUsername() + " defused the bomb! Watch everyone's standings and wait for the next round to start!";
+        }
+        else {
+            message = this.currentPlayer.getUsername() + "played his last card and won! Watch everyone's standings and wait for the next round to start!";
+        }
+        this.game.endGameRound(playerWithMaxPoints, changes, icon, message);
     }
 
     private void bombExploded() {
         int maxPoints = 0;
+        Map<String, Integer> changes = new HashMap<>();
         Player playerWithMaxPoints = this.currentPlayer;
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
+            changes.put(player.getUsername(), 2 * playersPoints);
             player.setPoints(player.getPoints() + 2 * playersPoints);
 
             if (playersPoints >= maxPoints) {
@@ -755,7 +796,8 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String message = "The bomb exploded! Watch everyone's standings and wait for the next round to start!";
+        this.game.endGameRound(playerWithMaxPoints, changes, "event:time-bomb", message);
     }
 
     public void playerLostConnection(Player player) {
