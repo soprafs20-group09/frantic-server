@@ -520,7 +520,7 @@ public class GameRound {
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
             chat.add(new Chat("event", "event:recession",
-                    entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " card.")));
+                    entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " cards.")));
         }
 
         this.gameService.sendChatMessage(this.lobbyId, chat);
