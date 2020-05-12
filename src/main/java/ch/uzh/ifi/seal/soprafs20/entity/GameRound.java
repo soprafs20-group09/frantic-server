@@ -246,10 +246,10 @@ public class GameRound {
                     if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
                         seconds = 45;
                     }
+                    this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
                     this.gameService.sendTimer(this.lobbyId, seconds);
                     startCounterAttackTimer(seconds);
-                    break;
                 }
             }
         }
