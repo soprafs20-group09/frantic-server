@@ -2,7 +2,9 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.PlayableDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +13,12 @@ public class MerryChristmasEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
-    private final int seconds;
+    private final List<Player> listOfPlayers;
 
     public MerryChristmasEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
-        this.seconds = 30;
+        this.listOfPlayers = gameRound.getListOfPlayers();
     }
 
     public String getName() {
@@ -24,6 +26,16 @@ public class MerryChristmasEvent implements Event {
     }
 
     public void performEvent() {
+
+        int maxHand = 0;
+        for (Player player : this.listOfPlayers) {
+            int hand = player.getHandSize();
+            if (hand > maxHand) {
+                maxHand = hand;
+            }
+        }
+        int seconds = 20 + (maxHand % 20) * 2;
+
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
         this.gameRound.startMerryChristmasTimer(seconds);
