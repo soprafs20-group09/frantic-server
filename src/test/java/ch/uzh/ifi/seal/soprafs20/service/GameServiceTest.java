@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.entity.events.FridayTheThirteenthEvent;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
@@ -76,7 +78,7 @@ public class GameServiceTest {
 
         gameService.startGame("testLobbyId", "testIdentity");
 
-        Mockito.verify(lobby, Mockito.times(1)).startGame();
+        Mockito.verify(lobby).startGame();
     }
 
     @Test
@@ -86,14 +88,14 @@ public class GameServiceTest {
 
         gameService.playCard("testLobbyId", "testIdentity", playCardDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).playCard("testIdentity", 5);
+        Mockito.verify(gameRound).playCard("testIdentity", 5);
     }
 
     @Test
     public void drawCardTest() {
         gameService.drawCard("testLobbyId", "testIdentity");
 
-        Mockito.verify(gameRound, Mockito.times(1)).currentPlayerDrawCard("testIdentity");
+        Mockito.verify(gameRound).currentPlayerDrawCard("testIdentity");
     }
 
     @Test
@@ -104,7 +106,7 @@ public class GameServiceTest {
 
         gameService.exchange("testLobbyId", "testIdentity", exchangeDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeExchangeAction("testIdentity",
+        Mockito.verify(gameRound).storeExchangeAction("testIdentity",
                 exchangeDTO.getCards(), exchangeDTO.getTarget());
     }
 
@@ -116,7 +118,7 @@ public class GameServiceTest {
 
         gameService.gift("testLobbyId", "testIdentity", giftDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeGiftAction("testIdentity",
+        Mockito.verify(gameRound).storeGiftAction("testIdentity",
                 giftDTO.getCards(), giftDTO.getTarget());
     }
 
@@ -127,7 +129,7 @@ public class GameServiceTest {
 
         gameService.skip("testLobbyId", "testIdentity", skipDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeSkipAction("testIdentity",
+        Mockito.verify(gameRound).storeSkipAction("testIdentity",
                 skipDTO.getTarget());
     }
 
@@ -138,7 +140,7 @@ public class GameServiceTest {
 
         gameService.fantastic("testLobbyId", "testIdentity", fantasticDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticAction("testIdentity",
+        Mockito.verify(gameRound).storeFantasticAction("testIdentity",
                 fantasticDTO.getNumber(), fantasticDTO.getColor());
     }
 
@@ -150,7 +152,7 @@ public class GameServiceTest {
 
         gameService.fantastic("testLobbyId", "testIdentity", fantasticDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticAction("testIdentity",
+        Mockito.verify(gameRound).storeFantasticAction("testIdentity",
                 fantasticDTO.getNumber(), fantasticDTO.getColor());
     }
 
@@ -162,7 +164,7 @@ public class GameServiceTest {
 
         gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
+        Mockito.verify(gameRound).storeFantasticFourAction("testIdentity",
                 fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getTargets());
     }
 
@@ -175,7 +177,7 @@ public class GameServiceTest {
 
         gameService.fantasticFour("testLobbyId", "testIdentity", fantasticFourDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeFantasticFourAction("testIdentity",
+        Mockito.verify(gameRound).storeFantasticFourAction("testIdentity",
                 fantasticFourDTO.getNumber(), fantasticFourDTO.getColor(), fantasticFourDTO.getTargets());
     }
 
@@ -187,7 +189,7 @@ public class GameServiceTest {
 
         gameService.equality("testLobbyId", "testIdentity", equalityDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeEqualityAction("testIdentity",
+        Mockito.verify(gameRound).storeEqualityAction("testIdentity",
                 equalityDTO.getColor(), equalityDTO.getTarget());
     }
 
@@ -198,7 +200,7 @@ public class GameServiceTest {
 
         gameService.counterAttack("testLobbyId", "testIdentity", counterAttackDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeCounterAttackAction("testIdentity",
+        Mockito.verify(gameRound).storeCounterAttackAction("testIdentity",
                 counterAttackDTO.getColor());
     }
 
@@ -209,15 +211,66 @@ public class GameServiceTest {
 
         gameService.niceTry("testLobbyId", "testIdentity", niceTryDTO);
 
-        Mockito.verify(gameRound, Mockito.times(1)).storeNiceTryAction("testIdentity",
+        Mockito.verify(gameRound).storeNiceTryAction("testIdentity",
                 niceTryDTO.getColor());
+    }
+
+    @Test
+    public void surprisePartyTest() {
+        SurprisePartyDTO surprisePartyDTO = Mockito.mock(SurprisePartyDTO.class);
+        Mockito.when(surprisePartyDTO.getCard()).thenReturn(3);
+        Mockito.when(surprisePartyDTO.getTarget()).thenReturn("testTarget");
+
+        gameService.surpriseParty("testLobbyId", "testIdentity", surprisePartyDTO);
+
+        Mockito.verify(gameRound).prepareSurpriseParty("testIdentity", 3, "testTarget");
+    }
+
+    @Test
+    public void merryChristmasTest() {
+        MerryChristmasDTO merryChristmasDTO = Mockito.mock(MerryChristmasDTO.class);
+        Mockito.when(merryChristmasDTO.getTargets()).thenReturn(new HashMap<>());
+
+        gameService.merryChristmas("testLobbyId", "testIdentity", merryChristmasDTO);
+
+        Mockito.verify(gameRound).prepareMerryChristmas("testIdentity", merryChristmasDTO.getTargets());
+    }
+
+    @Test
+    public void recessionTest() {
+        RecessionDTO recessionDTO = Mockito.mock(RecessionDTO.class);
+        Mockito.when(recessionDTO.getCards()).thenReturn(new int[]{1});
+
+        gameService.recession("testLobbyId", "testIdentity", recessionDTO);
+
+        Mockito.verify(gameRound).prepareRecession("testIdentity", recessionDTO.getCards());
+    }
+
+    @Test
+    public void marketTest() {
+        MarketDTO marketDTO = Mockito.mock(MarketDTO.class);
+        Mockito.when(marketDTO.getCard()).thenReturn(1);
+
+        gameService.market("testLobbyId", "testIdentity", marketDTO);
+
+        Mockito.verify(gameRound).prepareMarket("testIdentity", marketDTO.getCard());
+    }
+
+    @Test
+    public void gamblingManTest() {
+        GamblingManDTO gamblingManDTO = Mockito.mock(GamblingManDTO.class);
+        Mockito.when(gamblingManDTO.getCard()).thenReturn(1);
+
+        gameService.gamblingMan("testLobbyId", "testIdentity", gamblingManDTO);
+
+        Mockito.verify(gameRound).prepareGamblingMan("testIdentity", gamblingManDTO.getCard());
     }
 
     @Test
     public void endTurnTest() {
         gameService.endTurn("testLobbyId", "testIdentity");
 
-        Mockito.verify(gameRound, Mockito.times(1)).playerFinishesTurn(Mockito.any());
+        Mockito.verify(gameRound).playerFinishesTurn(Mockito.any());
     }
 
     @Test
@@ -225,7 +278,7 @@ public class GameServiceTest {
         Chat chat = new Chat("msg", "avatar:testPlayer", "testMessage");
         gameService.sendChatMessage("testLobbyId", chat);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage("testLobbyId", chat);
+        Mockito.verify(webSocketService).sendChatMessage("testLobbyId", chat);
     }
 
     @Test
@@ -234,32 +287,33 @@ public class GameServiceTest {
         chat.add(new Chat("msg", "avatar:testPlayer", "testMessage"));
         gameService.sendChatMessage("testLobbyId", chat);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage("testLobbyId", chat);
+        Mockito.verify(webSocketService).sendChatMessage("testLobbyId", chat);
     }
 
     @Test
     public void sendStartGameTest() {
         gameService.sendStartGame("testLobbyId");
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby("testLobbyId", "/start-game");
+        Mockito.verify(webSocketService).sendToLobby("testLobbyId", "/start-game");
     }
 
     @Test
     public void sendStartGameRoundTest() {
         gameService.sendStartGameRound("testLobbyId");
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby("testLobbyId", "/start-round");
+        Mockito.verify(webSocketService).sendToLobby("testLobbyId", "/start-round");
     }
 
     @Test
     public void sendGameStateTest() {
         List<Player> players = new ArrayList<>();
+        player.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.THREE));
         players.add(player);
         players.add(player);
 
         gameService.sendGameState("testLobbyId", card, players, false);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/game-state"), Mockito.any());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/game-state"), Mockito.any());
     }
 
     @Test
@@ -269,14 +323,14 @@ public class GameServiceTest {
 
         gameService.sendHand("testLobbyId", player);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/hand"), Mockito.any());
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/hand"), Mockito.any());
     }
 
     @Test
     public void sendStartTurnTest() {
         gameService.sendStartTurn("testLobbyId", "testPlayer");
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/start-turn"), Mockito.any());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/start-turn"), Mockito.any());
     }
 
     @Test
@@ -284,35 +338,79 @@ public class GameServiceTest {
         int[] playable = {1, 4};
 
         gameService.sendPlayable("testLobbyId", player, playable, false, false);
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/playable"), Mockito.any());
+    }
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/playable"), Mockito.any());
+    @Test
+    public void sendTimerTest() {
+        gameService.sendTimer("testLobbyId", 30);
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/timer"), Mockito.any());
+    }
+
+    @Test
+    public void sendAnimationSpeedTest() {
+        gameService.sendAnimationSpeed("testLobbyId", 500);
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/animation-speed"), Mockito.any());
     }
 
     @Test
     public void sendDrawAnimationTest() {
         gameService.sendDrawAnimation("testLobbyId", 4);
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/draw"), Mockito.any());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/draw"), Mockito.any());
     }
 
     @Test
     public void sendActionResponseTest() {
         gameService.sendActionResponse("testLobbyId", player, card);
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/action-response"), Mockito.any());
+    }
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/action-response"), Mockito.any());
+    @Test
+    public void sendEventActionResponseTest() {
+        gameService.sendEventActionResponse("testLobbyId", "testEvent");
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/action-response"), Mockito.any());
+    }
+
+    @Test
+    public void sendAttackTurnTest() {
+        gameService.sendAttackTurn("testLobbyId", "testPlayer");
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/attack-turn"), Mockito.any());
+    }
+
+    @Test
+    public void sendOverlayTest() {
+        gameService.sendOverlay("testLobbyId", player, "testIcon", "testTitle", "testMessage", 10);
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/overlay"), Mockito.any());
     }
 
     @Test
     public void sendEventTest() {
         gameService.sendEvent("testLobbyId", new FridayTheThirteenthEvent(this.gameRound));
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/event"), Mockito.any());
+    }
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/event"), Mockito.any());
+    @Test
+    public void sendRecessionTest() {
+        gameService.sendRecession("testLobbyId", player, 2);
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/recession"), Mockito.any());
+    }
+
+    @Test
+    public void sendGamblingManTest() {
+        gameService.sendGamblingMan("testLobbyId", player, new int[]{1});
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/gambling-man-window"), Mockito.any());
+    }
+
+    @Test
+    public void sendMarketWindowTest() {
+        gameService.sendMarketWindow("testLobbyId", player, Collections.singletonList(card));
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/market-window"), Mockito.any());
     }
 
     @Test
     public void sendEndRoundTest() {
         gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154, 20,null, null);
-
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }
 
     @Test
@@ -320,7 +418,6 @@ public class GameServiceTest {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
 
         gameService.sendEndGame("testLobbyId", Collections.singletonList(player));
-
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-game"), Mockito.any());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-game"), Mockito.any());
     }
 }
