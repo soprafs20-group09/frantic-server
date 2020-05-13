@@ -659,12 +659,14 @@ public class GameRound {
     }
 
     private void performGamblingMan() {
+        List<Chat> chat = new ArrayList<>();
         Value max = Value.ONE;
         List<Player> highest = new ArrayList<>();
         for (Player player : this.listOfPlayers) {
             if (this.gamblingManMap.containsKey(player)) {
                 Integer cardIndex = this.gamblingManMap.get(player);
                 Card card = player.peekCard(cardIndex);
+                chat.add(new EventChat("event:gambling-man", player.getUsername() + " bet " + FranticUtils.getStringRepresentation(card.getValue()) + "."));
                 if (card.getValue().ordinal() > max.ordinal()) {
                     max = card.getValue();
                     highest.add(player);
@@ -678,7 +680,7 @@ public class GameRound {
         else {
             loser = highest.get(0);
         }
-        Chat chat = new EventChat("event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.gamblingManMap.size() + " cards.");
+        chat.add(new EventChat("event:gambling-man", loser.getUsername() + " gambled wrong and collected " + this.gamblingManMap.size() + " cards."));
         this.gameService.sendChatMessage(this.lobbyId, chat);
         for (Map.Entry<Player, Integer> entry : this.gamblingManMap.entrySet()) {
             if (!entry.getKey().equals(loser)) {
