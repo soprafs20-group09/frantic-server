@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
@@ -51,8 +52,8 @@ public class WebSocketService {
 
     private void parseGameCommand(Player sender, String message) {
         if (message.equals("/end")) {
-            GameRound gameRound = GameRepository.findByLobbyId(sender.getLobbyId()).getCurrentGameRound();
-            gameRound.onRoundOver();
+            Game game = GameRepository.findByLobbyId(sender.getLobbyId());
+            game.getCurrentGameRound().onRoundOver();
         }
         else if (message.matches("/kick\\s\\S+")) {
             String toKick = message.split(" ")[1];
