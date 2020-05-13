@@ -272,11 +272,12 @@ public class GameService {
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 
-    public void sendEndGame(String lobbyId, List<Player> players) {
+    public void sendEndGame(String lobbyId, List<Player> players, Map<String, Integer> changes, String icon, String message) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.setIsPlaying(false);
+        lobbyRepository.flush();
 
-        EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players));
+        EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players), changes, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-game", dto);
     }
 

@@ -43,7 +43,7 @@ public class FinishLineEvent implements Event {
                 playerWithMaxPoints = player;
             }
         }
-        String message = "Welcome at the finish line! Watch everyone's standings and wait for the next round to start!";
+        String message = "Welcome at the finish line!";
         this.game.endGameRound(playerWithMaxPoints, changes, "event:finish-line", message);
     }
 

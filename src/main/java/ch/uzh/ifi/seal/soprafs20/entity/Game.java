@@ -49,11 +49,13 @@ public class Game {
         setFirstPlayer(playerWithMaxPoints);
         removeCardsFromHands();
         if (!gameOver()) {
+            message = message + " Watch everyone's standings and wait for the next round to start!";
             this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, calculateMaxPoints(), 20, icon, message);
             startTimer(20);
         }
         else {
-            this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers);
+            message = message + " The game is over. See who won below and challenge them to a rematch!";
+            this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers, changes, icon, message);
             onGameOver();
         }
     }

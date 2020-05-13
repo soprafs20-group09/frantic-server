@@ -492,6 +492,7 @@ public class GameRound {
 
         Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
+        this.gameService.sendTimer(this.lobbyId, 11);
         startAnimationTimer(11);
     }
 
@@ -783,10 +784,10 @@ public class GameRound {
         String message;
         if (this.timeBomb) {
             icon = "event:time-bomb";
-            message = this.currentPlayer.getUsername() + " defused the bomb! Watch everyone's standings and wait for the next round to start!";
+            message = this.currentPlayer.getUsername() + " defused the bomb!";
         }
         else {
-            message = this.currentPlayer.getUsername() + "played his last card and won! Watch everyone's standings and wait for the next round to start!";
+            message = this.currentPlayer.getUsername() + " played his last card!";
         }
         this.game.endGameRound(playerWithMaxPoints, changes, icon, message);
     }
@@ -805,7 +806,7 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        String message = "The bomb exploded! Watch everyone's standings and wait for the next round to start!";
+        String message = "The bomb exploded!";
         this.game.endGameRound(playerWithMaxPoints, changes, "event:time-bomb", message);
     }
 
