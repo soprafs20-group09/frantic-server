@@ -300,7 +300,10 @@ public class GameRound {
     public void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.isEmpty()) {
+            if (this.drawStack.size() > 0) {
+                player.pushCardToHand(this.drawStack.pop());
+            }
+            else {
                 this.timer.cancel();
                 onRoundOver();
             }
