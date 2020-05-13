@@ -41,7 +41,7 @@ public class TheAllSeeingEyeEventTest {
     @Test
     public void getMessageTest() {
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
-        assertEquals("You can't run! You can't hide! The all-seeing eye is here! Take a good look at everyone cards!", theAllSeeingEye.getMessage());
+        assertEquals("You can't run! You can't hide! The all-seeing eye is here! Take a good look at everyone's cards!", theAllSeeingEye.getMessage());
     }
 
     @Test
