@@ -571,6 +571,8 @@ public class GameRound {
                 for (int i = 0; i < entry.getValue().length; i++) {
                     cards.add(player.peekCard(entry.getValue()[i]));
                 }
+                this.eventLogs.add(new EventChat("event:merry-christmas",
+                        player.getUsername() + " gave " + target.getUsername() + " " + cards.size() + (cards.size() == 1 ? " card." : " cards.")));
                 if (this.christmasMap.containsKey(target)) {
                     List<Card> previous = this.christmasMap.get(target);
                     previous.addAll(cards);
@@ -597,8 +599,10 @@ public class GameRound {
             }
         }
         this.gameService.sendAnimationSpeed(this.lobbyId, 500);
+        this.gameService.sendChatMessage(this.lobbyId, this.eventLogs);
         sendCompleteGameState();
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
         this.christmasMap = new HashMap<>();
         finishTurn();
     }
