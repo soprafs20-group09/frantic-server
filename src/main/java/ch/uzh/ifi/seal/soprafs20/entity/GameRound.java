@@ -307,7 +307,6 @@ public class GameRound {
                 this.timer.cancel();
                 onRoundOver();
             }
-            player.pushCardToHand(this.drawStack.pop());
         }
         Chat chat;
         if (amount == 1) {
