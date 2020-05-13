@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;

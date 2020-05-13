@@ -1,12 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.PlayableDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MerryChristmasEvent implements Event {

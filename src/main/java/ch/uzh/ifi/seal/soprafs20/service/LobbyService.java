@@ -1,21 +1,18 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.Game;
+import ch.uzh.ifi.seal.soprafs20.entity.EventChat;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
 public class LobbyService {
-
-    private final Logger log = LoggerFactory.getLogger(LobbyService.class);
 
     private final WebSocketService webSocketService;
     private final PlayerService playerService;
@@ -108,7 +101,7 @@ public class LobbyService {
             webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
             playerService.removePlayer(toKick);
 
-            Chat chat = new Chat("event", "avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
+            Chat chat = new EventChat("avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
             webSocketService.sendChatMessage(lobbyId, chat);
             webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
         }
@@ -122,7 +115,7 @@ public class LobbyService {
             String lobbyId = playerService.removePlayer(player);
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
             if (lobby != null) {
-                Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
+                Chat chat = new EventChat("avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
                 webSocketService.sendChatMessage(lobbyId, chat);
                 List<String> playerList = lobby.getListOfPlayers();
                 if (playerList.size() > 1) {
@@ -161,7 +154,7 @@ public class LobbyService {
         lobby.setCreator(newHost.getUsername());
         playerRepository.flush();
         lobbyRepository.flush();
-        Chat chat = new Chat("event", "avatar:" + newHost.getUsername(), newHost.getUsername() + " is now host.");
+        Chat chat = new EventChat("avatar:" + newHost.getUsername(), newHost.getUsername() + " is now host.");
         webSocketService.sendChatMessage(lobbyId, chat);
     }
 

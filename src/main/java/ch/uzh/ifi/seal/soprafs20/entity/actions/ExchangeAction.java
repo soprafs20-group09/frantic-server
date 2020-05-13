@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.entity.actions;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.EventChat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
@@ -83,7 +84,7 @@ public class ExchangeAction implements Action {
             this.target.pushCardToHand(c);
         }
 
-        chat.add(new Chat("event", "special:exchange", this.initiator.getUsername()
+        chat.add(new EventChat("special:exchange", this.initiator.getUsername()
                 + " exchanged " + (twoCardsExchanged ? "2" : "") + " cards with " + this.target.getUsername() + "."));
         return chat;
     }

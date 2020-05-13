@@ -1,6 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Pile;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
@@ -12,7 +15,6 @@ public class MarketEvent implements Event {
     private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Pile<Card> drawStack;
-    private Player currentPlayer;
     private final int seconds;
 
     public MarketEvent(GameRound gameRound) {
@@ -28,7 +30,7 @@ public class MarketEvent implements Event {
     }
 
     public void performEvent() {
-        this.currentPlayer = this.gameRound.getCurrentPlayer();
+        Player currentPlayer = this.gameRound.getCurrentPlayer();
         List<Card> cards = new ArrayList<>();
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
             if (this.drawStack.size() > 0) {

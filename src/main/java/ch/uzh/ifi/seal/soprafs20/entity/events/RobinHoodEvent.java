@@ -1,9 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.ArrayList;
@@ -14,7 +11,6 @@ public class RobinHoodEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private Player currentPlayer;
 
     public RobinHoodEvent(GameRound gameRound) {
         this.gameRound = gameRound;
@@ -27,7 +23,7 @@ public class RobinHoodEvent implements Event {
     }
 
     public void performEvent() {
-        this.currentPlayer = this.gameRound.getCurrentPlayer();
+        Player currentPlayer = this.gameRound.getCurrentPlayer();
         int numOfPlayers = this.listOfPlayers.size();
         int currentPlayerIndex = this.listOfPlayers.indexOf(currentPlayer);
         int nextPlayerIndex = (currentPlayerIndex + 1) % numOfPlayers;
@@ -69,7 +65,7 @@ public class RobinHoodEvent implements Event {
                 minCardsPlayer.pushCardToHand(maxTemp.get(i));
             }
         }
-        Chat chat = new Chat("event", "event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped all cards");
+        Chat chat = new EventChat("event:robin-hood", maxCardsPlayer.getUsername() + " and " + minCardsPlayer.getUsername() + " swapped all cards");
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
 
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);

@@ -1,13 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class TheAllSeeingEyeEvent implements Event {
 

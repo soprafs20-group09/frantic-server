@@ -12,7 +12,7 @@ public class VandalismEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private Pile<Card> discardPile;
+    private final Pile<Card> discardPile;
 
     public VandalismEvent(GameRound gameRound) {
         this.gameRound = gameRound;
@@ -49,7 +49,7 @@ public class VandalismEvent implements Event {
                 }
             }
             if (discardedCards > 0) {
-                chat.add(new Chat("event", "avatar:" + player.getUsername(),
+                chat.add(new EventChat("avatar:" + player.getUsername(),
                         player.getUsername() + " discarded " + discardedCards + (discardedCards == 1 ? " card" : " cards")));
             }
         }

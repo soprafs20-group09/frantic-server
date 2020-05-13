@@ -54,21 +54,21 @@ public class FantasticFourAction implements Action {
                 }
             }
             if (target.getValue() == 1) {
-                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));
+                chat.add(new EventChat("special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));
             }
             else {
-                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
+                chat.add(new EventChat("special:fantastic-four", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
             }
         }
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
         if (this.wishedColor != Color.NONE) {
-            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+            chat.add(new EventChat("special:fantastic-four", this.initiator.getUsername()
                     + " wished " + FranticUtils.getStringRepresentation(this.wishedColor) + "."));
         }
         else {
-            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+            chat.add(new EventChat("special:fantastic-four", this.initiator.getUsername()
                     + " wished " + FranticUtils.getStringRepresentation(this.wishedValue) + "."));
         }
         return chat;

@@ -14,13 +14,11 @@ public class MatingSeasonEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player initiator;
 
     public MatingSeasonEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.initiator = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
@@ -53,7 +51,7 @@ public class MatingSeasonEvent implements Event {
             }
 
             if (discardedCards > 0) {
-                chat.add(new Chat("event", "avatar:" + playerOfInterest.getUsername(),
+                chat.add(new EventChat("avatar:" + playerOfInterest.getUsername(),
                         playerOfInterest.getUsername() + " discarded " + discardedCards + " cards"));
             }
         }

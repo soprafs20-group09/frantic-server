@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.EventChat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
@@ -71,7 +72,7 @@ public class RegisterService {
         FranticUtils.wait(500);
         // send initial lobby-state packet
         webSocketService.sendToLobby(lobbyId, "/lobby-state", lobbyService.getLobbyState(lobbyId));
-        Chat chat = new Chat("event", "avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");
+        Chat chat = new EventChat("avatar:" + player.getUsername(), player.getUsername() + " joined the lobby.");
         webSocketService.sendChatMessage(lobbyId, chat);
     }
 

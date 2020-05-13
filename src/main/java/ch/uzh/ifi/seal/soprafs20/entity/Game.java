@@ -15,8 +15,6 @@ public class Game {
     private final List<Player> listOfPlayers;
     private final int maxPoints;
     private Player firstPlayer;
-    private final List<Player> winners;
-    private Timer timer;
 
     private final GameService gameService;
 
@@ -27,7 +25,6 @@ public class Game {
         this.listOfPlayers = PlayerService.getInstance().getPlayersInLobby(lobbyId);
         this.firstPlayer = listOfPlayers.get(0);
         this.maxPoints = calculateMaxPoints();
-        this.winners = new ArrayList<>();
     }
 
     public GameRound getCurrentGameRound() {
@@ -84,24 +81,7 @@ public class Game {
     }
 
     private boolean gameOver() {
-        Map<String, Integer> scores = getScores();
-        if (Collections.max(scores.values()) >= this.maxPoints) {
-            calculateWinners(scores);
-            return true;
-        }
-        return false;
-    }
-
-    private void calculateWinners(Map<String, Integer> scores) {
-        //Calculate smallest number of points some player has
-        int minPoints = Collections.min(scores.values());
-
-        //Add all players with minPoints to winners-list
-        for (Player player : this.listOfPlayers) {
-            if (player.getPoints() == minPoints) {
-                this.winners.add(player);
-            }
-        }
+        return Collections.max(getScores().values()) >= this.maxPoints;
     }
 
     //The first player is the player to the right of the player who shuffles the cards
@@ -148,14 +128,14 @@ public class Game {
 
     public void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
-        this.timer = new Timer();
+        Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 startNewGameRound();
             }
         };
-        this.timer.schedule(timerTask, milliseconds);
+        timer.schedule(timerTask, milliseconds);
     }
 
     private void removeFromPlayerList(Player player) {

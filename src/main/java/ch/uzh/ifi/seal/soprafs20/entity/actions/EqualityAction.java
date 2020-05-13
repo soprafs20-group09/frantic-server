@@ -35,12 +35,12 @@ public class EqualityAction implements Action {
                 this.cardsDrawn += 1;
             }
 
-            chat.add(new Chat("event", "special:equality", this.target.getUsername()
+            chat.add(new EventChat("special:equality", this.target.getUsername()
                     + " drew " + this.cardsDrawn + " cards."));
         }
         discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
-        chat.add(new Chat("event", "special:equality", this.initiator.getUsername()
+        chat.add(new EventChat("special:equality", this.initiator.getUsername()
                 + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
 
         return chat;

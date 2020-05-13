@@ -3,7 +3,6 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.mapper.DTOMapper;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
@@ -26,8 +25,6 @@ import java.util.List;
 @RestController
 public class RESTController {
 
-    private final Logger log = LoggerFactory.getLogger(RESTController.class);
-
     private final LobbyService lobbyService;
 
     private final RegisterService registerService;
@@ -41,9 +38,6 @@ public class RESTController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
-
-        log.debug(q == null ? "GET /lobbies" : "GET /lobbies?q={}", q);
-
         List<Lobby> lobbies = lobbyService.getLobbies(q);
         List<LobbyListElementDTO> response = new ArrayList<>();
         for (Lobby lobby : lobbies) {
@@ -58,8 +52,6 @@ public class RESTController {
     public LobbyJoinDTO createLobby(@Valid @RequestBody PlayerUsernameDTO dto) {
 
         String username = clean(dto.getUsername());
-        log.debug("POST /lobbies, body: {}", dto.toString());
-
         lobbyService.checkLobbyCreate(username);
         return registerService.prepareLobby(username);
     }
@@ -70,8 +62,6 @@ public class RESTController {
     public LobbyJoinDTO joinLobby(@PathVariable String id, @RequestBody PlayerUsernameDTO dto) {
 
         String username = clean(dto.getUsername());
-        log.debug("PUT /lobbies/{}, body: {}", id, dto.toString());
-
         lobbyService.checkLobbyJoin(id, username);
         return registerService.prepareLobby(id, username);
     }

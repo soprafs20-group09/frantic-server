@@ -417,7 +417,7 @@ public class GameServiceTest {
     public void sendEndGameTest() {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
 
-        gameService.sendEndGame("testLobbyId", Collections.singletonList(player));
+        gameService.sendEndGame("testLobbyId", Collections.singletonList(player), new HashMap<>(), null, null);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-game"), Mockito.any());
     }
 }

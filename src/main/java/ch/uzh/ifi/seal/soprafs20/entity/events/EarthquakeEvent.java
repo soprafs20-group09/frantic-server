@@ -1,9 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Card;
-import ch.uzh.ifi.seal.soprafs20.entity.Chat;
-import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
-import ch.uzh.ifi.seal.soprafs20.entity.Player;
+import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
@@ -48,7 +45,7 @@ public class EarthquakeEvent implements Event {
             for (Card card : allCards.get(i)) {
                 toPlayer.pushCardToHand(card);
             }
-            chat.add(new Chat("event", "event:earthquake", fromPlayer.getUsername() + " gave all cards to " + toPlayer.getUsername() + "."));
+            chat.add(new EventChat("event:earthquake", fromPlayer.getUsername() + " gave all cards to " + toPlayer.getUsername() + "."));
         }
 
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);

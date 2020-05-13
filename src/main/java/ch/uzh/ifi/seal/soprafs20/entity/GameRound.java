@@ -36,7 +36,7 @@ public class GameRound {
     private Map<Player, Integer> recessionMap;
     private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
-    private Map<Player, Integer> gamblingManMap;
+    private final Map<Player, Integer> gamblingManMap;
     private List<Card> marketList;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
@@ -96,7 +96,7 @@ public class GameRound {
         this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
 
         if (!this.isDrawStackLow && this.drawStack.size() <= 10) {
-            Chat chat = new Chat("event", "misc:warning", "There are only " + this.drawStack.size() + " cards left.");
+            Chat chat = new EventChat("misc:warning", "There are only " + this.drawStack.size() + " cards left.");
             this.gameService.sendChatMessage(this.lobbyId, chat);
             this.isDrawStackLow = true;
         }
@@ -132,11 +132,11 @@ public class GameRound {
 
     private void startTurn() {
         this.turnIsRunning = true;
-        int timeBomb = Collections.max(this.bombMap.values());
-        if (timeBomb > 0) {
-            timeBomb = -timeBomb + 4;
+        int timeBombRounds = Collections.max(this.bombMap.values());
+        if (timeBombRounds > 0) {
+            timeBombRounds = -timeBombRounds + 4;
         }
-        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBomb);
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
         this.gameService.sendTimer(this.lobbyId, 30);
         startTurnTimer(30);
@@ -189,7 +189,7 @@ public class GameRound {
                         this.hasCurrentPlayerMadeMove = true;
 
                         if (cardToPlay.getType() == Type.NUMBER) {
-                            Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
+                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
                                     this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getColor() == Color.BLACK) {
@@ -200,7 +200,7 @@ public class GameRound {
                             }
                         }
                         else if (cardToPlay.getType() == Type.SPECIAL) {
-                            Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
+                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
                                     this.currentPlayer.getUsername() + " played " + (cardToPlay.getColor().ordinal() < 4 ? (FranticUtils.getStringRepresentation(cardToPlay.getColor()) + " ") : "")
                                             + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
@@ -244,7 +244,7 @@ public class GameRound {
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
-                    Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
+                    Chat chat = new EventChat("avatar:" + counterAttacker.getUsername(),
                             counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
@@ -269,7 +269,7 @@ public class GameRound {
         this.discardPile.push(cardToPlay);
         this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
         this.gameService.sendHand(this.lobbyId, niceTryPlayer);
-        Chat chat = new Chat("event", "avatar:" + niceTryPlayer.getUsername(),
+        Chat chat = new EventChat("avatar:" + niceTryPlayer.getUsername(),
                 niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
         this.gameService.sendChatMessage(this.lobbyId, chat);
 
@@ -300,7 +300,7 @@ public class GameRound {
     public void drawCardFromStack(Player player, int amount) {
         for (int i = 1; i <= amount; i++) {
             //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.size() <= 0) {
+            if (this.drawStack.isEmpty()) {
                 this.timer.cancel();
                 onRoundOver();
             }
@@ -308,11 +308,11 @@ public class GameRound {
         }
         Chat chat;
         if (amount == 1) {
-            chat = new Chat("event", "avatar:" + player.getUsername(),
+            chat = new EventChat("avatar:" + player.getUsername(),
                     player.getUsername() + " drew a card.");
         }
         else {
-            chat = new Chat("event", "avatar:" + player.getUsername(),
+            chat = new EventChat("avatar:" + player.getUsername(),
                     player.getUsername() + " drew " + amount + " cards");
         }
         this.gameService.sendChatMessage(this.lobbyId, chat);
@@ -454,7 +454,7 @@ public class GameRound {
         String attacker = this.currentAction.getInitiator().getUsername();
 
         if (!targets.isEmpty()) {
-            Chat chat = new Chat("event", "special:" + attackType,
+            Chat chat = new EventChat("special:" + attackType,
                     attacker + " is attacking " + String.join(", ", targetUsernames) + ".");
             this.gameService.sendChatMessage(this.lobbyId, chat);
         }
@@ -498,7 +498,7 @@ public class GameRound {
 
     private void performEvent() {
         Event event = this.events.remove(0);
-        Chat chat = new Chat("event", "event:" + event.getName(), event.getMessage());
+        Chat chat = new EventChat("event:" + event.getName(), event.getMessage());
         this.gameService.sendChatMessage(this.lobbyId, chat);
         event.performEvent();
     }
@@ -521,7 +521,7 @@ public class GameRound {
         this.timer.cancel();
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
-            chat.add(new Chat("event", "event:recession",
+            chat.add(new EventChat("event:recession",
                     entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " cards.")));
         }
 
@@ -539,7 +539,7 @@ public class GameRound {
         if (player != null && target != null) {
             this.eventResponses.add(player);
             this.surprisePartyMap.put(player.popCard(card), target);
-            this.eventLogs.add(new Chat("event", "event:surprise-party", player.getUsername() + " gave " + target.getUsername() + " a card."));
+            this.eventLogs.add(new EventChat("event:surprise-party", player.getUsername() + " gave " + target.getUsername() + " a card."));
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performSurpriseParty();
@@ -621,7 +621,7 @@ public class GameRound {
 
     private void performMarket(Player player, Card choice) {
         player.pushCardToHand(choice);
-        Chat chat = new Chat("event", "event:market", player.getUsername() + " took a card");
+        Chat chat = new EventChat("event:market", player.getUsername() + " took a card");
         this.gameService.sendChatMessage(this.lobbyId, chat);
         this.sendCompleteGameState();
 
@@ -672,7 +672,7 @@ public class GameRound {
         else {
             loser = highest.get(0);
         }
-        Chat chat = new Chat("event", "event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.gamblingManMap.size() + " cards.");
+        Chat chat = new EventChat("event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.gamblingManMap.size() + " cards.");
         this.gameService.sendChatMessage(this.lobbyId, chat);
         for (Map.Entry<Player, Integer> entry : this.gamblingManMap.entrySet()) {
             if (!entry.getKey().equals(loser)) {
@@ -732,7 +732,7 @@ public class GameRound {
             //go to the next player, if the current player is skipped
             if (this.currentPlayer.isBlocked()) {
                 this.gameService.sendOverlay(this.lobbyId, this.currentPlayer, "special:skip", "You are skipped!", null, 2);
-                Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
+                Chat chat = new EventChat("special:skip", this.currentPlayer.getUsername()
                         + " is skipped.");
                 this.gameService.sendChatMessage(this.lobbyId, chat);
                 this.currentPlayer.setBlocked(false);

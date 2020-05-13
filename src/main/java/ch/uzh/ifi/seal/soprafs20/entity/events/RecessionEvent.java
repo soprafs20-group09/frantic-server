@@ -1,19 +1,16 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class RecessionEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private Player currentPlayer;
     private int amount;
     private final int seconds;
 
@@ -30,9 +27,9 @@ public class RecessionEvent implements Event {
     }
 
     public void performEvent() {
-        this.currentPlayer = this.gameRound.getCurrentPlayer();
+        Player currentPlayer = this.gameRound.getCurrentPlayer();
         int numOfPlayers = this.listOfPlayers.size();
-        int initiatorIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+        int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
         for (int i = 1; i <= numOfPlayers; i++) {
             Player player = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
             this.gameService.sendRecession(this.gameRound.getLobbyId(), player, Math.min(this.amount, player.getHandSize()));
