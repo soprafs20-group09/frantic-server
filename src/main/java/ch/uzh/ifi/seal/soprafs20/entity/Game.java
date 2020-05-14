@@ -140,8 +140,9 @@ public class Game {
     }
 
     public void stopTimer() {
-        this.timer.cancel();
-        this.timer.purge();
+        if (this.timer != null) {
+            this.timer.cancel();
+        }
     }
 
     private void removeFromPlayerList(Player player) {

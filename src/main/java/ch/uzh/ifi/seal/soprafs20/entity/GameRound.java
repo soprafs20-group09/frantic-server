@@ -518,6 +518,7 @@ public class GameRound {
         Player player = getPlayerByIdentity(identity);
         if (player != null && cards.length > 0) {
             this.eventResponses.add(player);
+            Arrays.sort(cards);
             for (int i = cards.length - 1; i >= 0; i--) {
                 player.popCard(cards[i]);
             }
