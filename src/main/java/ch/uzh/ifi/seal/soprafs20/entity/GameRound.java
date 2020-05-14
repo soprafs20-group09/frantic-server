@@ -109,7 +109,13 @@ public class GameRound {
     }
 
     private void prepareNewTurn() {
-        if (!isRoundOver()) {
+        if (this.drawStack.size() == 0) {
+            endProcess();
+            sendGameState();
+            FranticUtils.wait(1000);
+            onRoundOver(true);
+        }
+        else if (!isRoundOver()) {
             changePlayer();
             endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
             if (this.timeBomb) {
@@ -308,7 +314,7 @@ public class GameRound {
             }
             else {
                 this.timer.cancel();
-                onRoundOver();
+                onRoundOver(true);
             }
         }
         Chat chat;
@@ -762,7 +768,7 @@ public class GameRound {
         return this.bombMap.get(this.currentPlayer) >= 4;
     }
 
-    public void onRoundOver() {
+    public void onRoundOver(boolean emptyStack) {
         this.timer.cancel();
         int maxPoints = 0;
         Map<String, Integer> changes = new HashMap<>();
@@ -796,6 +802,9 @@ public class GameRound {
         if (this.timeBomb) {
             icon = "event:time-bomb";
             message = this.currentPlayer.getUsername() + " defused the bomb!";
+        }
+        else if (emptyStack) {
+            message = "The card stack is empty!";
         }
         else {
             message = this.currentPlayer.getUsername() + " played his last card!";
@@ -866,7 +875,7 @@ public class GameRound {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                onRoundOver();
+                onRoundOver(false);
             }
         };
         this.timer.schedule(timerTask, milliseconds);
