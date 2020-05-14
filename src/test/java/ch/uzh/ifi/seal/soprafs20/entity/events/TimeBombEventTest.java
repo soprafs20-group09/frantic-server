@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
@@ -41,6 +43,16 @@ public class TimeBombEventTest {
     public void getNameTest() {
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         assertEquals("time-bomb", timeBomb.getName());
+    }
+
+    @Test
+    public void performEventTest() {
+        Mockito.doNothing().when(this.gameRound).setTimeBomb();
+        TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
+        timeBomb.performEvent();
+
+        Mockito.verify(this.gameRound).sendCompleteGameState();
+        Mockito.verify(this.gameRound).finishTurn();
     }
 
     @Test

@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
-import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 
 public class TimeBombEvent implements Event {
