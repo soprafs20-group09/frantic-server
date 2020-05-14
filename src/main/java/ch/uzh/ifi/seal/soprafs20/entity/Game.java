@@ -126,7 +126,7 @@ public class Game {
         this.removeFromPlayerList(player);
     }
 
-    public void startTimer(int seconds) {
+    private void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -140,5 +140,9 @@ public class Game {
 
     private void removeFromPlayerList(Player player) {
         this.listOfPlayers.removeIf(p -> player.getIdentity().equals(p.getIdentity()));
+    }
+
+    public int getMaxPoints() {
+        return this.maxPoints;
     }
 }
