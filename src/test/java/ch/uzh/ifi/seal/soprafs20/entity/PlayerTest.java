@@ -1,34 +1,32 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
 
-    @Mock
     private Player testPlayer;
 
     private Card someCard;
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        testPlayer = new Player();
+        someCard = new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0);
 
-        Mockito.when(testPlayer.getId()).thenReturn(1L);
-        Mockito.when(testPlayer.getUsername()).thenReturn("testPlayer");
-        Mockito.when(testPlayer.getIdentity()).thenReturn("FANCY_IDENTITY_FOR_TEST");
-        Mockito.when(testPlayer.getLobbyId()).thenReturn("I like bread");
-        Mockito.when(testPlayer.getPoints()).thenReturn(12);
-        Mockito.when(testPlayer.popCard(0)).thenReturn(someCard);
-        Mockito.when(testPlayer.isBlocked()).thenReturn(false);
-        Mockito.when(testPlayer.isAdmin()).thenReturn(false);
-        Mockito.when(testPlayer.getHandSize()).thenReturn(1);
-        Mockito.when(testPlayer.calculatePoints()).thenReturn(1);
+        testPlayer.setId(1L);
+        testPlayer.setUsername("testPlayer");
+        testPlayer.setIdentity("FANCY_IDENTITY_FOR_TEST");
+        testPlayer.setLobbyId("I like bread");
+        testPlayer.setPoints(12);
+        testPlayer.setBlocked(false);
+        testPlayer.setAdmin(false);
+        testPlayer.pushCardToHand(someCard);
     }
 
     @Test
@@ -38,7 +36,7 @@ public class PlayerTest {
 
     @Test
     public void setIdTest() {
-        Mockito.when(testPlayer.getId()).thenReturn(2L);
+        assertEquals(1L, testPlayer.getId());
         testPlayer.setId(2L);
         assertEquals(2L, testPlayer.getId());
     }
@@ -50,7 +48,7 @@ public class PlayerTest {
 
     @Test
     public void setUsernameTest() {
-        Mockito.when(testPlayer.getUsername()).thenReturn("SuperDuckling");
+        assertEquals("testPlayer", testPlayer.getUsername());
         testPlayer.setUsername("SuperDuckling");
         assertEquals("SuperDuckling", testPlayer.getUsername());
     }
@@ -62,7 +60,7 @@ public class PlayerTest {
 
     @Test
     public void setIdentityTest() {
-        Mockito.when(testPlayer.getIdentity()).thenReturn("SUPER_SECRET_IDENTITY");
+        assertEquals("FANCY_IDENTITY_FOR_TEST", testPlayer.getIdentity());
         testPlayer.setIdentity("SUPER_SECRET_IDENTITY");
         assertEquals("SUPER_SECRET_IDENTITY", testPlayer.getIdentity());
     }
@@ -74,7 +72,7 @@ public class PlayerTest {
 
     @Test
     public void setLobbyIdTest() {
-        Mockito.when(testPlayer.getLobbyId()).thenReturn("Pros only");
+        assertEquals("I like bread", testPlayer.getLobbyId());
         testPlayer.setLobbyId("Pros only");
         assertEquals("Pros only", testPlayer.getLobbyId());
     }
@@ -86,24 +84,23 @@ public class PlayerTest {
 
     @Test
     public void setPointsTest() {
-        Mockito.when(testPlayer.getPoints()).thenReturn(15);
+        assertEquals(12, testPlayer.getPoints());
         testPlayer.setPoints(15);
         assertEquals(15, testPlayer.getPoints());
     }
 
     @Test
     public void popCardTest() {
-        Mockito.when(testPlayer.getHandSize()).thenReturn(0);
         assertEquals(someCard, testPlayer.popCard(0));
         assertEquals(0, testPlayer.getHandSize());
     }
 
     @Test
     public void pushCardToHandTest() {
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        assertEquals(someCard, testPlayer.popCard(0));
         assertEquals(1, testPlayer.getHandSize());
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
+        assertEquals(3, testPlayer.getHandSize());
     }
 
     @Test
@@ -113,7 +110,7 @@ public class PlayerTest {
 
     @Test
     public void setBlockedTest() {
-        Mockito.when(testPlayer.isBlocked()).thenReturn(true);
+        assertFalse(testPlayer.isBlocked());
         testPlayer.setBlocked(true);
         assertTrue(testPlayer.isBlocked());
     }
@@ -130,7 +127,7 @@ public class PlayerTest {
 
     @Test
     public void setAdminTest() {
-        Mockito.when(testPlayer.isAdmin()).thenReturn(true);
+        assertFalse(testPlayer.isAdmin());
         testPlayer.setAdmin(true);
         assertTrue(testPlayer.isAdmin());
     }
@@ -140,19 +137,17 @@ public class PlayerTest {
     @Test
     public void calculatePointsTest() {
         //TODO: test with special cards & FuckYouCard
-        assertEquals(1, testPlayer.calculatePoints());
+        assertEquals(7, testPlayer.calculatePoints());
     }
 
     @Test
     public void clearHandTest() {
-        Mockito.when(testPlayer.getHandSize()).thenReturn(5);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 3));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 4));
         assertEquals(5, testPlayer.getHandSize());
         testPlayer.clearHand();
-        Mockito.when(testPlayer.getHandSize()).thenReturn(0);
         assertEquals(0, testPlayer.getHandSize());
     }
 }
