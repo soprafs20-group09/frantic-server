@@ -42,13 +42,19 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void calculateMaxPoints_2Players_short() {
+    public void calculateMaxPoints_2Players() {
         Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
         assertEquals(137, testGame.getMaxPoints());
+
+        testGame = new Game(this.testLobbyId, GameLength.MEDIUM);
+        assertEquals(154, testGame.getMaxPoints());
+
+        testGame = new Game(this.testLobbyId, GameLength.LONG);
+        assertEquals(179, testGame.getMaxPoints());
     }
 
     @Test
-    public void calculateMaxPoints_4Players_medium() {
+    public void calculateMaxPoints_4Players() {
         Player player3 = playerService.createPlayer("id3", "player3");
         lobbyService.joinLobby(this.testLobbyId, player3);
         Player player4 = playerService.createPlayer("id4", "player4");
@@ -59,7 +65,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void calculateMaxPoints_6Players_long() {
+    public void calculateMaxPoints_6Players() {
         Player player3 = playerService.createPlayer("id3", "player3");
         lobbyService.joinLobby(this.testLobbyId, player3);
         Player player4 = playerService.createPlayer("id4", "player4");
@@ -68,8 +74,14 @@ public class GameIntegrationTest {
         lobbyService.joinLobby(this.testLobbyId, player5);
         Player player6 = playerService.createPlayer("id6", "player6");
         lobbyService.joinLobby(this.testLobbyId, player6);
-        Game testGame = new Game(this.testLobbyId, GameLength.LONG);
 
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        assertEquals(113, testGame.getMaxPoints());
+
+        testGame = new Game(this.testLobbyId, GameLength.MEDIUM);
+        assertEquals(137, testGame.getMaxPoints());
+
+        testGame = new Game(this.testLobbyId, GameLength.LONG);
         assertEquals(154, testGame.getMaxPoints());
     }
 }
