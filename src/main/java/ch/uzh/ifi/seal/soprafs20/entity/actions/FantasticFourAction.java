@@ -48,17 +48,13 @@ public class FantasticFourAction implements Action {
         List<Chat> chat = new ArrayList<>();
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
-            for (int i = 0; i < target.getValue(); i++) {
-                if (this.drawStack.size() > 0) {
-                    target.getKey().pushCardToHand(drawStack.pop());
-                }
+            int cardsDrawn = 0;
+            while (cardsDrawn < target.getValue() && this.drawStack.size() > 0) {
+                target.getKey().pushCardToHand(drawStack.pop());
+                cardsDrawn++;
             }
-            if (target.getValue() == 1) {
-                chat.add(new EventChat("special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));
-            }
-            else {
-                chat.add(new EventChat("special:fantastic-four", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
-            }
+            chat.add(new EventChat("special:fantastic-four",
+                    target.getKey().getUsername() + " drew " + cardsDrawn + (cardsDrawn == 1 ? " card." : " cards.")));
         }
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);

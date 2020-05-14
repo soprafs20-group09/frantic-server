@@ -52,7 +52,7 @@ public class WebSocketService {
     private void parseGameCommand(Player sender, String message) {
         if (message.equals("/end")) {
             Game game = GameRepository.findByLobbyId(sender.getLobbyId());
-            game.getCurrentGameRound().onRoundOver();
+            game.getCurrentGameRound().onRoundOver(false);
         }
         else if (message.matches("/kick\\s\\S+")) {
             String toKick = message.split(" ")[1];

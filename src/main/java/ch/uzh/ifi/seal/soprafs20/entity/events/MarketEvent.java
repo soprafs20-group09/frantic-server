@@ -37,7 +37,7 @@ public class MarketEvent implements Event {
                 cards.add(this.drawStack.pop());
             }
             else {
-                this.gameRound.onRoundOver();
+                this.gameRound.onRoundOver(true);
                 return;
             }
         }
