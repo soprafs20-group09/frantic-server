@@ -576,19 +576,21 @@ public class GameRound {
             this.eventResponses.add(player);
             for (Map.Entry<String, Integer[]> entry : targets.entrySet()) {
                 Player target = getPlayerByUsername(entry.getKey());
-                List<Card> cards = new ArrayList<>();
-                for (int i = 0; i < entry.getValue().length; i++) {
-                    cards.add(player.peekCard(entry.getValue()[i]));
-                }
-                this.eventLogs.add(new EventChat("event:merry-christmas",
-                        player.getUsername() + " gave " + target.getUsername() + " " + cards.size() + (cards.size() == 1 ? " card." : " cards.")));
-                if (this.christmasMap.containsKey(target)) {
-                    List<Card> previous = this.christmasMap.get(target);
-                    previous.addAll(cards);
-                    this.christmasMap.put(target, previous);
-                }
-                else {
-                    this.christmasMap.put(target, cards);
+                if (target != null) {
+                    List<Card> cards = new ArrayList<>();
+                    for (int i = 0; i < entry.getValue().length; i++) {
+                        cards.add(player.peekCard(entry.getValue()[i]));
+                    }
+                    this.eventLogs.add(new EventChat("event:merry-christmas",
+                            player.getUsername() + " gave " + target.getUsername() + " " + cards.size() + (cards.size() == 1 ? " card." : " cards.")));
+                    if (this.christmasMap.containsKey(target)) {
+                        List<Card> previous = this.christmasMap.get(target);
+                        previous.addAll(cards);
+                        this.christmasMap.put(target, previous);
+                    }
+                    else {
+                        this.christmasMap.put(target, cards);
+                    }
                 }
             }
             player.clearHand();
