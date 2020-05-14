@@ -301,13 +301,16 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void handleDisconnect_setNewAdmin_sendLobbyState() {
+    void handleDisconnect_setNewAdmin() {
+        testPlayer.setAdmin(true);
         Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
 
         assertTrue(lobbyRepository.findByLobbyId("abc").getPlayers() > 1);
-        lobbyService.handleDisconnect("abc");
-        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage(Mockito.matches("lobbyId"), (Chat) Mockito.any());
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/lobby-state"), Mockito.any());
+        lobbyService.handleDisconnect("testIdentity");
+        Mockito.verify(webSocketService, Mockito.times(2)).sendChatMessage(Mockito.matches("lobbyId"), (Chat) Mockito.any());
+        assertTrue(testPlayer.isAdmin());
+        assertEquals("testPlayer", testLobby.getCreator());
+        Mockito.verify(webSocketService).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/lobby-state"), Mockito.any());
     }
 
     @Test
@@ -319,5 +322,11 @@ public class LobbyServiceTest {
         assertEquals(1, lobbyRepository.findByLobbyId("abc").getPlayers());
         lobbyService.handleDisconnect("abc");
         Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches("testIdentity"), Mockito.matches("/queue/disconnect"), Mockito.any());
+    }
+
+    @Test
+    public void rematchTest() {
+        lobbyService.rematch("lobbyId", "testIdentity");
+        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("lobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/lobby-state"), Mockito.any());
     }
 }
