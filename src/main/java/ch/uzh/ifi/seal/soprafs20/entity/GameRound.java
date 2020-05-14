@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class GameRound {
 
-    private final GameService gameService;
+    private GameService gameService;
     private final Game game;
     private final String lobbyId;
     private final List<Player> listOfPlayers;
@@ -112,8 +112,8 @@ public class GameRound {
         if (!isRoundOver()) {
             changePlayer();
             endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
-            if (timeBomb) {
-                this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
+            if (this.timeBomb) {
+                this.bombMap.put(this.currentPlayer, this.bombMap.get(this.currentPlayer) + 1);
                 if (isTimeBombExploding()) {
                     bombExploded();
                     return;
@@ -132,9 +132,12 @@ public class GameRound {
 
     private void startTurn() {
         this.turnIsRunning = true;
-        int timeBombRounds = Collections.max(this.bombMap.values());
-        if (timeBombRounds > 0) {
-            timeBombRounds = -timeBombRounds + 4;
+        int timeBombRounds = 0;
+        if (this.timeBomb) {
+            timeBombRounds = Collections.max(this.bombMap.values());
+            if (timeBombRounds > 0) {
+                timeBombRounds = -timeBombRounds + 4;
+            }
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
@@ -1057,5 +1060,10 @@ public class GameRound {
         this.events.add(new VandalismEvent(this));
 
         Collections.shuffle(this.events);
+    }
+
+    //needed for testing
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
     }
 }
