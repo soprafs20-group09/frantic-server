@@ -12,11 +12,11 @@ public class Game {
     private final String lobbyId;
     private GameRound currentGameRound;
     private final GameLength gameDuration;
-    private final List<Player> listOfPlayers;
+    private List<Player> listOfPlayers;
     private final int maxPoints;
     private Player firstPlayer;
 
-    private final GameService gameService;
+    private GameService gameService;
 
     public Game(String lobbyId, GameLength gameDuration) {
         this.gameService = GameService.getInstance();
@@ -47,7 +47,7 @@ public class Game {
         removeCardsFromHands();
         if (!gameOver()) {
             message = message + " Watch everyone's standings and wait for the next round to start!";
-            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, calculateMaxPoints(), 20, icon, message);
+            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, 20, icon, message);
             startTimer(20);
         }
         else {
@@ -144,5 +144,18 @@ public class Game {
 
     public int getMaxPoints() {
         return this.maxPoints;
+    }
+
+    public Player getFirstPlayer() {
+        return this.firstPlayer;
+    }
+
+    //needed for testing
+    public void setListOfPlayers(List<Player> playerList) {
+        this.listOfPlayers = playerList;
+    }
+
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
     }
 }
