@@ -15,6 +15,7 @@ public class Game {
     private List<Player> listOfPlayers;
     private final int maxPoints;
     private Player firstPlayer;
+    private Timer timer;
 
     private GameService gameService;
 
@@ -128,7 +129,7 @@ public class Game {
 
     private void startTimer(int seconds) {
         int milliseconds = seconds * 1000;
-        Timer timer = new Timer();
+        this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -136,6 +137,11 @@ public class Game {
             }
         };
         timer.schedule(timerTask, milliseconds);
+    }
+
+    public void stopTimer() {
+        this.timer.cancel();
+        this.timer.purge();
     }
 
     private void removeFromPlayerList(Player player) {

@@ -13,6 +13,7 @@ public class GameRepository {
     }
 
     public static void removeGame(String lobbyId) {
+        gameRepo.get(lobbyId).stopTimer();
         gameRepo.remove(lobbyId);
     }
 
