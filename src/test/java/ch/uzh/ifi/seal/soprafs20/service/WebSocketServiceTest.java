@@ -95,7 +95,7 @@ public class WebSocketServiceTest {
 
     @Test
     public void parseEndCommandTest() {
-        Mockito.doNothing().when(gameRound).onRoundOver();
+        Mockito.doNothing().when(gameRound).onRoundOver(Mockito.anyBoolean());
 
         testPlayer.setAdmin(true);
 
@@ -103,7 +103,7 @@ public class WebSocketServiceTest {
         dto.setMessage("/end");
         webSocketService.sendChatMessage("testLobby", "testIdentity", dto);
 
-        Mockito.verify(gameRound).onRoundOver();
+        Mockito.verify(gameRound).onRoundOver(Mockito.anyBoolean());
     }
 
     @Test
