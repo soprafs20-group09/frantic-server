@@ -54,6 +54,10 @@ public class VandalismEvent implements Event {
             }
         }
 
+        if (chat.size() == 0) {
+            chat.add(new EventChat("event:vandalism", "All spray cans are empty. No vandalism today."));
+        }
+
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
         this.gameRound.sendCompleteGameState();
         this.gameRound.finishTurn();
