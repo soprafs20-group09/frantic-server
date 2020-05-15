@@ -97,13 +97,15 @@ public class LobbyService {
             }
 
             Player toKick = playerRepository.findByUsernameAndLobbyId(dto.getUsername(), lobbyId);
-            DisconnectDTO disconnectDTO = new DisconnectDTO("You were kicked out of the Lobby.");
-            webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
-            playerService.removePlayer(toKick);
+            if (!admin.equals(toKick)) {
+                DisconnectDTO disconnectDTO = new DisconnectDTO("You were kicked out of the Lobby.");
+                webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
+                playerService.removePlayer(toKick);
 
-            Chat chat = new EventChat("avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
-            webSocketService.sendChatMessage(lobbyId, chat);
-            webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+                Chat chat = new EventChat("avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
+                webSocketService.sendChatMessage(lobbyId, chat);
+                webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+            }
         }
     }
 
