@@ -22,6 +22,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("*")
                 .setHandshakeHandler(new CustomHandshakeHandler()).withSockJS();
     }
-
-
 }
