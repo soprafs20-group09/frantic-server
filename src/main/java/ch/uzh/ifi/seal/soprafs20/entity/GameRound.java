@@ -289,7 +289,6 @@ public class GameRound {
 
     private void finishSecondChance() {
         this.hasCurrentPlayerMadeMove = false;
-        this.gameService.sendHand(this.lobbyId, this.currentPlayer);
         sendGameState();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
     }
