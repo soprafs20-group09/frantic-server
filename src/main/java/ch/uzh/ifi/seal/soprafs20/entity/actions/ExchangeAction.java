@@ -8,6 +8,8 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ExchangeAction implements Action {
@@ -20,11 +22,6 @@ public class ExchangeAction implements Action {
     public ExchangeAction(Player initiator, Player target, int[] cards) {
         this.initiator = initiator;
         this.target = target;
-        if (cards.length > 1 && cards[0] < cards[1]) {
-            int temp = cards[0];
-            cards[0] = cards[1];
-            cards[1] = temp;
-        }
         this.exchangeCards = cards;
     }
 
@@ -44,10 +41,11 @@ public class ExchangeAction implements Action {
         List<Chat> chat = new ArrayList<>();
         ArrayList<Card> initiatorCards = new ArrayList<>();
         boolean twoCardsExchanged = exchangeCards.length == 2;
-        for (int i : exchangeCards) {
-            Card toPush = this.initiator.peekCard(i);
+        Arrays.sort(this.exchangeCards);
+        for (int i = this.exchangeCards.length - 1; i >= 0; i--) {
+            Card toPush = this.initiator.peekCard(this.exchangeCards[i]);
             if (toPush.getValue() != Value.FUCKYOU) {
-                toPush = this.initiator.popCard(i);
+                toPush = this.initiator.popCard(this.exchangeCards[i]);
                 initiatorCards.add(toPush);
             }
         }

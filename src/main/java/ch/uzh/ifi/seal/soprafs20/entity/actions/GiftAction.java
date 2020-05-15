@@ -23,15 +23,15 @@ public class GiftAction implements Action {
     @Override
     public List<Chat> perform() {
         List<Chat> chat = new ArrayList<>();
-        Arrays.sort(gifts);
+        Arrays.sort(this.gifts);
         for (int i = this.gifts.length - 1; i >= 0; i--) {
             if (this.initiator.peekCard(this.gifts[i]).getValue() != Value.FUCKYOU) {
                 target.pushCardToHand(this.initiator.popCard(this.gifts[i]));
             }
         }
 
-        chat.add(new EventChat("special:gift", this.initiator.getUsername()
-                + " gifted " + this.target.getUsername() + " " + this.gifts.length + " cards."));
+        chat.add(new EventChat("special:gift", this.initiator.getUsername() + " gifted "
+                + this.target.getUsername() + " " + this.gifts.length + (this.gifts.length == 1 ? " card." : " cards.")));
         return chat;
     }
 
