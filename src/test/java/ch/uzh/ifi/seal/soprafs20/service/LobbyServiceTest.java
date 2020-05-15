@@ -292,10 +292,13 @@ public class LobbyServiceTest {
     void kickPlayer_admin_success() {
         testPlayer.setAdmin(true);
         KickDTO kick = Mockito.mock(KickDTO.class);
+        Player testPlayer2 = new Player();
+        testPlayer2.setIdentity("testIdentity2");
+        Mockito.when(playerRepository.findByUsernameAndLobbyId(Mockito.any(), Mockito.any())).thenReturn(testPlayer2);
 
         lobbyService.kickPlayer("abc", testPlayer.getIdentity(), kick);
 
-        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches(testPlayer.getIdentity()), Mockito.matches("/queue/disconnect"), Mockito.any());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendToPlayer(Mockito.matches(testPlayer2.getIdentity()), Mockito.matches("/queue/disconnect"), Mockito.any());
         Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage(Mockito.matches("abc"), (Chat) Mockito.any());
         Mockito.verify(webSocketService, Mockito.times(1)).sendToLobby(Mockito.matches("abc"), Mockito.matches("/lobby-state"), Mockito.any());
     }
