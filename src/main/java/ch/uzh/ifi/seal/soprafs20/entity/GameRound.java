@@ -51,7 +51,7 @@ public class GameRound {
         this.timeBomb = false;
         this.bombMap = new HashMap<>();
         this.currentAction = null;
-        this.events = new ArrayList<>();
+        this.events = initEvents();
         this.isProcessing = false;
         this.turnIsRunning = false;
         this.attackState = false;
@@ -76,8 +76,6 @@ public class GameRound {
     }
 
     public void initializeGameRound() {
-        initEvents();
-
         //move 7 initial cards to player hands
         for (Player player : this.listOfPlayers) {
             for (int i = 1; i <= 7; i++) {
@@ -1076,30 +1074,32 @@ public class GameRound {
     // Event Initialization
     //================================================================================
 
-    private void initEvents() {
+    private List initEvents() {
         //initialize all Events and add them to the list
-        this.events.add(new CharityEvent(this));
-        this.events.add(new CommunismEvent(this));
-        this.events.add(new DoomsdayEvent(this.game, this));
-        this.events.add(new EarthquakeEvent(this));
-        this.events.add(new ExpansionEvent(this));
-        this.events.add(new FinishLineEvent(game, this));
-        this.events.add(new FridayTheThirteenthEvent(this));
-        this.events.add(new GamblingManEvent(this));
-        this.events.add(new MarketEvent(this));
-        this.events.add(new MerryChristmasEvent(this));
-        this.events.add(new MatingSeasonEvent(this));
-        this.events.add(new MexicanStandoffEvent(this));
-        this.events.add(new RecessionEvent(this));
-        this.events.add(new RobinHoodEvent(this));
-        this.events.add(new SurprisePartyEvent(this));
-        this.events.add(new TheAllSeeingEyeEvent(this));
-        this.events.add(new ThirdTimeLuckyEvent(this));
-        this.events.add(new TimeBombEvent(this));
-        this.events.add(new TornadoEvent(this));
-        this.events.add(new VandalismEvent(this));
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(new CharityEvent(this));
+        eventList.add(new CommunismEvent(this));
+        eventList.add(new DoomsdayEvent(this.game, this));
+        eventList.add(new EarthquakeEvent(this));
+        eventList.add(new ExpansionEvent(this));
+        eventList.add(new FinishLineEvent(game, this));
+        eventList.add(new FridayTheThirteenthEvent(this));
+        eventList.add(new GamblingManEvent(this));
+        eventList.add(new MarketEvent(this));
+        eventList.add(new MerryChristmasEvent(this));
+        eventList.add(new MatingSeasonEvent(this));
+        eventList.add(new MexicanStandoffEvent(this));
+        eventList.add(new RecessionEvent(this));
+        eventList.add(new RobinHoodEvent(this));
+        eventList.add(new SurprisePartyEvent(this));
+        eventList.add(new TheAllSeeingEyeEvent(this));
+        eventList.add(new ThirdTimeLuckyEvent(this));
+        eventList.add(new TimeBombEvent(this));
+        eventList.add(new TornadoEvent(this));
+        eventList.add(new VandalismEvent(this));
 
-        Collections.shuffle(this.events);
+        Collections.shuffle(eventList);
+        return eventList;
     }
 
     //needed for testing
