@@ -478,7 +478,7 @@ public class GameRound {
         }
     }
 
-    public void performRecession() {
+    private void performRecession() {
         this.timer.cancel();
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
@@ -909,7 +909,7 @@ public class GameRound {
         }
     }
 
-    public void sendGameState() {
+    private void sendGameState() {
         this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
 
         if (!this.isDrawStackLow && this.drawStack.size() <= 10) {
@@ -964,7 +964,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startCounterAttackTimer(int seconds) {
+    private void startCounterAttackTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -976,7 +976,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startNiceTryTimer(int seconds) {
+    private void startNiceTryTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -989,7 +989,7 @@ public class GameRound {
     }
 
     //needed for color wish after the nice try was played
-    public void startInterTurnTimer(int seconds) {
+    private void startInterTurnTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -1001,7 +1001,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startAnimationTimer(int seconds) {
+    private void startAnimationTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -1090,7 +1090,7 @@ public class GameRound {
     // Event Initialization
     //================================================================================
 
-    private List initEvents() {
+    private List<Event> initEvents() {
         //initialize all Events and add them to the list
         List<Event> eventList = new ArrayList<>();
         eventList.add(new CharityEvent(this));
