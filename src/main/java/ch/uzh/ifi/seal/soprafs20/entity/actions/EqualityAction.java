@@ -37,7 +37,6 @@ public class EqualityAction implements Action {
             chat.add(new EventChat("special:equality", this.target.getUsername()
                     + " drew " + cardsDrawn + (cardsDrawn == 1 ? " card." : " cards.")));
         }
-        discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
         chat.add(new EventChat("special:equality", this.initiator.getUsername()
                 + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
