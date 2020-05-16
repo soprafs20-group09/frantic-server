@@ -712,9 +712,13 @@ public class GameRound {
         this.timer.cancel();
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer;
+        List<Player> finishedPlayers = new ArrayList<>();
         Map<String, Integer> changes = new HashMap<>();
         for (Player player : listOfPlayers) {
             player.setBlocked(false);
+            if (player.getHandSize() == 0) {
+                finishedPlayers.add(player);
+            }
 
             int playersPoints = player.calculatePoints();
             if (!this.timeBomb) {
@@ -738,16 +742,25 @@ public class GameRound {
             }
         }
         String icon = null;
-        String message;
+        String message = "";
+        int playersToCome = finishedPlayers.size();
+        for (Player player : finishedPlayers) {
+            message += player.getUsername();
+            playersToCome--;
+            if (playersToCome > 0) {
+                message += ", ";
+            }
+        }
+
         if (this.timeBomb) {
             icon = "event:time-bomb";
-            message = this.currentPlayer.getUsername() + " defused the bomb!";
+            message += " defused the bomb!";
         }
         else if (emptyStack) {
             message = "The card stack is empty!";
         }
         else {
-            message = this.currentPlayer.getUsername() + " played his last card!";
+            message += " played " + (finishedPlayers.size() != 1 ? "their last card!" : "his/her last card!");
         }
         this.game.endGameRound(playerWithMaxPoints, changes, icon, message);
     }
