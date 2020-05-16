@@ -4,6 +4,8 @@ import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.actions.Action;
+import ch.uzh.ifi.seal.soprafs20.entity.actions.SkipAction;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,10 +13,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GameRoundIntegrationTest {
 
@@ -68,6 +71,77 @@ public class GameRoundIntegrationTest {
 
         this.testRound = new GameRound(this.game, "lobbyId", playerList, player1);
         this.testRound.setGameService(this.gameService);
+    }
+
+    @Test
+    public void startGameRoundTest() {
+        List<Player> playerList = new ArrayList<>();
+        Player emptyPlayer1 = new Player();
+        emptyPlayer1.setUsername("emptyPlayer1");
+        playerList.add(emptyPlayer1);
+        Player emptyPlayer2 = new Player();
+        playerList.add(emptyPlayer2);
+        GameRound gameRound = new GameRound(this.game, "lobbyId", playerList, emptyPlayer1);
+        gameRound.setGameService(this.gameService);
+        Card expectedDiscardPileCard = gameRound.getDrawStack().peekN(15);
+
+        gameRound.startGameRound();
+
+        Mockito.verify(this.gameService).sendHand("lobbyId", emptyPlayer1);
+        Mockito.verify(this.gameService).sendHand("lobbyId", emptyPlayer2);
+        Mockito.verify(this.gameService).sendGameState("lobbyId", expectedDiscardPileCard, playerList, false);
+        Mockito.verify(this.gameService).sendStartTurn("lobbyId", emptyPlayer1.getUsername(), 0);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", emptyPlayer1, emptyPlayer1.getPlayableCards(expectedDiscardPileCard), true, false);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 30);
+
+        assertEquals(7, emptyPlayer1.getHandSize());
+        assertEquals(7, emptyPlayer2.getHandSize());
+        assertEquals(expectedDiscardPileCard, gameRound.getDiscardPile().peek());
+    }
+
+    @Test
+    public void playerFinishesTurn_notMadeMoveBefore_success() {
+        assertEquals(3, player1.getHandSize());
+        Card cardOnDiscardPile = new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 10);
+        testRound.getDiscardPile().push(cardOnDiscardPile);
+
+        testRound.startTurnTimer(30);
+        testRound.playerFinishesTurn("id1");
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendGameState("lobbyId", cardOnDiscardPile, this.testRound.getListOfPlayers(), false);
+        Mockito.verify(this.gameService).sendStartTurn("lobbyId", player2.getUsername(), 0);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player2, player2.getPlayableCards(cardOnDiscardPile), true, false);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 30);
+
+        assertEquals(4, player1.getHandSize());
+        assertEquals(player2, testRound.getCurrentPlayer());
+    }
+
+    @Test
+    public void playerFinishesTurn_madeMoveBefore_success() {
+        assertEquals(3, player1.getHandSize());
+        Card cardOnDiscardPile = new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 10);
+        testRound.getDiscardPile().push(cardOnDiscardPile);
+
+        testRound.startTurnTimer(30);
+        testRound.currentPlayerDrawCard("id1");
+        assertEquals(4, player1.getHandSize());
+
+        testRound.playerFinishesTurn("id1");
+
+        assertEquals(4, player1.getHandSize());
+        assertEquals(player2, testRound.getCurrentPlayer());
+    }
+
+    @Test
+    public void playerFinishesTurn_wrongPlayer_unsuccessful() {
+        testRound.startTurnTimer(30);
+        testRound.playerFinishesTurn("id2");
+
+        assertEquals(3, player1.getHandSize());
+        assertEquals(2, player2.getHandSize());
+        assertEquals(player1, testRound.getCurrentPlayer());
     }
 
     @Test
@@ -332,5 +406,204 @@ public class GameRoundIntegrationTest {
         assertEquals(3, player3.getHandSize());
         assertEquals(actionCard, testRound.getDiscardPile().peek());
         assertEquals(player1, testRound.getCurrentPlayer());
+    }
+
+    @Test
+    public void storeSkipAction_prepareCounterattack_noCounterattack() {
+        testRound.startTurnTimer(30);
+        testRound.storeSkipAction("id1", "player3");
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player3, "special:skip", "skip", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService, Mockito.never()).sendOverlay("lobbyId", player1, "special:skip", "skip", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService, Mockito.never()).sendOverlay("lobbyId", player2, "special:skip", "skip", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService, Mockito.never()).sendOverlay("lobbyId", player4, "special:skip", "skip", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 6);
+
+        Action skip = testRound.getCurrentAction();
+        assertEquals(player1, skip.getInitiator());
+        assertEquals(1, skip.getTargets().length);
+        assertEquals(player3, Array.get(skip.getTargets(), 0));
+    }
+
+    @Test
+    public void storeSkipAction_prepareCounterattack_hasCounterattack() {
+        player3.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, false, 10));
+
+        testRound.startTurnTimer(30);
+        testRound.storeSkipAction("id1", "player3");
+
+        int[] index = {2};
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, index, false, false);
+    }
+
+    @Test
+    public void storeGiftAction_prepareCounterattack() {
+        int[] cards = {0, 1};
+        testRound.startTurnTimer(30);
+        testRound.storeGiftAction("id1", cards, "player3");
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player3, "special:gift", "gift", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 6);
+
+        Action gift = testRound.getCurrentAction();
+        assertEquals(player1, gift.getInitiator());
+        assertEquals(1, gift.getTargets().length);
+        assertEquals(player3, Array.get(gift.getTargets(), 0));
+    }
+
+    @Test
+    public void storeExchangeAction_prepareCounterattack() {
+        int[] cards = {0, 1};
+        testRound.startTurnTimer(30);
+        testRound.storeExchangeAction("id1", cards, "player3");
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player3, "special:exchange", "exchange", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 6);
+
+        Action exchange = testRound.getCurrentAction();
+        assertEquals(player1, exchange.getInitiator());
+        assertEquals(1, exchange.getTargets().length);
+        assertEquals(player3, Array.get(exchange.getTargets(), 0));
+    }
+
+    @Test
+    public void storeFantasticAction_colorWish_performAction() {
+        testRound.startTurnTimer(30);
+        testRound.storeFantasticAction("id1", 7, Color.BLUE);
+
+        //in case prepareCounterAttack would be (mistakenly) invoked, this assertion would fail
+        Mockito.verify(this.gameService).sendHand("lobbyId", player1);
+        //no targets so no other player should get a hand package
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player2);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player3);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player4);
+
+        Action fantastic = testRound.getCurrentAction();
+        assertEquals(player1, fantastic.getInitiator());
+        Card wishCard = testRound.getDiscardPile().peek();
+        assertEquals(Color.BLUE, wishCard.getColor());
+        assertEquals(Value.NONE, wishCard.getValue());
+        assertEquals(Type.WISH, wishCard.getType());
+    }
+
+    @Test
+    public void storeFantasticAction_valueWish_performAction() {
+        testRound.startTurnTimer(30);
+        testRound.storeFantasticAction("id1", 7, null);
+
+        Mockito.verify(this.gameService).sendHand("lobbyId", player1);
+        //no targets so no other player should get a hand package
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player2);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player3);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player4);
+
+        Action fantastic = testRound.getCurrentAction();
+        assertEquals(player1, fantastic.getInitiator());
+        Card wishCard = testRound.getDiscardPile().peek();
+        assertEquals(Color.NONE, wishCard.getColor());
+        assertEquals(Value.SEVEN, wishCard.getValue());
+        assertEquals(Type.WISH, wishCard.getType());
+    }
+
+    @Test
+    public void storeFantasticFourAction_prepareCounterattack() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put(player2.getUsername(), 2);
+        map.put(player3.getUsername(), 2);
+        testRound.startTurnTimer(30);
+        testRound.storeFantasticFourAction("id1", 7, Color.YELLOW, map);
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player2, "special:fantastic-four", "fantastic-four", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player3, "special:fantastic-four", "fantastic-four", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService, Mockito.never()).sendOverlay("lobbyId", player4, "special:fantastic-four", "fantastic-four", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 6);
+
+        Action fantasticFour = testRound.getCurrentAction();
+        assertEquals(player1, fantasticFour.getInitiator());
+        assertEquals(2, fantasticFour.getTargets().length);
+        assertTrue(Arrays.asList(fantasticFour.getTargets()).contains(player2));
+        assertTrue(Arrays.asList(fantasticFour.getTargets()).contains(player3));
+    }
+
+    @Test
+    public void storeEqualityAction_noTargets_performAction() {
+        testRound.startTurnTimer(30);
+        testRound.storeEqualityAction("id1", Color.RED, "");
+
+        Mockito.verify(this.gameService).sendHand("lobbyId", player1);
+        //no targets so no other player should get a hand package
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player2);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player3);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player4);
+
+        Action equality = testRound.getCurrentAction();
+        assertEquals(player1, equality.getInitiator());
+        Card wishCard = testRound.getDiscardPile().peek();
+        assertEquals(Color.RED, wishCard.getColor());
+        assertEquals(Value.COLORWISH, wishCard.getValue());
+        assertEquals(Type.WISH, wishCard.getType());
+    }
+
+    @Test
+    public void storeEqualityAction_prepareCounterattack() {
+        testRound.startTurnTimer(30);
+        testRound.storeEqualityAction("id1", Color.YELLOW, "player3");
+
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendOverlay("lobbyId", player3, "special:equality", "equality", "You are being attacked by player1", 2);
+        Mockito.verify(this.gameService).sendTimer("lobbyId", 6);
+
+        Action equality = testRound.getCurrentAction();
+        assertEquals(player1, equality.getInitiator());
+        assertEquals(1, equality.getTargets().length);
+        assertEquals(player3, Array.get(equality.getTargets(), 0));
+    }
+
+    @Test
+    public void storeCounterattackAction_performAction() {
+        testRound.startTurnTimer(30);
+        testRound.storeCounterAttackAction("id1", Color.GREEN);
+
+        Mockito.verify(this.gameService).sendHand("lobbyId", player1);
+        //no targets so no other player should get a hand package
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player2);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player3);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player4);
+
+        Action equality = testRound.getCurrentAction();
+        assertEquals(player1, equality.getInitiator());
+        Card wishCard = testRound.getDiscardPile().peek();
+        assertEquals(Color.GREEN, wishCard.getColor());
+        assertEquals(Value.COLORWISH, wishCard.getValue());
+        assertEquals(Type.WISH, wishCard.getType());
+    }
+
+    @Test
+    public void storeNiceTryAction_performAction() {
+        testRound.startTurnTimer(30);
+        testRound.storeNiceTryAction("id1", Color.GREEN);
+
+        Mockito.verify(this.gameService).sendHand("lobbyId", player1);
+        //no targets so no other player should get a hand package
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player2);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player3);
+        Mockito.verify(this.gameService, Mockito.never()).sendHand("lobbyId", player4);
+
+        Action equality = testRound.getCurrentAction();
+        assertEquals(player1, equality.getInitiator());
+        Card wishCard = testRound.getDiscardPile().peek();
+        assertEquals(Color.GREEN, wishCard.getColor());
+        assertEquals(Value.COLORWISH, wishCard.getValue());
+        assertEquals(Type.WISH, wishCard.getType());
     }
 }
