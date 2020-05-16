@@ -75,7 +75,7 @@ public class GameRound {
         startTurn();
     }
 
-    public void initializeGameRound() {
+    private void initializeGameRound() {
         //move 7 initial cards to player hands
         for (Player player : this.listOfPlayers) {
             for (int i = 1; i <= 7; i++) {
@@ -780,6 +780,10 @@ public class GameRound {
 
     public Player getCurrentPlayer() {
         return this.currentPlayer;
+    }
+
+    public Action getCurrentAction() {
+        return this.currentAction;
     }
 
     public GameService getGameService() {
