@@ -37,7 +37,8 @@ public class GameRound {
     private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
     private final Map<Player, Integer> gamblingManMap;
-    private List<Card> marketList;
+    private Card[] marketArray;
+    private Boolean[] marketDisabledArray;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -62,7 +63,6 @@ public class GameRound {
         this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
         this.gamblingManMap = new HashMap<>();
-        this.marketList = new ArrayList<>();
     }
 
     //================================================================================
@@ -571,18 +571,26 @@ public class GameRound {
         Player player = getPlayerByIdentity(identity);
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
-        int numOfPreviousPlayers = this.listOfPlayers.size() - this.marketList.size();
+        int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
         Player expectedPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
         if (player != null && player == expectedPlayer) {
             this.timer.cancel();
-            Card choice = this.marketList.remove(card);
+            Card choice = this.marketArray[card];
+            this.marketDisabledArray[card] = true;
             performMarket(player, choice);
         }
     }
 
     private void prepareRandomMarket(Player player) {
-        Card choice = this.marketList.remove(FranticUtils.random.nextInt(this.marketList.size()));
-        performMarket(player, choice);
+        int randomCard = 0;
+        while (this.marketDisabledArray[randomCard]) {
+            randomCard++;
+        }
+        if (randomCard < this.marketArray.length) {
+            Card choice = this.marketArray[randomCard];
+            this.marketDisabledArray[randomCard] = true;
+            performMarket(player, choice);
+        }
     }
 
     private void performMarket(Player player, Card choice) {
@@ -591,18 +599,18 @@ public class GameRound {
         this.gameService.sendChatMessage(this.lobbyId, chat);
         this.sendCompleteGameState();
 
-        if (!this.marketList.isEmpty()) {
+        if (countMarketLeft() > 0) {
             int numOfPlayers = this.listOfPlayers.size();
             int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
-            int numOfPreviousPlayers = this.listOfPlayers.size() - this.marketList.size();
+            int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
             Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
             this.gameService.sendAttackTurn(this.lobbyId, nextPlayer.getUsername());
-            this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketList);
+            this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketArray, this.marketDisabledArray);
             this.gameService.sendTimer(this.lobbyId, 15);
             startMarketTimer(15, nextPlayer);
         }
         else {
-            this.marketList = new ArrayList<>();
+            this.marketArray = new Card[0];
             finishTurn();
         }
     }
@@ -683,8 +691,19 @@ public class GameRound {
         this.gamblingManMap.put(player, card);
     }
 
-    public void setMarketList(List<Card> cards) {
-        this.marketList = cards;
+    public void setMarketList(Card[] cards, Boolean[] disabled) {
+        this.marketArray = cards;
+        this.marketDisabledArray = disabled;
+    }
+
+    public int countMarketLeft() {
+        int c = 0;
+        for (Boolean aBoolean : this.marketDisabledArray) {
+            if (!aBoolean) {
+                c++;
+            }
+        }
+        return c;
     }
 
     public void setTimeBomb() {

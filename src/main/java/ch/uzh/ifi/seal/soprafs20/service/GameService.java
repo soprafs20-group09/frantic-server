@@ -258,10 +258,15 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/gambling-man-window", dto);
     }
 
-    public void sendMarketWindow(String lobbyId, Player player, List<Card> cards) {
-        CardDTO[] cardDTO = new CardDTO[cards.size()];
-        for (int i = 0; i < cards.size(); i++) {
-            cardDTO[i] = cardToDTO(cards.get(i));
+    public void sendMarketWindow(String lobbyId, Player player, Card[] cards, Boolean[] disabled) {
+        CardDisabledDTO[] cardDTO = new CardDisabledDTO[cards.length];
+        for (int i = 0; i < cards.length; i++) {
+            cardDTO[i] = new CardDisabledDTO();
+            cardDTO[i].setColor(FranticUtils.getStringRepresentation(cards[i].getColor()));
+            cardDTO[i].setKey(cards[i].getKey());
+            cardDTO[i].setType(FranticUtils.getStringRepresentation(cards[i].getType()));
+            cardDTO[i].setValue(FranticUtils.getStringRepresentation(cards[i].getValue()));
+            cardDTO[i].setDisabled(disabled[i]);
         }
         MarketWindowDTO dto = new MarketWindowDTO(cardDTO);
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);

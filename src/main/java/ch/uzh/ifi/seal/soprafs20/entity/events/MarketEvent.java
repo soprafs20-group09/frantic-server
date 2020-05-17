@@ -32,23 +32,27 @@ public class MarketEvent implements Event {
     public void performEvent() {
         Player currentPlayer = this.gameRound.getCurrentPlayer();
         List<Card> cards = new ArrayList<>();
+        List<Boolean> disabled = new ArrayList<>();
         for (int i = 0; i < this.listOfPlayers.size(); i++) {
             if (this.drawStack.size() > 0) {
                 cards.add(this.drawStack.pop());
+                disabled.add(false);
             }
             else {
                 this.gameRound.onRoundOver(true);
                 return;
             }
         }
+        Card[] cardArray = cards.toArray(new Card[0]);
+        Boolean[] disabledArray = disabled.toArray(new Boolean[0]);
         // send packet to first player
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 
         Player firstPlayer = this.listOfPlayers.get((initiatorIndex + 1) % numOfPlayers);
         this.gameService.sendAttackTurn(this.gameRound.getLobbyId(), firstPlayer.getUsername());
-        this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cards);
-        this.gameRound.setMarketList(cards);
+        this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cardArray, disabledArray);
+        this.gameRound.setMarketList(cardArray, disabledArray);
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
         this.gameRound.startMarketTimer(seconds, firstPlayer);
     }
