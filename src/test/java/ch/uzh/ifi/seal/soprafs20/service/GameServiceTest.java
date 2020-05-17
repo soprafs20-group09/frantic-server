@@ -403,7 +403,7 @@ public class GameServiceTest {
 
     @Test
     public void sendMarketWindowTest() {
-        gameService.sendMarketWindow("testLobbyId", player, Collections.singletonList(card));
+        gameService.sendMarketWindow("testLobbyId", player, new Card[]{card}, new Boolean[]{false});
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/market-window"), Mockito.any());
     }
 

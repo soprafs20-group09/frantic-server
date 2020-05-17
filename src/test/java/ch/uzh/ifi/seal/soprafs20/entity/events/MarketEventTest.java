@@ -42,7 +42,7 @@ public class MarketEventTest {
 
     @Test
     public void performEventTest() {
-        Mockito.doNothing().when(gameService).sendMarketWindow(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(gameService).sendMarketWindow(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
         Player player1 = new Player();
@@ -64,7 +64,7 @@ public class MarketEventTest {
         Event market = new MarketEvent(this.gameRound);
         market.performEvent();
 
-        Mockito.verify(gameService).sendMarketWindow(Mockito.any(), Mockito.eq(player2), Mockito.any());
+        Mockito.verify(gameService).sendMarketWindow(Mockito.any(), Mockito.eq(player2), Mockito.any(), Mockito.any());
     }
 
     @Test
