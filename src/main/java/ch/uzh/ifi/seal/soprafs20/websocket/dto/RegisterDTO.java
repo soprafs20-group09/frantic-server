@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming;
+package ch.uzh.ifi.seal.soprafs20.websocket.dto;
 
 public class RegisterDTO {
 

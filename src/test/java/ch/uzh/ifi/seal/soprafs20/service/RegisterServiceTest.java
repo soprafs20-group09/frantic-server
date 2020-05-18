@@ -3,7 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.service;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.junit.jupiter.api.BeforeEach;

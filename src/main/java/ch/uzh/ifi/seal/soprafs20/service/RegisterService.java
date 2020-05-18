@@ -6,7 +6,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

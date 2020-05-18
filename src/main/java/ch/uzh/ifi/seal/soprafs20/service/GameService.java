@@ -43,6 +43,10 @@ public class GameService {
         return instance;
     }
 
+    public List<Player> getPlayersInGame(String lobbyId) {
+        return this.playerRepository.findByLobbyId(lobbyId);
+    }
+
     public void startGame(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
@@ -284,6 +288,12 @@ public class GameService {
 
         EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players), changes, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-game", dto);
+    }
+
+    public void sendReconnect(String lobbyId) {
+        for (Player player : this.playerRepository.findByLobbyId(lobbyId)) {
+            webSocketService.sendReconnect(lobbyId, player.getIdentity());
+        }
     }
 
     private CardDTO cardToDTO(Card card) {

@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +16,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -23,6 +27,9 @@ public class WebSocketService {
 
     protected final PlayerRepository playerRepository;
     private final LobbyService lobbyService;
+
+    private final Map<String, String> reconnectMap = new HashMap<>();
+
     @Autowired
     protected SimpMessagingTemplate simp;
 
@@ -46,6 +53,24 @@ public class WebSocketService {
                     this.sendToLobby(lobbyId, "/chat", dto);
                 }
             }
+        }
+    }
+
+    public void sendReconnect(String lobbyId, String identity) {
+        String token = UUID.randomUUID().toString();
+        RegisterDTO dto = new RegisterDTO();
+        dto.setToken(token);
+        this.reconnectMap.put(token, identity);
+        this.sendToPlayerInLobby(lobbyId, identity, "/queue/lobby/" + lobbyId + "/reconnect", dto);
+    }
+
+    public synchronized void reconnect(String newIdentity, RegisterDTO dto) {
+        String oldIdentity = this.reconnectMap.get(dto.getToken());
+        if (oldIdentity != null) {
+            Player player = this.playerRepository.findByIdentity(oldIdentity);
+            player.setIdentity(newIdentity);
+            this.playerRepository.flush();
+            this.reconnectMap.remove(dto.getToken());
         }
     }
 

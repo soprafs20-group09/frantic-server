@@ -4,7 +4,7 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.RegisterDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
