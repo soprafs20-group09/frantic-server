@@ -20,6 +20,6 @@ class FranticUtilsTest {
     @Test
     public void getStringRepresentationOfNumberCardTest() {
         Card card = new Card(Color.RED, 3, 1);
-        assertEquals("red 3", FranticUtils.getStringRepresentationOfNumberCard(card));
+        assertEquals("red 3", FranticUtils.getStringRepresentationOfCard(card));
     }
 }
