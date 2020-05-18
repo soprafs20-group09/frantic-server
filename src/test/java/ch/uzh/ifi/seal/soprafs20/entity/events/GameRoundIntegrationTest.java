@@ -747,7 +747,7 @@ public class GameRoundIntegrationTest {
     @Test
     public void drawCardFromStack_stackNotEmpty() {
         assertEquals(2, player2.getHandSize());
-        Card card1 =new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
+        Card card1 = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
         Card card2 = new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 11);
         testRound.getDrawStack().push(card1);
         testRound.getDrawStack().push(card2);
@@ -769,7 +769,7 @@ public class GameRoundIntegrationTest {
     public void drawCardFromStack_stackEmpty_onRoundOver() {
         assertEquals(2, player2.getHandSize());
 
-        for (int i=1; i<=124; i++) {
+        for (int i = 1; i <= 124; i++) {
             testRound.getDrawStack().pop();
         }
         assertEquals(1, testRound.getDrawStack().size());
@@ -780,5 +780,124 @@ public class GameRoundIntegrationTest {
         Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
         assertEquals(0, testRound.getDrawStack().size());
         assertEquals(3, player2.getHandSize());
+    }
+
+    @Test
+    public void recessionTest_sortedInput() {
+        player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, -1)); //negative order key to make sure randomly drawn card is larger
+        player1.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.TWO, false, 11));
+        player3.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FOUR, false, 12));
+        player4.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.THREE, false, 13));
+
+        testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
+        testRound.startTurnTimer(30);
+        testRound.prepareRecession("id2", new int[]{1});
+        testRound.prepareRecession("id3", new int[]{1, 2});
+        testRound.prepareRecession("id4", new int[]{0, 2, 3});
+        testRound.prepareRecession("id1", new int[]{1, 2, 3, 4});
+
+        Mockito.verify(this.gameService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
+
+        assertEquals(2, player1.getHandSize()); //due to finish-turn, the current player (player1) will draw a card
+        assertEquals(1, player2.getHandSize());
+        assertEquals(1, player3.getHandSize());
+        assertEquals(1, player4.getHandSize());
+
+        Card p1Card = player1.peekCard(0);
+        Card p2Card = player2.peekCard(0);
+        Card p3Card = player3.peekCard(0);
+        Card p4Card = player4.peekCard(0);
+
+        assertEquals(Color.GREEN, p1Card.getColor());
+        assertEquals(Type.NUMBER, p1Card.getType());
+        assertEquals(Value.ONE, p1Card.getValue());
+        assertEquals(Color.GREEN, p2Card.getColor());
+        assertEquals(Type.SPECIAL, p2Card.getType());
+        assertEquals(Value.GIFT, p2Card.getValue());
+        assertEquals(Color.BLUE, p3Card.getColor());
+        assertEquals(Type.SPECIAL, p3Card.getType());
+        assertEquals(Value.EXCHANGE, p3Card.getValue());
+        assertEquals(Color.MULTICOLOR, p4Card.getColor());
+        assertEquals(Type.SPECIAL, p4Card.getType());
+        assertEquals(Value.NICETRY, p4Card.getValue());
+    }
+
+    @Test
+    public void recessionTest_unsortedInput() {
+        player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, -1)); //negative order key to make sure randomly drawn card is larger
+        player1.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.TWO, false, 11));
+        player3.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FOUR, false, 12));
+        player4.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.THREE, false, 13));
+
+        testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
+        testRound.startTurnTimer(30);
+        testRound.prepareRecession("id2", new int[]{1});
+        testRound.prepareRecession("id3", new int[]{2, 1});
+        testRound.prepareRecession("id4", new int[]{2, 3, 0});
+        testRound.prepareRecession("id1", new int[]{3, 2, 4, 1});
+
+        Mockito.verify(this.gameService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
+
+        assertEquals(2, player1.getHandSize()); //due to finish-turn, the current player (player1) will draw a card
+        assertEquals(1, player2.getHandSize());
+        assertEquals(1, player3.getHandSize());
+        assertEquals(1, player4.getHandSize());
+
+        Card p1Card = player1.peekCard(0);
+        Card p2Card = player2.peekCard(0);
+        Card p3Card = player3.peekCard(0);
+        Card p4Card = player4.peekCard(0);
+
+        assertEquals(Color.GREEN, p1Card.getColor());
+        assertEquals(Type.NUMBER, p1Card.getType());
+        assertEquals(Value.ONE, p1Card.getValue());
+        assertEquals(Color.GREEN, p2Card.getColor());
+        assertEquals(Type.SPECIAL, p2Card.getType());
+        assertEquals(Value.GIFT, p2Card.getValue());
+        assertEquals(Color.BLUE, p3Card.getColor());
+        assertEquals(Type.SPECIAL, p3Card.getType());
+        assertEquals(Value.EXCHANGE, p3Card.getValue());
+        assertEquals(Color.MULTICOLOR, p4Card.getColor());
+        assertEquals(Type.SPECIAL, p4Card.getType());
+        assertEquals(Value.NICETRY, p4Card.getValue());
+    }
+
+    @Test
+    public void surprisePartyTest() {
+        testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
+        Card p1Card = player1.peekCard(2);
+        Card p2Card = player2.peekCard(0);
+        Card p3Card = player3.peekCard(1);
+        Card p4Card = player4.peekCard(1);
+
+        testRound.startTurnTimer(30);
+        testRound.prepareSurpriseParty("id1", 2, "player2");
+        testRound.prepareSurpriseParty("id2", 0, "player4");
+        testRound.prepareSurpriseParty("id3", 1, "player2");
+        testRound.prepareSurpriseParty("id4", 1, "player3");
+
+        Mockito.verify(this.gameService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
+
+        assertEquals(3, player1.getHandSize()); //due to finish-turn, the current player (player1) will draw a card
+        assertEquals(3, player2.getHandSize());
+        assertEquals(2, player3.getHandSize());
+        assertEquals(3, player4.getHandSize());
+
+        List<Card> p2Hand = new ArrayList<>();
+        List<Card> p3Hand = new ArrayList<>();
+        List<Card> p4Hand = new ArrayList<>();
+        for (int i = 0; i < player2.getHandSize(); i++) {
+            p2Hand.add(player2.peekCard(i));
+        }
+        for (int i = 0; i < player3.getHandSize(); i++) {
+            p3Hand.add(player3.peekCard(i));
+        }
+        for (int i = 0; i < player4.getHandSize(); i++) {
+            p4Hand.add(player4.peekCard(i));
+        }
+        assertTrue(p2Hand.contains(p1Card));
+        assertTrue(p4Hand.contains(p2Card));
+        assertTrue(p2Hand.contains(p3Card));
+        assertTrue(p3Hand.contains(p4Card));
     }
 }
