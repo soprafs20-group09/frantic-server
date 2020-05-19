@@ -18,6 +18,8 @@ To establish a connection between the front- and backend REST is used. When furt
 
 Listed below are the main components of the game:
 
+[Main Class](./Application.java)
+
 ## Launch & Deployment
 
 ```bash
