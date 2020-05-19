@@ -25,7 +25,7 @@ class GiftActionTest {
     private final Card fuckYou = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FUCKYOU, false, 3);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.initiator = new Player();
         this.initiator.setUsername("GiftMaker");
         this.initiator.pushCardToHand(blue1);
@@ -41,7 +41,7 @@ class GiftActionTest {
     }
 
     @Test
-    public void performTest() {
+    void performTest() {
         List<Chat> resultChat = giftAction.perform();
         assertEquals(1, this.initiator.getHandSize());
         assertEquals(2, this.target.getHandSize());
@@ -55,22 +55,22 @@ class GiftActionTest {
     }
 
     @Test
-    public void getTargetsTest() {
+    void getTargetsTest() {
         assertEquals(this.target, giftAction.getTargets()[0]);
     }
 
     @Test
-    public void getInitiatorTest() {
+    void getInitiatorTest() {
         assertEquals(this.initiator, giftAction.getInitiator());
     }
 
     @Test
-    public void isCounterableTest() {
+    void isCounterableTest() {
         assertTrue(giftAction.isCounterable());
     }
 
     @Test
-    public void fuckYouNotGiftableTest() {
+    void fuckYouNotGiftableTest() {
         this.initiator.popCard(0);
         this.initiator.pushCardToHand(fuckYou);
         giftAction.perform();

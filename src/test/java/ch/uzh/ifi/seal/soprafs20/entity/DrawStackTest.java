@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DrawStackTest {
 
     @Test
-    public void createDrawStack() {
+    void createDrawStack() {
         DrawStack drawStack = new DrawStack();
         // check if constructor works
         System.out.println(drawStack.peek().toString());

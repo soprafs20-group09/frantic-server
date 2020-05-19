@@ -27,7 +27,7 @@ public class VandalismEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -36,19 +36,19 @@ public class VandalismEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event vandalism = new VandalismEvent(this.gameRound);
         assertEquals("vandalism", vandalism.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event vandalism = new VandalismEvent(this.gameRound);
         assertEquals("Let all your anger out! You can discard all cards of the last played color! Do it! Just smash them on the discard Pile!", vandalism.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.RED, 7, 11));
         player1.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12));

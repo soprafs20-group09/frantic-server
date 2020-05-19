@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LobbyTest {
 
     @Test
-    public void addPlayer_increaseSize() {
+    void addPlayer_increaseSize() {
         Lobby lobby = new Lobby();
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -22,7 +22,7 @@ public class LobbyTest {
     }
 
     @Test
-    public void removePlayer_decreaseSize() {
+    void removePlayer_decreaseSize() {
         Lobby lobby = new Lobby();
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -37,7 +37,7 @@ public class LobbyTest {
     }
 
     @Test
-    public void createLobby_baseSettings() {
+    void createLobby_baseSettings() {
         Lobby lobby = new Lobby();
         assertNotNull(lobby.getLobbyId());
         assertEquals(GameLength.MEDIUM, lobby.getGameDuration());
@@ -47,7 +47,7 @@ public class LobbyTest {
     }
 
     @Test
-    public void addPlayers_getListOfPlayers() {
+    void addPlayers_getListOfPlayers() {
         Lobby lobby = new Lobby();
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");

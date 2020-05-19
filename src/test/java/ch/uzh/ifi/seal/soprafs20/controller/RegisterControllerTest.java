@@ -50,7 +50,7 @@ public class RegisterControllerTest {
     private WebSocketController webSocketController;
 
     @Test
-    public void testRegistration() throws Exception {
+    void testRegistration() throws Exception {
         stompClient = new WebSocketStompClient(new SockJsClient(
                 Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()))));
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());

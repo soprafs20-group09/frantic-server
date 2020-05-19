@@ -24,7 +24,7 @@ public class CharityEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
     
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -33,19 +33,19 @@ public class CharityEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         CharityEvent charity = new CharityEvent(this.gameRound);
         assertEquals("charity", charity.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         CharityEvent charity = new CharityEvent(this.gameRound);
         assertEquals("How noble of you! You pick a card from the player with the most cards!", charity.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.NINE, false, 1));
@@ -85,7 +85,7 @@ public class CharityEventTest {
     }
 
     @Test
-    public void performEventTest_playerHasNoMoreCards() {
+    void performEventTest_playerHasNoMoreCards() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
         this.listOfPlayers.add(player1);

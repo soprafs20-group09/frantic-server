@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FantasticActionTest {
 
     @Test
-    public void wishColor() {
+    void wishColor() {
         DiscardPile discardPile = new DiscardPile();
         Player initiator = new Player();
 
@@ -26,7 +26,7 @@ class FantasticActionTest {
     }
 
     @Test
-    public void wishValue() {
+    void wishValue() {
         DiscardPile discardPile = new DiscardPile();
         Player initiator = new Player();
 
