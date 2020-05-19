@@ -32,7 +32,7 @@ public class GameRoundIntegrationTest {
     private Player player4;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
 
         List<Player> playerList = new ArrayList<>();
@@ -72,7 +72,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void startGameRoundTest() {
+    void startGameRoundTest() {
         List<Player> playerList = new ArrayList<>();
         Player emptyPlayer1 = new Player();
         emptyPlayer1.setUsername("emptyPlayer1");
@@ -127,7 +127,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playerFinishesTurn_notMadeMoveBefore_success() {
+    void playerFinishesTurn_notMadeMoveBefore_success() {
         assertEquals(3, player1.getHandSize());
         Card cardOnDiscardPile = new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 10);
         testRound.getDiscardPile().push(cardOnDiscardPile);
@@ -146,7 +146,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playerFinishesTurn_madeMoveBefore_success() {
+    void playerFinishesTurn_madeMoveBefore_success() {
         assertEquals(3, player1.getHandSize());
         Card cardOnDiscardPile = new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 10);
         testRound.getDiscardPile().push(cardOnDiscardPile);
@@ -162,7 +162,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playerFinishesTurn_wrongPlayer_unsuccessful() {
+    void playerFinishesTurn_wrongPlayer_unsuccessful() {
         testRound.startTurnTimer(30);
         testRound.playerFinishesTurn("id2");
 
@@ -172,7 +172,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playCard_playerNotAllowedToPlay() {
+    void playCard_playerNotAllowedToPlay() {
         Card pileCard = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
         testRound.getDiscardPile().push(pileCard);
         testRound.startTurnTimer(30);
@@ -186,7 +186,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playNumberCard_success() {
+    void playNumberCard_success() {
         Card cardToPlay = player1.peekCard(1);
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
         testRound.startTurnTimer(30);
@@ -200,7 +200,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playBlackNumberCard_success_prepareEvent() {
+    void playBlackNumberCard_success_prepareEvent() {
         Card cardToPlay = player1.peekCard(0);
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
         testRound.startTurnTimer(30);
@@ -219,7 +219,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playNumberCard_cardNotPlayable() {
+    void playNumberCard_cardNotPlayable() {
         Card pileCard = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
         testRound.getDiscardPile().push(pileCard);
         testRound.startTurnTimer(30);
@@ -233,7 +233,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playFuckYou_success() {
+    void playFuckYou_success() {
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 10));
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 11));
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 12));
@@ -256,7 +256,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playFuckYou_not10Cards() {
+    void playFuckYou_not10Cards() {
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 10));
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 11));
         player1.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.THREE, false, 12));
@@ -276,7 +276,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void play2ChanceCard_success() {
+    void play2ChanceCard_success() {
         Card secondChance = new Card(Color.BLUE, Type.SPECIAL, Value.SECONDCHANCE, false, 10);
         player1.pushCardToHand(secondChance);
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 11));
@@ -292,7 +292,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playFantasticFourCard_success_45sec() {
+    void playFantasticFourCard_success_45sec() {
         Card fantasticFour = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, 10);
         player1.pushCardToHand(fantasticFour);
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 11));
@@ -309,7 +309,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playEqualityCard_success_30sec() {
+    void playEqualityCard_success_30sec() {
         Card equality = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.EQUALITY, false, 10);
         player1.pushCardToHand(equality);
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 11));
@@ -326,7 +326,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playNiceTry_niceTryOpportunity_success() {
+    void playNiceTry_niceTryOpportunity_success() {
         player4.popCard();
         player4.popCard();
         player4.popCard();
@@ -352,7 +352,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playCounterattack_niceTryOpportunity_unsuccessful() {
+    void playCounterattack_niceTryOpportunity_unsuccessful() {
         player4.popCard();
         player4.popCard();
         player4.popCard();
@@ -375,7 +375,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playCounterAttack_counterAttackOpportunity_success() {
+    void playCounterAttack_counterAttackOpportunity_success() {
         testRound.startTurnTimer(30);
         testRound.storeSkipAction("id1", "player3");
 
@@ -399,7 +399,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playCounterAttack_counterAttackOpportunity_notTarget() {
+    void playCounterAttack_counterAttackOpportunity_notTarget() {
         testRound.startTurnTimer(30);
         testRound.storeSkipAction("id1", "player2");
 
@@ -418,7 +418,7 @@ public class GameRoundIntegrationTest {
 
     //if someone tries to play a nice try to block an attack
     @Test
-    public void playNiceTry_counterAttackOpportunity_unsuccessful() {
+    void playNiceTry_counterAttackOpportunity_unsuccessful() {
         testRound.startTurnTimer(30);
         testRound.storeSkipAction("id1", "player3");
 
@@ -436,7 +436,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeSkipAction_prepareCounterattack_noCounterattack() {
+    void storeSkipAction_prepareCounterattack_noCounterattack() {
         testRound.startTurnTimer(30);
         testRound.storeSkipAction("id1", "player3");
 
@@ -455,7 +455,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeSkipAction_prepareCounterattack_hasCounterattack() {
+    void storeSkipAction_prepareCounterattack_hasCounterattack() {
         player3.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, false, 10));
 
         testRound.startTurnTimer(30);
@@ -467,7 +467,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeGiftAction_prepareCounterattack() {
+    void storeGiftAction_prepareCounterattack() {
         int[] cards = {0, 1};
         testRound.startTurnTimer(30);
         testRound.storeGiftAction("id1", cards, "player3");
@@ -484,7 +484,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeExchangeAction_prepareCounterattack() {
+    void storeExchangeAction_prepareCounterattack() {
         int[] cards = {0, 1};
         testRound.startTurnTimer(30);
         testRound.storeExchangeAction("id1", cards, "player3");
@@ -501,7 +501,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeFantasticAction_colorWish_performAction() {
+    void storeFantasticAction_colorWish_performAction() {
         testRound.startTurnTimer(30);
         testRound.storeFantasticAction("id1", 7, Color.BLUE);
 
@@ -521,7 +521,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeFantasticAction_valueWish_performAction() {
+    void storeFantasticAction_valueWish_performAction() {
         testRound.startTurnTimer(30);
         testRound.storeFantasticAction("id1", 7, null);
 
@@ -540,7 +540,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeFantasticFourAction_prepareCounterattack() {
+    void storeFantasticFourAction_prepareCounterattack() {
         Map<String, Integer> map = new HashMap<>();
         map.put(player2.getUsername(), 2);
         map.put(player3.getUsername(), 2);
@@ -562,7 +562,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeEqualityAction_noTargets_performAction() {
+    void storeEqualityAction_noTargets_performAction() {
         testRound.startTurnTimer(30);
         testRound.storeEqualityAction("id1", Color.RED, "");
 
@@ -581,7 +581,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeEqualityAction_prepareCounterattack() {
+    void storeEqualityAction_prepareCounterattack() {
         testRound.startTurnTimer(30);
         testRound.storeEqualityAction("id1", Color.YELLOW, "player3");
 
@@ -597,7 +597,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeCounterattackAction_performAction() {
+    void storeCounterattackAction_performAction() {
         testRound.startTurnTimer(30);
         testRound.storeCounterAttackAction("id1", Color.GREEN);
 
@@ -616,7 +616,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void storeNiceTryAction_performAction() {
+    void storeNiceTryAction_performAction() {
         testRound.startTurnTimer(30);
         testRound.storeNiceTryAction("id1", Color.GREEN);
 
@@ -635,7 +635,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void recessionTest_sortedInput() {
+    void recessionTest_sortedInput() {
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, -1)); //negative order key to make sure randomly drawn card is larger
         player1.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.TWO, false, 11));
         player3.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FOUR, false, 12));
@@ -675,7 +675,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void recessionTest_unsortedInput() {
+    void recessionTest_unsortedInput() {
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, -1)); //negative order key to make sure randomly drawn card is larger
         player1.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.TWO, false, 11));
         player3.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FOUR, false, 12));
@@ -715,7 +715,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void surprisePartyTest() {
+    void surprisePartyTest() {
         testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
         Card p1Card = player1.peekCard(2);
         Card p2Card = player2.peekCard(0);
@@ -754,7 +754,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void MerryChristmasTest() {
+    void MerryChristmasTest() {
         testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
         Card p1_1 = player1.peekCard(0);
         Card p1_2 = player1.peekCard(1);
@@ -821,7 +821,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void MarketTest() {
+    void MarketTest() {
         testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
         Card c1 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, 15);
         Card c2 = new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 16);
@@ -866,7 +866,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void GamblingManTest() {
+    void GamblingManTest() {
         testRound.getDiscardPile().push(new Card(Color.BLACK, Type.NUMBER, Value.EIGHT, false, 14));
         Card c1 = new Card(Color.BLUE, Type.NUMBER, Value.TWO, false, -1);
         Card c2 = new Card(Color.BLUE, Type.NUMBER, Value.SEVEN, false, -2);
@@ -902,7 +902,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_unblockPlayer() {
+    void onRoundOver_unblockPlayer() {
         player2.setBlocked(true);
         player4.setBlocked(true);
 
@@ -914,7 +914,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_calculatePoints_noTimeBomb_1winner() {
+    void onRoundOver_calculatePoints_noTimeBomb_1winner() {
         player1.popCard();
         player1.popCard();
         player1.popCard();
@@ -934,7 +934,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_calculatePoints_noTimeBomb_2winners() {
+    void onRoundOver_calculatePoints_noTimeBomb_2winners() {
         player1.popCard();
         player1.popCard();
         player1.popCard();
@@ -957,7 +957,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_calculatePoints_TimeBomb_1winner() {
+    void onRoundOver_calculatePoints_TimeBomb_1winner() {
         player1.popCard();
         player1.popCard();
         player1.popCard();
@@ -978,7 +978,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_calculatePoints_TimeBomb_2winners() {
+    void onRoundOver_calculatePoints_TimeBomb_2winners() {
         player1.popCard();
         player1.popCard();
         player1.popCard();
@@ -1002,7 +1002,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_calculatePoints_TimeBomb_belowZero() {
+    void onRoundOver_calculatePoints_TimeBomb_belowZero() {
         player1.popCard();
         player1.popCard();
         player1.popCard();
@@ -1024,7 +1024,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_stackEmpty() {
+    void onRoundOver_stackEmpty() {
         assertEquals(42, player1.getPoints());
         assertEquals(104, player2.getPoints());
         assertEquals(44, player3.getPoints());
@@ -1089,7 +1089,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void drawCardFromStack_stackNotEmpty() {
+    void drawCardFromStack_stackNotEmpty() {
         assertEquals(2, player2.getHandSize());
         Card card1 = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
         Card card2 = new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 11);
@@ -1110,7 +1110,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void drawCardFromStack_stackEmpty_onRoundOver() {
+    void drawCardFromStack_stackEmpty_onRoundOver() {
         assertEquals(2, player2.getHandSize());
 
         for (int i = 1; i <= 124; i++) {
@@ -1127,7 +1127,7 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void playerLostConnection_isCurrentPlayer_prepareNewTurn() {
+    void playerLostConnection_isCurrentPlayer_prepareNewTurn() {
         testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
         testRound.startTurnTimer(30);
         testRound.playerLostConnection(player1);

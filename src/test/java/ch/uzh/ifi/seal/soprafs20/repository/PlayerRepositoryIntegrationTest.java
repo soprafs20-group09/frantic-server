@@ -27,7 +27,7 @@ public class PlayerRepositoryIntegrationTest {
     private Player player;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
 
         //given
@@ -42,7 +42,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByUsernameAndLobbyId_success() {
+    void findByUsernameAndLobbyId_success() {
         // when
         Player found = playerRepository.findByUsernameAndLobbyId(player.getUsername(), player.getLobbyId());
 
@@ -55,7 +55,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByUsernameAndLobbyId_invalidUsername_unsuccessful() {
+    void findByUsernameAndLobbyId_invalidUsername_unsuccessful() {
         // when
         Player found = playerRepository.findByUsernameAndLobbyId("poop", player.getLobbyId());
 
@@ -64,7 +64,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByUsernameAndLobbyId_invalidLobbyId_unsuccessful() {
+    void findByUsernameAndLobbyId_invalidLobbyId_unsuccessful() {
         // when
         Player found = playerRepository.findByUsernameAndLobbyId(player.getUsername(), "poop");
 
@@ -73,7 +73,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByUsernameAndLobbyId_invalidUsernameAndLobbyId_unsuccessful() {
+    void findByUsernameAndLobbyId_invalidUsernameAndLobbyId_unsuccessful() {
         // when
         Player found = playerRepository.findByUsernameAndLobbyId("poop", "poop");
 
@@ -82,7 +82,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByIdentity_success() {
+    void findByIdentity_success() {
         // when
         Player found = playerRepository.findByIdentity(player.getIdentity());
 
@@ -95,7 +95,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByIdentity_invalidIdentity_unsuccessful() {
+    void findByIdentity_invalidIdentity_unsuccessful() {
         // when
         Player found = playerRepository.findByIdentity("poop");
 
@@ -104,7 +104,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByLobbyId_successful() {
+    void findByLobbyId_successful() {
         // when
         List<Player> found = playerRepository.findByLobbyId(player.getLobbyId());
 
@@ -120,7 +120,7 @@ public class PlayerRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByLobbyId_invalidLobbyId_unsuccessful() {
+    void findByLobbyId_invalidLobbyId_unsuccessful() {
         // when
         List<Player> found = playerRepository.findByLobbyId("poop");
         List<Player> empty = new ArrayList<>();

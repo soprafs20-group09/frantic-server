@@ -44,7 +44,7 @@ public class WebSocketServiceTest {
     private ChatDTO chat;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
         GameRepository.addGame("testLobbyId", game);
 
@@ -76,7 +76,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void sendChatMessage_invalidContent_notSendToLobby() {
+    void sendChatMessage_invalidContent_notSendToLobby() {
         this.chat.setMessage(" ");
 
         webSocketService.sendChatMessage("lobbyId", "identity", this.chat);
@@ -85,7 +85,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void sendChatMessage_validContent_SendToLobby() {
+    void sendChatMessage_validContent_SendToLobby() {
         this.chat.setMessage("message");
 
         webSocketService.sendChatMessage("lobbyId", "identity", this.chat);
@@ -94,7 +94,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void parseEndCommandTest() {
+    void parseEndCommandTest() {
         Mockito.doNothing().when(gameRound).onRoundOver(Mockito.anyBoolean());
 
         testPlayer.setAdmin(true);
@@ -107,7 +107,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void parseKickCommandTest() {
+    void parseKickCommandTest() {
         Mockito.doNothing().when(lobbyService).kickPlayer(Mockito.any(), Mockito.any(), Mockito.any());
 
         testPlayer.setAdmin(true);
@@ -120,12 +120,12 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void checkSenderTest() {
+    void checkSenderTest() {
         assertTrue(webSocketService.checkSender("testLobbyId", "testIdentity"));
     }
 
     @Test
-    public void endChatListMessageTest() {
+    void endChatListMessageTest() {
         Chat chat1 = new Chat("msg", "testIcon", "testMessage1");
         Chat chat2 = new Chat("msg", "testIcon", "testMessage2");
         List<Chat> chats = new ArrayList<>();
@@ -137,7 +137,7 @@ public class WebSocketServiceTest {
     }
 
     @Test
-    public void sendToLobbyTest() {
+    void sendToLobbyTest() {
         webSocketService.sendToLobby("testLobbyId", "testPath");
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("testPath"), Mockito.any());
     }

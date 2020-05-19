@@ -31,7 +31,7 @@ public class PlayerServiceTest {
     private Lobby testLobby;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
 
         // given
@@ -51,7 +51,7 @@ public class PlayerServiceTest {
     }
 
     @Test
-    public void createPlayer_returnPlayer() {
+    void createPlayer_returnPlayer() {
         Player foundPlayer = playerService.createPlayer(testPlayer.getIdentity(), testPlayer.getUsername());
 
         assertEquals(testPlayer.getUsername(), foundPlayer.getUsername());
@@ -59,7 +59,7 @@ public class PlayerServiceTest {
     }
 
     @Test
-    public void registerPlayer_returnRegisteredDTO() {
+    void registerPlayer_returnRegisteredDTO() {
         RegisteredDTO returnedRegisteredDTO = playerService.registerPlayer(testPlayer.getIdentity(), testPlayer, testPlayer.getLobbyId());
 
         assertEquals(testPlayer.getUsername(), returnedRegisteredDTO.getUsername());
@@ -67,7 +67,7 @@ public class PlayerServiceTest {
     }
 
     @Test
-    public void removePlayer_returnString() {
+    void removePlayer_returnString() {
         Mockito.when(lobbyRepository.findByLobbyId(testPlayer.getLobbyId())).thenReturn(testLobby);
 
         String response = playerService.removePlayer(testPlayer);

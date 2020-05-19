@@ -29,12 +29,12 @@ public class RegisterServiceTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void prepareLobby_returnDTO() {
+    void prepareLobby_returnDTO() {
         LobbyJoinDTO lobbyJoinDTO = new LobbyJoinDTO();
         lobbyJoinDTO.setName("testPlayer's lobby");
         lobbyJoinDTO.setUsername("testPlayer");
@@ -47,7 +47,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    public void joinLobbyTest() throws InterruptedException {
+    void joinLobbyTest() throws InterruptedException {
         RegisteredDTO registeredDTO = new RegisteredDTO("testPlayer", "testLobbyId");
 
         testPlayer = new Player();

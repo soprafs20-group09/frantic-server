@@ -46,7 +46,7 @@ public class GameIntegrationTest {
     private String testLobbyId;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
         lobbyRepository.deleteAll();
         playerRepository.deleteAll();
@@ -59,7 +59,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void calculateMaxPoints_2Players() {
+    void calculateMaxPoints_2Players() {
         Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
         assertEquals(137, testGame.getMaxPoints());
 
@@ -71,7 +71,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void calculateMaxPoints_4Players() {
+    void calculateMaxPoints_4Players() {
         Player player3 = playerService.createPlayer("id3", "player3");
         lobbyService.joinLobby(this.testLobbyId, player3);
         Player player4 = playerService.createPlayer("id4", "player4");
@@ -82,7 +82,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void calculateMaxPoints_6Players() {
+    void calculateMaxPoints_6Players() {
         Player player3 = playerService.createPlayer("id3", "player3");
         lobbyService.joinLobby(this.testLobbyId, player3);
         Player player4 = playerService.createPlayer("id4", "player4");
@@ -103,7 +103,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void endGameRound_notGameOver() {
+    void endGameRound_notGameOver() {
         List<Player> playerList = new ArrayList<>();
         Player player1 = new Player();
         player1.setUsername("player1");
@@ -139,7 +139,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void endGameRound_gameOver() {
+    void endGameRound_gameOver() {
         List<Player> playerList = new ArrayList<>();
         Player player1 = new Player();
         player1.setUsername("player1");
@@ -178,7 +178,7 @@ public class GameIntegrationTest {
     }
 
     @Test
-    public void removeFromPlayerList() {
+    void removeFromPlayerList() {
         List<Player> playerList = new ArrayList<>();
         Player player1 = new Player();
         player1.setIdentity("player1");

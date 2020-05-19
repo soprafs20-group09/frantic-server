@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class NiceTryActionTest {
 
     @Test
-    public void wishColor() {
+    void wishColor() {
         DiscardPile discardPile = new DiscardPile();
         Player initiator = new Player();
         initiator.setUsername("Testplayer");

@@ -29,7 +29,7 @@ public class RobinHoodEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -38,19 +38,19 @@ public class RobinHoodEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         assertEquals("robin-hood", robinHood.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         RobinHoodEvent robinHood = new RobinHoodEvent(this.gameRound);
         assertEquals("Some call him a hero, some call him a thief! The player with the least cards has to swap cards with the player holding the most!", robinHood.getMessage());
     }
 
     @Test
-    public void performEventTest_differentNumberOfCards() {
+    void performEventTest_differentNumberOfCards() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0));
         player1.pushCardToHand(new Card(Color.BLUE, Type.SPECIAL, Value.GIFT, true, 1));
@@ -93,7 +93,7 @@ public class RobinHoodEventTest {
     }
 
     @Test
-    public void performEventTest_sameNumberOfCards() {
+    void performEventTest_sameNumberOfCards() {
         Player player1 = new Player();
         List<Card> player1Cards = new ArrayList<>();
         player1Cards.add(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0));
@@ -144,7 +144,7 @@ public class RobinHoodEventTest {
     }
 
     @Test
-    public void performEventTest_nothingShouldHappen() {
+    void performEventTest_nothingShouldHappen() {
         Player player1 = new Player();
         List<Card> player1Cards = new ArrayList<>();
         player1Cards.add(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0));

@@ -83,20 +83,20 @@ public class PlayerTest {
     }
 
     @Test
-    public void setPointsTest() {
+    void setPointsTest() {
         assertEquals(12, testPlayer.getPoints());
         testPlayer.setPoints(15);
         assertEquals(15, testPlayer.getPoints());
     }
 
     @Test
-    public void popCardTest() {
+    void popCardTest() {
         assertEquals(someCard, testPlayer.popCard(0));
         assertEquals(0, testPlayer.getHandSize());
     }
 
     @Test
-    public void pushCardToHandTest() {
+    void pushCardToHandTest() {
         assertEquals(1, testPlayer.getHandSize());
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
@@ -104,29 +104,29 @@ public class PlayerTest {
     }
 
     @Test
-    public void isBlockedTest() {
+    void isBlockedTest() {
         assertFalse(testPlayer.isBlocked());
     }
 
     @Test
-    public void setBlockedTest() {
+    void setBlockedTest() {
         assertFalse(testPlayer.isBlocked());
         testPlayer.setBlocked(true);
         assertTrue(testPlayer.isBlocked());
     }
 
     @Test
-    public void getHandSizeTest() {
+    void getHandSizeTest() {
         assertEquals(1, testPlayer.getHandSize());
     }
 
     @Test
-    public void isAdminTest() {
+    void isAdminTest() {
         assertFalse(testPlayer.isAdmin());
     }
 
     @Test
-    public void setAdminTest() {
+    void setAdminTest() {
         assertFalse(testPlayer.isAdmin());
         testPlayer.setAdmin(true);
         assertTrue(testPlayer.isAdmin());
@@ -135,13 +135,13 @@ public class PlayerTest {
     //TODO: hasNiceTryTest() & hasCounterAttackTest()
 
     @Test
-    public void calculatePointsTest() {
+    void calculatePointsTest() {
         //TODO: test with special cards & FuckYouCard
         assertEquals(7, testPlayer.calculatePoints());
     }
 
     @Test
-    public void clearHandTest() {
+    void clearHandTest() {
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 3));

@@ -159,7 +159,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void getLobbyState_ReturnCorrectState() {
+    void getLobbyState_ReturnCorrectState() {
         String lobbyId = lobbyService.createLobby(player1);
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
         LobbyStateDTO response = lobbyService.getLobbyState(lobbyId);
@@ -169,13 +169,13 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_ReturnTrue() {
+    void isUsernameAlreadyInLobby_ReturnTrue() {
         String lobbyId = lobbyService.createLobby(player1);
         assertTrue(lobbyService.isUsernameAlreadyInLobby(lobbyId, player1.getUsername()));
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_ReturnFalse() {
+    void isUsernameAlreadyInLobby_ReturnFalse() {
         String lobbyId = lobbyService.createLobby(player1);
         assertFalse(lobbyService.isUsernameAlreadyInLobby(lobbyId, player2.getUsername()));
     }

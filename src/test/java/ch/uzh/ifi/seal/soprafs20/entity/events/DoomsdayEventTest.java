@@ -38,19 +38,19 @@ public class DoomsdayEventTest {
     }
     
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event doomsday = new DoomsdayEvent(this.game, this.gameRound);
         assertEquals("doomsday", doomsday.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event doomsday = new DoomsdayEvent(this.game, this.gameRound);
         assertEquals("Rest in peace, everyone is dead. Well, not really, since it's just a game. The round is over and everyone's points increase by 50.", doomsday.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(game).endGameRound(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
         Player player1 = new Player();
