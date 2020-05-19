@@ -292,7 +292,7 @@ public class GameService {
 
     public void sendReconnect(String lobbyId) {
         for (Player player : this.playerRepository.findByLobbyId(lobbyId)) {
-            webSocketService.sendReconnect(lobbyId, player.getIdentity());
+            webSocketService.sendReconnect(player.getIdentity());
         }
     }
 

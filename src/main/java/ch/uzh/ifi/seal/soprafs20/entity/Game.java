@@ -57,7 +57,7 @@ public class Game {
             onGameOver();
         }
         this.gameService.sendReconnect(this.lobbyId);
-        startReconnectTimer(2);
+        startReconnectTimer(5);
     }
 
     private void onGameOver() {
@@ -161,11 +161,17 @@ public class Game {
 
     private void updatePlayerIdentities() {
         List<Player> newListOfPlayers = this.gameService.getPlayersInGame(this.lobbyId);
-        for (int i = 0; i < newListOfPlayers.size(); i++) {
-            Player oldPlayer = this.listOfPlayers.get(i);
-            Player newPlayer = newListOfPlayers.get(i);
-            oldPlayer.setIdentity(newPlayer.getIdentity());
+        Map<String, Player> mapOfPlayers = new HashMap<>();
+        for (Player p : this.listOfPlayers) {
+            mapOfPlayers.put(p.getUsername(), p);
         }
+        for (Player newPlayer : newListOfPlayers) {
+            Player oldPlayer = mapOfPlayers.get(newPlayer.getUsername());
+            if (oldPlayer != null) {
+                newPlayer.setPoints(oldPlayer.getPoints());
+            }
+        }
+        this.listOfPlayers = newListOfPlayers;
     }
 
     private void removeFromPlayerList(Player player) {

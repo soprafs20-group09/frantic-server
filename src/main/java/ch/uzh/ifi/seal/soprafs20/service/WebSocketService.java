@@ -9,6 +9,7 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -16,10 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -27,15 +25,19 @@ public class WebSocketService {
 
     protected final PlayerRepository playerRepository;
     private final LobbyService lobbyService;
+    private final PlayerService playerService;
 
     private final Map<String, String> reconnectMap = new HashMap<>();
+    private final Map<String, Timer> reconnectTimer = new HashMap<>();
 
     @Autowired
     protected SimpMessagingTemplate simp;
 
-    public WebSocketService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Lazy LobbyService lobbyService) {
+    public WebSocketService(@Qualifier("playerRepository") PlayerRepository playerRepository,
+                            @Lazy LobbyService lobbyService, @Lazy PlayerService playerService) {
         this.playerRepository = playerRepository;
         this.lobbyService = lobbyService;
+        this.playerService = playerService;
     }
 
     public void sendChatMessage(String lobbyId, String identity, ChatDTO dto) {
@@ -56,22 +58,39 @@ public class WebSocketService {
         }
     }
 
-    public void sendReconnect(String lobbyId, String identity) {
+    public void sendReconnect(String identity) {
         String token = UUID.randomUUID().toString();
         RegisterDTO dto = new RegisterDTO();
         dto.setToken(token);
         this.reconnectMap.put(token, identity);
-        this.sendToPlayerInLobby(lobbyId, identity, "/queue/lobby/" + lobbyId + "/reconnect", dto);
+        this.sendToPlayer(identity, "/queue/reconnect", dto);
     }
 
-    public synchronized void reconnect(String newIdentity, RegisterDTO dto) {
-        String oldIdentity = this.reconnectMap.get(dto.getToken());
+    public synchronized void reconnect(String newIdentity, String token) {
+        String oldIdentity = this.reconnectMap.get(token);
         if (oldIdentity != null) {
+            this.reconnectTimer.get(oldIdentity).cancel();
             Player player = this.playerRepository.findByIdentity(oldIdentity);
-            player.setIdentity(newIdentity);
-            this.playerRepository.flush();
-            this.reconnectMap.remove(dto.getToken());
+            RegisteredDTO registeredDTO = this.playerService.registerPlayer(newIdentity, player, player.getLobbyId());
+            this.sendToPlayer(newIdentity, "/queue/register", registeredDTO);
+            this.reconnectMap.remove(token);
         }
+    }
+
+    public void startReconnectTimer(int seconds, String identity) {
+        int milliseconds = seconds * 1000;
+        this.reconnectTimer.put(identity, new Timer());
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                lobbyService.handleDisconnect(identity);
+            }
+        };
+        this.reconnectTimer.get(identity).schedule(timerTask, milliseconds);
+    }
+
+    public boolean isReconnecting(String token) {
+        return this.reconnectMap.containsKey(token);
     }
 
     private void parseGameCommand(Player sender, String message) {

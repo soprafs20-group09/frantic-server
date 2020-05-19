@@ -26,23 +26,20 @@ public class WebSocketController {
     private final RegisterService registerService;
     private final LobbyService lobbyService;
     private final WebSocketService webSocketService;
-    private final Map<String, Timer> reconnectWindow;
 
     public WebSocketController(RegisterService registerService, LobbyService lobbyService, WebSocketService webSocketService) {
         this.registerService = registerService;
         this.lobbyService = lobbyService;
         this.webSocketService = webSocketService;
-        this.reconnectWindow = new HashMap<>();
     }
 
     @MessageMapping("/register")
     public synchronized void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO dto) {
-        if (this.reconnectWindow.get(getIdentity(sha)) == null) {
-            registerService.joinLobby(getIdentity(sha), dto);
+        if (this.webSocketService.isReconnecting(dto.getToken())) {
+            webSocketService.reconnect(getIdentity(sha), dto.getToken());
         }
         else {
-            this.reconnectWindow.get(getIdentity(sha)).cancel();
-            webSocketService.reconnect(getIdentity(sha), dto);
+            registerService.joinLobby(getIdentity(sha), dto);
         }
     }
 
@@ -56,19 +53,7 @@ public class WebSocketController {
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         Principal p = event.getUser();
         if (p != null) {
-            startReconnectTimer(2, p.getName());
+            this.webSocketService.startReconnectTimer(2, p.getName());
         }
-    }
-
-    private void startReconnectTimer(int seconds, String identity) {
-        int milliseconds = seconds * 1000;
-        this.reconnectWindow.put(identity, new Timer());
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                lobbyService.handleDisconnect(identity);
-            }
-        };
-        this.reconnectWindow.get(identity).schedule(timerTask, milliseconds);
     }
 }
