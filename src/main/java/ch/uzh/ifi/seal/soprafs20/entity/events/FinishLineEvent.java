@@ -3,7 +3,6 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
-import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
 import java.util.HashMap;
 import java.util.List;
