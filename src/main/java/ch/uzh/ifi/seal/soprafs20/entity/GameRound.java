@@ -636,6 +636,10 @@ public class GameRound {
                 chat.add(new EventChat("event:gambling-man", player.getUsername() + " bet " + FranticUtils.getStringRepresentation(card.getValue()) + "."));
                 if (card.getValue().ordinal() > max.ordinal()) {
                     max = card.getValue();
+                    highest.clear();
+                    highest.add(player);
+                }
+                else if (card.getValue().ordinal() == max.ordinal()) {
                     highest.add(player);
                 }
             }
