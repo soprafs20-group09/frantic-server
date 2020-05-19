@@ -16,11 +16,17 @@ To establish a connection between the front- and backend REST is used. When furt
 
 ## High-level Components
 
-Listed below are the main components of the game:
+The [GameConroller](src/main/java/ch/uzh/ifi/seal/soprafs20/controller/GameController.java) recieves all game-related packages and passes them to the [GameService](src/main/java/ch/uzh/ifi/seal/soprafs20/service/GameService.java). The GameService then reads the packages and assigns the tasks to the Game and GameRound.
 
-[Main Class](src/main/java/ch/uzh/ifi/seal/soprafs20/Application.java)
+The [Game class](src/main/java/ch/uzh/ifi/seal/soprafs20/entity/Game.java) handles the overall state of the game (game starts, round starts, round or game ends etc).
+The [GameRound](src/main/java/ch/uzh/ifi/seal/soprafs20/entity/GameRound) class manages the individual rounds. Which means it decides what happens when a (special) card is played, event gets triggerd etc. The GameRound class is by far the largest class of the backend.
+
+
+When starting the server the [Application class](src/main/java/ch/uzh/ifi/seal/soprafs20/Application.java) gets executed
 
 ## Launch & Deployment
+
+### Build
 
 ```bash
 ./gradlew build
@@ -76,5 +82,3 @@ Sina Krumhard
 
 First of all we want to thank our tutor Moritz Eck, who always provided useful advice to get cleaner code and more user friendlyness.
 Further, we would like to say thank you to our friends and families, who tested our game extensively and also provided improvements in terms of user friendlyness. 
-
-## License
