@@ -833,13 +833,13 @@ public class GameRound {
         return this.discardPile;
     }
 
-    public Pile<Card> getDrawStack() {
-        return this.drawStack;
-    }
-
     //================================================================================
     // Utility Methods
     //================================================================================
+
+    public Pile<Card> getDrawStack() {
+        return this.drawStack;
+    }
 
     private void changePlayer() {
         if (!this.listOfPlayers.isEmpty()) {
@@ -961,6 +961,10 @@ public class GameRound {
         return null;
     }
 
+    //================================================================================
+    // Timers
+    //================================================================================
+
     private Player getPlayerByUsername(String username) {
         for (Player p : listOfPlayers) {
             if (p.getUsername().equals(username)) {
@@ -969,10 +973,6 @@ public class GameRound {
         }
         return null;
     }
-
-    //================================================================================
-    // Timers
-    //================================================================================
 
     public void startTurnTimer(int seconds) {
         int milliseconds = seconds * 1000;
@@ -1096,6 +1096,10 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
+    //================================================================================
+    // Event Initialization
+    //================================================================================
+
     public void startGamblingManTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
@@ -1107,10 +1111,6 @@ public class GameRound {
         };
         this.timer.schedule(timerTask, milliseconds);
     }
-
-    //================================================================================
-    // Event Initialization
-    //================================================================================
 
     private List<Event> initEvents() {
         //initialize all Events and add them to the list
