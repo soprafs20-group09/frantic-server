@@ -14,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * User Service
- * This class is the "worker" and responsible for all functionality related to the user
- * (e.g., it creates, modifies, deletes, finds). The result will be passed back to the caller.
+ * Handles Player functionalities (create, register, remove)
  */
 @Service
 @Transactional
@@ -40,32 +38,28 @@ public class PlayerService {
     }
 
     public synchronized Player createPlayer(String identity, String username) {
-
         Player newPlayer = new Player();
         newPlayer.setUsername(username);
         newPlayer.setIdentity(identity);
-        playerRepository.save(newPlayer);
-        playerRepository.flush();
+        this.playerRepository.save(newPlayer);
+        this.playerRepository.flush();
         return newPlayer;
     }
 
     public synchronized RegisteredDTO registerPlayer(String identity, Player player, String lobbyId) {
-
         player.setIdentity(identity);
-        playerRepository.flush();
-
+        this.playerRepository.flush();
         return new RegisteredDTO(player.getUsername(), lobbyId);
     }
 
     public synchronized String removePlayer(Player player) {
-
-        Lobby currentLobby = null;
+        Lobby currentLobby;
         try {
-            currentLobby = lobbyRepository.findByLobbyId(player.getLobbyId());
+            currentLobby = this.lobbyRepository.findByLobbyId(player.getLobbyId());
 
             //remove player from lobby
             currentLobby.removePlayer(player);
-            lobbyRepository.flush();
+            this.lobbyRepository.flush();
 
             //remove player from game
             if (currentLobby.isPlaying()) {
@@ -73,9 +67,9 @@ public class PlayerService {
             }
 
             //remove player from PlayerRepository
-            if (playerRepository.findByIdentity(player.getIdentity()) != null) {
-                playerRepository.delete(player);
-                playerRepository.flush();
+            if (this.playerRepository.findByIdentity(player.getIdentity()) != null) {
+                this.playerRepository.delete(player);
+                this.playerRepository.flush();
             }
         }
         catch (NullPointerException e) {
@@ -85,6 +79,6 @@ public class PlayerService {
     }
 
     public List<Player> getPlayersInLobby(String lobbyId) {
-        return playerRepository.findByLobbyId(lobbyId);
+        return this.playerRepository.findByLobbyId(lobbyId);
     }
 }

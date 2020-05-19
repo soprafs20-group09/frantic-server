@@ -6,8 +6,8 @@ import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * - Handles general WebSocket stuff (chat, reconnect)
+ * - Provides utility functions for sending packets
+ */
 @Service
 @Transactional
 public class WebSocketService {
@@ -58,6 +62,21 @@ public class WebSocketService {
         }
     }
 
+    private void parseGameCommand(Player sender, String message) {
+        if (message.equals("/end")) {
+            Game game = GameRepository.findByLobbyId(sender.getLobbyId());
+            game.getCurrentGameRound().onRoundOver(false);
+        }
+        else if (message.matches("/kick\\s\\S+")) {
+            String toKick = message.split(" ")[1];
+            if (this.playerRepository.findByUsernameAndLobbyId(toKick, sender.getLobbyId()) != null) {
+                KickDTO simulateDTO = new KickDTO();
+                simulateDTO.setUsername(toKick);
+                this.lobbyService.kickPlayer(sender.getLobbyId(), sender.getIdentity(), simulateDTO);
+            }
+        }
+    }
+
     public void sendReconnect(String identity) {
         String token = UUID.randomUUID().toString();
         RegisterDTO dto = new RegisterDTO();
@@ -79,6 +98,10 @@ public class WebSocketService {
         }
     }
 
+    public boolean isReconnecting(String token) {
+        return this.reconnectMap.containsKey(token);
+    }
+
     public void startReconnectTimer(int seconds, String identity) {
         int milliseconds = seconds * 1000;
         this.reconnectTimer.put(identity, new Timer());
@@ -91,27 +114,8 @@ public class WebSocketService {
         this.reconnectTimer.get(identity).schedule(timerTask, milliseconds);
     }
 
-    public boolean isReconnecting(String token) {
-        return this.reconnectMap.containsKey(token);
-    }
-
-    private void parseGameCommand(Player sender, String message) {
-        if (message.equals("/end")) {
-            Game game = GameRepository.findByLobbyId(sender.getLobbyId());
-            game.getCurrentGameRound().onRoundOver(false);
-        }
-        else if (message.matches("/kick\\s\\S+")) {
-            String toKick = message.split(" ")[1];
-            if (this.playerRepository.findByUsernameAndLobbyId(toKick, sender.getLobbyId()) != null) {
-                KickDTO simulateDTO = new KickDTO();
-                simulateDTO.setUsername(toKick);
-                lobbyService.kickPlayer(sender.getLobbyId(), sender.getIdentity(), simulateDTO);
-            }
-        }
-    }
-
     protected boolean checkSender(String lobbyId, String identity) {
-        Player toCheck = playerRepository.findByIdentity(identity);
+        Player toCheck = this.playerRepository.findByIdentity(identity);
         return toCheck.getLobbyId().equals(lobbyId);
     }
 
@@ -128,12 +132,12 @@ public class WebSocketService {
 
     protected void sendToPlayer(String identity, String path, Object dto) {
 
-        simp.convertAndSendToUser(identity, path, dto);
+        this.simp.convertAndSendToUser(identity, path, dto);
     }
 
     protected void sendToPlayerInLobby(String lobbyId, String identity, String destination, Object dto) {
 
-        simp.convertAndSendToUser(identity, "/queue/lobby/" + lobbyId + destination, dto);
+        this.simp.convertAndSendToUser(identity, "/queue/lobby/" + lobbyId + destination, dto);
     }
 
     protected void sendToLobby(String lobbyId, String destination) {
@@ -141,17 +145,9 @@ public class WebSocketService {
     }
 
     protected void sendToLobby(String lobbyId, String destination, Object dto) {
-        List<Player> lobby = playerRepository.findByLobbyId(lobbyId);
+        List<Player> lobby = this.playerRepository.findByLobbyId(lobbyId);
         for (Player player : lobby) {
             sendToPlayerInLobby(lobbyId, player.getIdentity(), destination, dto);
-        }
-    }
-
-    protected void sendDisconnectToLobby(String lobbyId, DisconnectDTO message) {
-        List<Player> lobby = playerRepository.findByLobbyId(lobbyId);
-        for (Player player : lobby) {
-            simp.convertAndSendToUser(player.getIdentity(),
-                    "/queue/disconnect", message);
         }
     }
 }

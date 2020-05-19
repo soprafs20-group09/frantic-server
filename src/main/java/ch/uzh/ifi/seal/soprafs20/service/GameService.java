@@ -8,9 +8,8 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.CardDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RecessionAmountDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * - Receives game-related DTOs and forwards content to GameRound
+ * - Compiles game-related information into DTO and sends it to players
+ */
 @Service
 @Transactional
 public class GameService {
@@ -254,7 +257,7 @@ public class GameService {
 
     public void sendRecession(String lobbyId, Player player, int amount) {
         RecessionAmountDTO dto = new RecessionAmountDTO(amount);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession" , dto);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession", dto);
     }
 
     public void sendGamblingMan(String lobbyId, Player player, int[] playable) {
@@ -273,7 +276,7 @@ public class GameService {
             cardDTO[i].setDisabled(disabled[i]);
         }
         MarketWindowDTO dto = new MarketWindowDTO(cardDTO);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window", dto);
     }
 
     public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, int seconds, String icon, String message) {

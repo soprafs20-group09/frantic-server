@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 
 import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 
+/**
+ * Provides game-related WebSocket endpoints
+ */
 @Controller
 public class GameController {
 
@@ -86,37 +89,37 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/action/nice-try")
     public void niceTry(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
+                        SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
         gameService.niceTry(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/surprise-party")
     public void surpriseParty(@DestinationVariable String lobbyId,
-                          SimpMessageHeaderAccessor sha, SurprisePartyDTO dto) {
+                              SimpMessageHeaderAccessor sha, SurprisePartyDTO dto) {
         gameService.surpriseParty(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/merry-christmas")
     public void merryChristmas(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, MerryChristmasDTO dto) {
+                               SimpMessageHeaderAccessor sha, MerryChristmasDTO dto) {
         gameService.merryChristmas(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/recession")
     public void recession(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, RecessionDTO dto) {
+                          SimpMessageHeaderAccessor sha, RecessionDTO dto) {
         gameService.recession(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/market")
     public void market(@DestinationVariable String lobbyId,
-                          SimpMessageHeaderAccessor sha, MarketDTO dto) {
+                       SimpMessageHeaderAccessor sha, MarketDTO dto) {
         gameService.market(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/gambling-man")
     public void gamblingMan(@DestinationVariable String lobbyId,
-                       SimpMessageHeaderAccessor sha, GamblingManDTO dto) {
+                            SimpMessageHeaderAccessor sha, GamblingManDTO dto) {
         gameService.gamblingMan(lobbyId, getIdentity(sha), dto);
     }
 }

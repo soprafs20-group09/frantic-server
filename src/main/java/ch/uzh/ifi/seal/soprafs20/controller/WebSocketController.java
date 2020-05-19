@@ -13,23 +13,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 
+/**
+ * Provides general WebSocket endpoints and handles session disconnects
+ */
 @Controller
 public class WebSocketController {
 
     private final RegisterService registerService;
-    private final LobbyService lobbyService;
     private final WebSocketService webSocketService;
 
-    public WebSocketController(RegisterService registerService, LobbyService lobbyService, WebSocketService webSocketService) {
+    public WebSocketController(RegisterService registerService, WebSocketService webSocketService) {
         this.registerService = registerService;
-        this.lobbyService = lobbyService;
         this.webSocketService = webSocketService;
     }
 

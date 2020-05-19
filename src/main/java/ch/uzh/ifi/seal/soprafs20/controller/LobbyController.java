@@ -10,6 +10,9 @@ import org.springframework.stereotype.Controller;
 
 import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 
+/**
+ * Provides lobby-related WebSocket endpoints
+ */
 @Controller
 public class LobbyController {
 
