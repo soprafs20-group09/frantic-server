@@ -166,7 +166,7 @@ public class GameRound {
 
                         if (cardToPlay.getType() == Type.NUMBER) {
                             Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
+                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getColor() == Color.BLACK) {
                                 prepareEvent();
@@ -177,8 +177,7 @@ public class GameRound {
                         }
                         else if (cardToPlay.getType() == Type.SPECIAL) {
                             Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + (cardToPlay.getColor().ordinal() < 4 ? (FranticUtils.getStringRepresentation(cardToPlay.getColor()) + " ") : "")
-                                            + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
                             this.gameService.sendChatMessage(this.lobbyId, chat);
                             if (cardToPlay.getValue() == Value.FUCKYOU) {
                                 finishTurn();
@@ -595,7 +594,7 @@ public class GameRound {
 
     private void performMarket(Player player, Card choice) {
         player.pushCardToHand(choice);
-        Chat chat = new EventChat("event:market", player.getUsername() + " took a card");
+        Chat chat = new EventChat("event:market", player.getUsername() + " took " + FranticUtils.getStringRepresentationOfCard(choice) + ".");
         this.gameService.sendChatMessage(this.lobbyId, chat);
         this.sendCompleteGameState();
 
@@ -637,6 +636,10 @@ public class GameRound {
                 chat.add(new EventChat("event:gambling-man", player.getUsername() + " bet " + FranticUtils.getStringRepresentation(card.getValue()) + "."));
                 if (card.getValue().ordinal() > max.ordinal()) {
                     max = card.getValue();
+                    highest.clear();
+                    highest.add(player);
+                }
+                else if (card.getValue().ordinal() == max.ordinal()) {
                     highest.add(player);
                 }
             }
@@ -875,7 +878,7 @@ public class GameRound {
         }
         else {
             chat = new EventChat("avatar:" + player.getUsername(),
-                    player.getUsername() + " drew " + amount + " cards");
+                    player.getUsername() + " drew " + amount + " cards.");
         }
         this.gameService.sendChatMessage(this.lobbyId, chat);
         this.gameService.sendDrawAnimation(this.lobbyId, amount);

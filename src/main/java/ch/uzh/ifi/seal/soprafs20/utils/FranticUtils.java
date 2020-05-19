@@ -100,14 +100,23 @@ public class FranticUtils {
         return typeMap.get(t);
     }
 
-    public static String getStringRepresentationOfNumberCard(Card card) {
+    public static String getStringRepresentationOfCard(Card card) {
         if (!colorMap.containsKey(card.getColor())) {
             fillColorMap();
+        }
+        if (!typeMap.containsKey(card.getType())) {
+            fillTypeMap();
         }
         if (!valueMap.containsKey(card.getValue())) {
             fillValueMap();
         }
-        return colorMap.get(card.getColor()) + " " + valueMap.get(card.getValue());
+        if (card.getType() == Type.NUMBER) {
+            return colorMap.get(card.getColor()) + " " + valueMap.get(card.getValue());
+        }
+        else {
+            return (card.getColor().ordinal() < 4 ? (colorMap.get(card.getColor()) + " ") : "")
+                    + valueMap.get(card.getValue());
+        }
     }
 
     public static String getIdentity(SimpMessageHeaderAccessor sha) {
