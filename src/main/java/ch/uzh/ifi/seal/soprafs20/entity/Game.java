@@ -170,6 +170,9 @@ public class Game {
             if (oldPlayer != null) {
                 newPlayer.setPoints(oldPlayer.getPoints());
             }
+            if (newPlayer.getUsername().equals(this.firstPlayer.getUsername())) {
+                this.firstPlayer = newPlayer;
+            }
         }
         this.listOfPlayers = newListOfPlayers;
     }

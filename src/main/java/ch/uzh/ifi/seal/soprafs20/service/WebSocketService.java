@@ -69,11 +69,13 @@ public class WebSocketService {
     public synchronized void reconnect(String newIdentity, String token) {
         String oldIdentity = this.reconnectMap.get(token);
         if (oldIdentity != null) {
-            this.reconnectTimer.get(oldIdentity).cancel();
             Player player = this.playerRepository.findByIdentity(oldIdentity);
-            RegisteredDTO registeredDTO = this.playerService.registerPlayer(newIdentity, player, player.getLobbyId());
-            this.sendToPlayer(newIdentity, "/queue/register", registeredDTO);
-            this.reconnectMap.remove(token);
+            if (player != null) {
+                this.reconnectTimer.get(oldIdentity).cancel();
+                RegisteredDTO registeredDTO = this.playerService.registerPlayer(newIdentity, player, player.getLobbyId());
+                this.sendToPlayer(newIdentity, "/queue/register", registeredDTO);
+                this.reconnectMap.remove(token);
+            }
         }
     }
 
