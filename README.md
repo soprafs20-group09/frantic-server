@@ -18,7 +18,7 @@ To establish a connection between the front- and backend REST is used. When furt
 
 Listed below are the main components of the game:
 
-[Main Class](soprafs20/Application.java)
+[Main Class](src/main/java/ch/uzh/ifi/seal/soprafs20/Application.java)
 
 ## Launch & Deployment
 
