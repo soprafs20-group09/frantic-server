@@ -97,6 +97,35 @@ public class GameRoundIntegrationTest {
         assertEquals(expectedDiscardPileCard, gameRound.getDiscardPile().peek());
     }
 
+
+    @Test
+    void prepareNewTurn_drawStackEmpty_performOnRoundOver() {
+        for (int i = 1; i <= 125; i++) {
+            testRound.getDrawStack().pop();
+        }
+        testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
+
+        testRound.startTurnTimer(30);
+        testRound.playCard("id1", 1);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
+    }
+
+    @Test
+    void prepareNewTurn_playerFinished_prepareNiceTry() {
+        player1.popCard(2);
+        player1.popCard(0);
+        testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
+
+        testRound.startTurnTimer(30);
+        testRound.playCard("id1", 0);
+
+        Mockito.verify(this.gameService, Mockito.times(2)).sendPlayable("lobbyId", player1, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player2, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player3, new int[0], false, false);
+        Mockito.verify(this.gameService).sendPlayable("lobbyId", player4, new int[]{1}, false, false);
+    }
+
     @Test
     public void playerFinishesTurn_notMadeMoveBefore_success() {
         assertEquals(3, player1.getHandSize());
@@ -1011,7 +1040,8 @@ public class GameRoundIntegrationTest {
         assertEquals(36, player4.getPoints());
     }
 
-    @Test void bombExploded_doubledPoints_endGame() {
+    @Test
+    void bombExploded_doubledPoints_endGame() {
         //start with 0 cards & 0 points
         player1.popCard();
         player1.popCard();
@@ -1030,7 +1060,7 @@ public class GameRoundIntegrationTest {
         player4.setPoints(0);
 
         //for easier calculation of points
-        for (int i=1; i<=42; i++) {
+        for (int i = 1; i <= 42; i++) {
             testRound.getDrawStack().push(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, i));
         }
 
@@ -1094,5 +1124,15 @@ public class GameRoundIntegrationTest {
         Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
         assertEquals(0, testRound.getDrawStack().size());
         assertEquals(3, player2.getHandSize());
+    }
+
+    @Test
+    public void playerLostConnection_isCurrentPlayer_prepareNewTurn() {
+        testRound.getDiscardPile().push(new Card(Color.BLUE, Type.NUMBER, Value.EIGHT, false, 10));
+        testRound.startTurnTimer(30);
+        testRound.playerLostConnection(player1);
+
+        assertEquals(3, testRound.getListOfPlayers().size());
+        assertEquals(player2, testRound.getCurrentPlayer());
     }
 }
