@@ -606,183 +606,6 @@ public class GameRoundIntegrationTest {
     }
 
     @Test
-    public void onRoundOver_unblockPlayer() {
-        player2.setBlocked(true);
-        player4.setBlocked(true);
-
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        assertFalse(player2.isBlocked());
-        assertFalse(player4.isBlocked());
-    }
-
-    @Test
-    public void onRoundOver_calculatePoints_noTimeBomb_1winner() {
-        player1.popCard();
-        player1.popCard();
-        player1.popCard();
-        assertEquals(42, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 played his/her last card!"));
-        assertEquals(42, player1.getPoints());
-        assertEquals(120, player2.getPoints());
-        assertEquals(58, player3.getPoints());
-        assertEquals(36, player4.getPoints());
-    }
-
-    @Test
-    public void onRoundOver_calculatePoints_noTimeBomb_2winners() {
-        player1.popCard();
-        player1.popCard();
-        player1.popCard();
-        player4.popCard();
-        player4.popCard();
-        player4.popCard();
-        assertEquals(42, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1, player4 played their last card!"));
-        assertEquals(42, player1.getPoints());
-        assertEquals(120, player2.getPoints());
-        assertEquals(58, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-    }
-
-    @Test
-    public void onRoundOver_calculatePoints_TimeBomb_1winner() {
-        player1.popCard();
-        player1.popCard();
-        player1.popCard();
-        assertEquals(42, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.setTimeBomb();
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 defused the bomb!"));
-        assertEquals(32, player1.getPoints());
-        assertEquals(130, player2.getPoints());
-        assertEquals(68, player3.getPoints());
-        assertEquals(46, player4.getPoints());
-    }
-
-    @Test
-    public void onRoundOver_calculatePoints_TimeBomb_2winners() {
-        player1.popCard();
-        player1.popCard();
-        player1.popCard();
-        player4.popCard();
-        player4.popCard();
-        player4.popCard();
-        assertEquals(42, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.setTimeBomb();
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1, player4 defused the bomb!"));
-        assertEquals(32, player1.getPoints());
-        assertEquals(130, player2.getPoints());
-        assertEquals(68, player3.getPoints());
-        assertEquals(11, player4.getPoints());
-    }
-
-    @Test
-    public void onRoundOver_calculatePoints_TimeBomb_belowZero() {
-        player1.popCard();
-        player1.popCard();
-        player1.popCard();
-        player1.setPoints(3);
-        assertEquals(3, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.setTimeBomb();
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(false);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 defused the bomb!"));
-        assertEquals(-7, player1.getPoints());
-        assertEquals(130, player2.getPoints());
-        assertEquals(68, player3.getPoints());
-        assertEquals(46, player4.getPoints());
-    }
-
-    @Test
-    public void onRoundOver_stackEmpty() {
-        assertEquals(42, player1.getPoints());
-        assertEquals(104, player2.getPoints());
-        assertEquals(44, player3.getPoints());
-        assertEquals(21, player4.getPoints());
-
-        testRound.startTurnTimer(30);
-        testRound.onRoundOver(true);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
-        assertEquals(62, player1.getPoints());
-        assertEquals(120, player2.getPoints());
-        assertEquals(58, player3.getPoints());
-        assertEquals(36, player4.getPoints());
-    }
-
-    @Test
-    public void drawCardFromStack_stackNotEmpty() {
-        assertEquals(2, player2.getHandSize());
-        Card card1 = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
-        Card card2 = new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 11);
-        testRound.getDrawStack().push(card1);
-        testRound.getDrawStack().push(card2);
-        int drawStackSize = testRound.getDrawStack().size();
-
-        testRound.drawCardFromStack(player2, 2);
-
-        Mockito.verify(this.gameService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
-        Mockito.verify(this.gameService).sendDrawAnimation("lobbyId", 2);
-        Mockito.verify(this.gameService).sendHand("lobbyId", player2);
-
-        assertEquals(drawStackSize - 2, testRound.getDrawStack().size());
-        assertEquals(4, player2.getHandSize());
-        assertEquals(card1, player2.peekCard(2));
-        assertEquals(card2, player2.peekCard(3));
-    }
-
-    @Test
-    public void drawCardFromStack_stackEmpty_onRoundOver() {
-        assertEquals(2, player2.getHandSize());
-
-        for (int i = 1; i <= 124; i++) {
-            testRound.getDrawStack().pop();
-        }
-        assertEquals(1, testRound.getDrawStack().size());
-
-        testRound.startTurnTimer(30);
-        testRound.drawCardFromStack(player2, 2);
-
-        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
-        assertEquals(0, testRound.getDrawStack().size());
-        assertEquals(3, player2.getHandSize());
-    }
-
-    @Test
     public void recessionTest_sortedInput() {
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, -1)); //negative order key to make sure randomly drawn card is larger
         player1.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.TWO, false, 11));
@@ -1047,5 +870,229 @@ public class GameRoundIntegrationTest {
         assertTrue(p2Hand.contains(c2));
         assertTrue(p2Hand.contains(c3));
         assertTrue(p2Hand.contains(c4));
+    }
+
+    @Test
+    public void onRoundOver_unblockPlayer() {
+        player2.setBlocked(true);
+        player4.setBlocked(true);
+
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        assertFalse(player2.isBlocked());
+        assertFalse(player4.isBlocked());
+    }
+
+    @Test
+    public void onRoundOver_calculatePoints_noTimeBomb_1winner() {
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        assertEquals(42, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 played his/her last card!"));
+        assertEquals(42, player1.getPoints());
+        assertEquals(120, player2.getPoints());
+        assertEquals(58, player3.getPoints());
+        assertEquals(36, player4.getPoints());
+    }
+
+    @Test
+    public void onRoundOver_calculatePoints_noTimeBomb_2winners() {
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        player4.popCard();
+        player4.popCard();
+        player4.popCard();
+        assertEquals(42, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1, player4 played their last card!"));
+        assertEquals(42, player1.getPoints());
+        assertEquals(120, player2.getPoints());
+        assertEquals(58, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+    }
+
+    @Test
+    public void onRoundOver_calculatePoints_TimeBomb_1winner() {
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        assertEquals(42, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.setTimeBomb();
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 defused the bomb!"));
+        assertEquals(32, player1.getPoints());
+        assertEquals(130, player2.getPoints());
+        assertEquals(68, player3.getPoints());
+        assertEquals(46, player4.getPoints());
+    }
+
+    @Test
+    public void onRoundOver_calculatePoints_TimeBomb_2winners() {
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        player4.popCard();
+        player4.popCard();
+        player4.popCard();
+        assertEquals(42, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.setTimeBomb();
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1, player4 defused the bomb!"));
+        assertEquals(32, player1.getPoints());
+        assertEquals(130, player2.getPoints());
+        assertEquals(68, player3.getPoints());
+        assertEquals(11, player4.getPoints());
+    }
+
+    @Test
+    public void onRoundOver_calculatePoints_TimeBomb_belowZero() {
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        player1.setPoints(3);
+        assertEquals(3, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.setTimeBomb();
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(false);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("player1 defused the bomb!"));
+        assertEquals(-7, player1.getPoints());
+        assertEquals(130, player2.getPoints());
+        assertEquals(68, player3.getPoints());
+        assertEquals(46, player4.getPoints());
+    }
+
+    @Test
+    public void onRoundOver_stackEmpty() {
+        assertEquals(42, player1.getPoints());
+        assertEquals(104, player2.getPoints());
+        assertEquals(44, player3.getPoints());
+        assertEquals(21, player4.getPoints());
+
+        testRound.startTurnTimer(30);
+        testRound.onRoundOver(true);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
+        assertEquals(62, player1.getPoints());
+        assertEquals(120, player2.getPoints());
+        assertEquals(58, player3.getPoints());
+        assertEquals(36, player4.getPoints());
+    }
+
+    @Test void bombExploded_doubledPoints_endGame() {
+        //start with 0 cards & 0 points
+        player1.popCard();
+        player1.popCard();
+        player1.popCard();
+        player2.popCard();
+        player2.popCard();
+        player3.popCard();
+        player3.popCard();
+        player4.popCard();
+        player4.popCard();
+        player4.popCard();
+
+        player1.setPoints(0);
+        player2.setPoints(0);
+        player3.setPoints(0);
+        player4.setPoints(0);
+
+        //for easier calculation of points
+        for (int i=1; i<=42; i++) {
+            testRound.getDrawStack().push(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, i));
+        }
+
+        testRound.setTimeBomb();
+        testRound.startGameRound();
+        testRound.playerFinishesTurn("id1"); //turn where black card would be played
+        testRound.playerFinishesTurn("id2");
+        testRound.playerFinishesTurn("id3");
+        testRound.playerFinishesTurn("id4");
+        testRound.playerFinishesTurn("id1");
+        testRound.playerFinishesTurn("id2");
+        testRound.playerFinishesTurn("id3");
+        testRound.playerFinishesTurn("id4");
+        testRound.playerFinishesTurn("id1");
+        testRound.playerFinishesTurn("id2");
+        testRound.playerFinishesTurn("id3");
+        testRound.playerFinishesTurn("id4");
+        testRound.playerFinishesTurn("id1");
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The bomb exploded!"));
+
+        assertEquals(22, player1.getPoints());
+        assertEquals(20, player2.getPoints());
+        assertEquals(20, player3.getPoints());
+        assertEquals(20, player4.getPoints());
+    }
+
+    @Test
+    public void drawCardFromStack_stackNotEmpty() {
+        assertEquals(2, player2.getHandSize());
+        Card card1 = new Card(Color.YELLOW, Type.NUMBER, Value.EIGHT, false, 10);
+        Card card2 = new Card(Color.RED, Type.NUMBER, Value.EIGHT, false, 11);
+        testRound.getDrawStack().push(card1);
+        testRound.getDrawStack().push(card2);
+        int drawStackSize = testRound.getDrawStack().size();
+
+        testRound.drawCardFromStack(player2, 2);
+
+        Mockito.verify(this.gameService).sendChatMessage(Mockito.any(), (Chat) Mockito.any());
+        Mockito.verify(this.gameService).sendDrawAnimation("lobbyId", 2);
+        Mockito.verify(this.gameService).sendHand("lobbyId", player2);
+
+        assertEquals(drawStackSize - 2, testRound.getDrawStack().size());
+        assertEquals(4, player2.getHandSize());
+        assertEquals(card1, player2.peekCard(2));
+        assertEquals(card2, player2.peekCard(3));
+    }
+
+    @Test
+    public void drawCardFromStack_stackEmpty_onRoundOver() {
+        assertEquals(2, player2.getHandSize());
+
+        for (int i = 1; i <= 124; i++) {
+            testRound.getDrawStack().pop();
+        }
+        assertEquals(1, testRound.getDrawStack().size());
+
+        testRound.startTurnTimer(30);
+        testRound.drawCardFromStack(player2, 2);
+
+        Mockito.verify(this.game).endGameRound(Mockito.any(), Mockito.anyMap(), Mockito.any(), Mockito.eq("The card stack is empty!"));
+        assertEquals(0, testRound.getDrawStack().size());
+        assertEquals(3, player2.getHandSize());
     }
 }
