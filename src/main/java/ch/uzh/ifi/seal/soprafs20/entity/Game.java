@@ -65,6 +65,7 @@ public class Game {
             player.setPoints(0);
         }
         GameRepository.removeGame(this.lobbyId);
+        this.gameService.endGame(this.lobbyId);
     }
 
     //Removes all cards from the players hands

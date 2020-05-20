@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,6 +70,7 @@ public class LobbyServiceTest {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.any())).thenReturn(testLobby);
         Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
         Mockito.when(playerRepository.findByIdentity(Mockito.any())).thenReturn(testPlayer);
+        Mockito.when(playerRepository.findByLobbyId(Mockito.any())).thenReturn(Collections.singletonList(testPlayer));
         Mockito.when(playerRepository.findByUsernameAndLobbyId(Mockito.any(), Mockito.any())).thenReturn(testPlayer);
     }
 
@@ -76,8 +78,14 @@ public class LobbyServiceTest {
     void getLobbiesWithoutFilter_returnLobbies() {
         //setup
         Lobby lobby1 = new Lobby();
+        lobby1.setCreator("testPlayer");
+        lobby1.addPlayer(testPlayer);
         Lobby lobby2 = new Lobby();
+        lobby2.setCreator("testPlayer");
+        lobby2.addPlayer(testPlayer);
         Lobby lobby3 = new Lobby();
+        lobby3.setCreator("testPlayer");
+        lobby3.addPlayer(testPlayer);
         List<Lobby> listOfLobbies = new ArrayList<>();
         listOfLobbies.add(lobby1);
         listOfLobbies.add(lobby2);
@@ -100,9 +108,11 @@ public class LobbyServiceTest {
         Lobby lobby1 = new Lobby();
         lobby1.setName("alpha");
         lobby1.setCreator("Brian");
+        lobby1.addPlayer(testPlayer);
         Lobby lobby2 = new Lobby();
         lobby2.setName("beta");
-        lobby2.setCreator("Peter");
+        lobby2.setCreator("testPlayer");
+        lobby2.addPlayer(testPlayer);
 
         List<Lobby> listOfLobbies = new ArrayList<>();
         listOfLobbies.add(lobby1);
@@ -124,9 +134,11 @@ public class LobbyServiceTest {
         lobby1.setName("alpha");
         lobby1.setCreator("Brian");
         lobby1.setIsPublic(false);
+        lobby1.addPlayer(testPlayer);
         Lobby lobby2 = new Lobby();
         lobby2.setName("beta");
-        lobby2.setCreator("Peter");
+        lobby2.setCreator("testPlayer");
+        lobby2.addPlayer(testPlayer);
 
         List<Lobby> listOfLobbies = new ArrayList<>();
         listOfLobbies.add(lobby1);
@@ -188,11 +200,6 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void isUsernameAlreadyInLobby_false() {
-        assertFalse(lobbyService.isUsernameAlreadyInLobby("abc", "someUsername"));
-    }
-
-    @Test
     void isUsernameAlreadyInLobby_true() {
         assertTrue(lobbyService.isUsernameAlreadyInLobby("abc", "testPlayer"));
     }
@@ -248,6 +255,10 @@ public class LobbyServiceTest {
 
     @Test
     void checkLobbyJoin_lobbyFull_throwResponseStatusException() {
+        Mockito.when(playerRepository.findByUsernameAndLobbyId(Mockito.any(), Mockito.any())).thenReturn(null);
+
+        testLobby.addPlayer(testPlayer);
+        testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer);
@@ -266,6 +277,7 @@ public class LobbyServiceTest {
 
     @Test
     void checkLobbyJoin_gameAlreadyStarted_throwResponseStatusException() {
+        Mockito.when(playerRepository.findByUsernameAndLobbyId(Mockito.any(), Mockito.any())).thenReturn(null);
         testLobby.setIsPlaying(true);
         try {
             lobbyService.checkLobbyJoin("abc", "username");
@@ -304,7 +316,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void handleDisconnect_setNewAdmin() {
+    void handleDisconnect_setNewAdmin() throws InterruptedException {
         testPlayer.setAdmin(true);
         Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
 
@@ -317,7 +329,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void handleDisconnect_onePlayerInGame_sendLobbyState() {
+    void handleDisconnect_onePlayerInGame_sendLobbyState() throws InterruptedException {
         testLobby.removePlayer(testPlayer);
         testLobby.setIsPlaying(true);
         Mockito.when(playerService.removePlayer(Mockito.any())).thenReturn("lobbyId");
@@ -330,6 +342,6 @@ public class LobbyServiceTest {
     @Test
     void rematchTest() {
         lobbyService.rematch("lobbyId", "testIdentity");
-        Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("lobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/lobby-state"), Mockito.any());
+        Mockito.verify(webSocketService, Mockito.atLeastOnce()).sendToPlayerInLobby(Mockito.matches("lobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/lobby-state"), Mockito.any());
     }
 }

@@ -79,6 +79,9 @@ public class PlayerService {
     }
 
     public List<Player> getPlayersInLobby(String lobbyId) {
-        return this.playerRepository.findByLobbyId(lobbyId);
+        List<Player> players = this.playerRepository.findByLobbyId(lobbyId);
+        Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
+        players.removeIf(player -> !lobby.getListOfPlayers().contains(player.getUsername()));
+        return players;
     }
 }

@@ -29,14 +29,17 @@ public class GameService {
 
     private static GameService instance;
     private final WebSocketService webSocketService;
+    private final PlayerService playerService;
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
     public GameService(WebSocketService webSocketService,
+                       PlayerService playerService,
                        @Qualifier("playerRepository") PlayerRepository playerRepository,
                        @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.webSocketService = webSocketService;
+        this.playerService = playerService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
         instance = this;
@@ -53,6 +56,14 @@ public class GameService {
     public void startGame(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+            List<Player> players = this.playerRepository.findByLobbyId(lobbyId);
+            for (Player p : players) {
+                if (!lobby.getListOfPlayers().contains(p.getUsername())) {
+                    DisconnectDTO disconnectDTO = new DisconnectDTO("A new game has been started without you.");
+                    this.webSocketService.sendToPlayer(p.getIdentity(), "/queue/disconnect", disconnectDTO);
+                    this.playerService.removePlayer(p);
+                }
+            }
             sendStartGame(lobbyId);
             lobby.startGame();
         }
@@ -297,6 +308,11 @@ public class GameService {
         for (Player player : this.playerRepository.findByLobbyId(lobbyId)) {
             webSocketService.sendReconnect(player.getIdentity());
         }
+    }
+
+    public void endGame(String lobbyId) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        lobby.removeAllPlayers();
     }
 
     private CardDTO cardToDTO(Card card) {
