@@ -54,7 +54,7 @@ public class RESTControllerTest {
     private RegisterService registerService;
 
     @Test
-    public void getLobbies_returnsLobbyList() throws Exception {
+    void getLobbies_returnsLobbyList() throws Exception {
 
         Lobby lobby = new Lobby();
         lobby.setLobbyId("1");
@@ -76,7 +76,7 @@ public class RESTControllerTest {
     }
 
     @Test()
-    public void post_validUsername_returnsAuthToken() throws Exception {
+    void post_validUsername_returnsAuthToken() throws Exception {
 
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");
@@ -99,7 +99,7 @@ public class RESTControllerTest {
     }
 
     @Test()
-    public void post_invalidUsername_throwsException() throws Exception {
+    void post_invalidUsername_throwsException() throws Exception {
 
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername(" ");
@@ -119,7 +119,7 @@ public class RESTControllerTest {
     }
 
     @Test
-    public void put_validUsername_returnsAuthToken() throws Exception {
+    void put_validUsername_returnsAuthToken() throws Exception {
 
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");
@@ -142,7 +142,7 @@ public class RESTControllerTest {
     }
 
     @Test
-    public void put_privateLobby_throwsException() throws Exception {
+    void put_privateLobby_throwsException() throws Exception {
 
         PlayerUsernameDTO username = new PlayerUsernameDTO();
         username.setUsername("foo");

@@ -220,7 +220,7 @@ public class GameRound {
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
                     Chat chat = new EventChat("avatar:" + counterAttacker.getUsername(),
-                            counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+                            counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + "!");
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
@@ -245,7 +245,7 @@ public class GameRound {
         this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
         this.gameService.sendHand(this.lobbyId, niceTryPlayer);
         Chat chat = new EventChat("avatar:" + niceTryPlayer.getUsername(),
-                niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
+                niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + "!");
         this.gameService.sendChatMessage(this.lobbyId, chat);
 
         for (Player potentialWinner : this.listOfPlayers) {
@@ -636,6 +636,10 @@ public class GameRound {
                 chat.add(new EventChat("event:gambling-man", player.getUsername() + " bet " + FranticUtils.getStringRepresentation(card.getValue()) + "."));
                 if (card.getValue().ordinal() > max.ordinal()) {
                     max = card.getValue();
+                    highest.clear();
+                    highest.add(player);
+                }
+                else if (card.getValue().ordinal() == max.ordinal()) {
                     highest.add(player);
                 }
             }

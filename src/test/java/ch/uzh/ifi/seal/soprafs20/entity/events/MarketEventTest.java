@@ -26,7 +26,7 @@ public class MarketEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,13 +35,13 @@ public class MarketEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         MarketEvent market = new MarketEvent(this.gameRound);
         assertEquals("market", market.getName());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendMarketWindow(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
@@ -68,7 +68,7 @@ public class MarketEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         MarketEvent market = new MarketEvent(this.gameRound);
         assertEquals("Choose one of these incredibly awesome cards for the great price of only 0$!", market.getMessage());
     }

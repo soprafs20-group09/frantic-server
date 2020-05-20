@@ -32,7 +32,7 @@ public class ThirdTimeLuckyEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -41,19 +41,19 @@ public class ThirdTimeLuckyEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this.gameRound);
         assertEquals("third-time-lucky", thirdTimeLucky.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event thirdTimeLucky = new ThirdTimeLuckyEvent(this.gameRound);
         assertEquals("Three cards for everyone!", thirdTimeLucky.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         Player player2 = new Player();
         player1.pushCardToHand(new Card(Color.RED, 7, 1));

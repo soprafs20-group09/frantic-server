@@ -41,7 +41,7 @@ public class LobbyServiceIntegrationTest {
     private Player player3;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         Mockito.doNothing().when(webSocketService).sendToLobby(Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.when(webSocketService.checkSender(Mockito.any(), Mockito.any())).thenReturn(true);
 
@@ -68,7 +68,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void getLobbies_FilteredByName_success() {
+    void getLobbies_FilteredByName_success() {
         lobbyService.createLobby(player1);
         String lobbyId = lobbyService.createLobby(player2);
         lobbyService.createLobby(player3);
@@ -84,7 +84,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void getLobbies_FilteredByCreator_success() {
+    void getLobbies_FilteredByCreator_success() {
         lobbyService.createLobby(player1);
         lobbyService.createLobby(player2);
         String lobbyId = lobbyService.createLobby(player3);
@@ -100,14 +100,14 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void createLobby() {
+    void createLobby() {
         String lobbyId = lobbyService.createLobby(player1);
         Lobby referenceLobby = lobbyRepository.findByLobbyId(lobbyId);
         assertEquals(referenceLobby.getLobbyId(), lobbyId);
     }
 
     @Test
-    public void joinLobby_addPlayer() {
+    void joinLobby_addPlayer() {
         String lobbyId = lobbyService.createLobby(player1);
         Lobby referenceLobby = lobbyRepository.findByLobbyId(lobbyId);
         assertEquals(1, referenceLobby.getPlayers());
@@ -118,7 +118,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void asAdmin_kickPlayer() {
+    void asAdmin_kickPlayer() {
         player1.setAdmin(true);
         String lobbyId = lobbyService.createLobby(player1);
         lobbyService.joinLobby(lobbyId, player2);
@@ -136,7 +136,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void updateLobbySettings_updateLobby() {
+    void updateLobbySettings_updateLobby() {
         String lobbyId = lobbyService.createLobby(player1);
         LobbySettingsDTO newSettings = new LobbySettingsDTO();
         newSettings.setPublicLobby(false);
@@ -159,7 +159,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void getLobbyState_ReturnCorrectState() {
+    void getLobbyState_ReturnCorrectState() {
         String lobbyId = lobbyService.createLobby(player1);
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
         LobbyStateDTO response = lobbyService.getLobbyState(lobbyId);
@@ -169,13 +169,13 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_ReturnTrue() {
+    void isUsernameAlreadyInLobby_ReturnTrue() {
         String lobbyId = lobbyService.createLobby(player1);
         assertTrue(lobbyService.isUsernameAlreadyInLobby(lobbyId, player1.getUsername()));
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_ReturnFalse() {
+    void isUsernameAlreadyInLobby_ReturnFalse() {
         String lobbyId = lobbyService.createLobby(player1);
         assertFalse(lobbyService.isUsernameAlreadyInLobby(lobbyId, player2.getUsername()));
     }

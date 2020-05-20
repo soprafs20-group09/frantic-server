@@ -27,7 +27,7 @@ public class RecessionEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -37,19 +37,19 @@ public class RecessionEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event recession = new RecessionEvent(this.gameRound);
         assertEquals("recession", recession.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event recession = new RecessionEvent(this.gameRound);
         assertEquals("Card Stocks are going down! Dispose one or two or three ...", recession.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendRecession(Mockito.any(), Mockito.any(), Mockito.anyInt());
 
         Player player1 = new Player();

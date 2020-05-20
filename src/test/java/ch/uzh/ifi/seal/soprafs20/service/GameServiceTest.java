@@ -44,7 +44,7 @@ public class GameServiceTest {
     GameService gameService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
         GameRepository.addGame("testLobbyId", game);
 
@@ -55,12 +55,12 @@ public class GameServiceTest {
     }
 
     @AfterEach
-    public void teardown() {
+    void teardown() {
         GameRepository.removeGame("testLobbyId");
     }
 
     @Test
-    public void startGame_notAdmin_notStart() {
+    void startGame_notAdmin_notStart() {
         Mockito.when(playerRepository.findByIdentity(Mockito.anyString())).thenReturn(player);
         Mockito.when(player.isAdmin()).thenReturn(false);
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
@@ -71,7 +71,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void startGame_success() {
+    void startGame_success() {
         Mockito.when(playerRepository.findByIdentity(Mockito.anyString())).thenReturn(player);
         Mockito.when(player.isAdmin()).thenReturn(true);
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
@@ -82,7 +82,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void playCardTest() {
+    void playCardTest() {
         PlayCardDTO playCardDTO = Mockito.mock(PlayCardDTO.class);
         Mockito.when(playCardDTO.getIndex()).thenReturn(5);
 
@@ -92,14 +92,14 @@ public class GameServiceTest {
     }
 
     @Test
-    public void drawCardTest() {
+    void drawCardTest() {
         gameService.drawCard("testLobbyId", "testIdentity");
 
         Mockito.verify(gameRound).currentPlayerDrawCard("testIdentity");
     }
 
     @Test
-    public void exchangeActionTest() {
+    void exchangeActionTest() {
         ExchangeDTO exchangeDTO = Mockito.mock(ExchangeDTO.class);
         Mockito.when(exchangeDTO.getCards()).thenReturn(new int[]{1, 2});
         Mockito.when(exchangeDTO.getTarget()).thenReturn("testTarget");
@@ -111,7 +111,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void giftActionTest() {
+    void giftActionTest() {
         GiftDTO giftDTO = Mockito.mock(GiftDTO.class);
         Mockito.when(giftDTO.getCards()).thenReturn(new int[]{1, 2});
         Mockito.when(giftDTO.getTarget()).thenReturn("testTarget");
@@ -123,7 +123,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void skipActionTest() {
+    void skipActionTest() {
         SkipDTO skipDTO = Mockito.mock(SkipDTO.class);
         Mockito.when(skipDTO.getTarget()).thenReturn("testTarget");
 
@@ -134,7 +134,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void fantasticColorActionTest() {
+    void fantasticColorActionTest() {
         FantasticDTO fantasticDTO = Mockito.mock(FantasticDTO.class);
         Mockito.when(fantasticDTO.getColor()).thenReturn(Color.BLUE);
 
@@ -145,7 +145,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void fantasticNumberActionTest() {
+    void fantasticNumberActionTest() {
         FantasticDTO fantasticDTO = Mockito.mock(FantasticDTO.class);
         Mockito.when(fantasticDTO.getColor()).thenReturn(null);
         Mockito.when(fantasticDTO.getNumber()).thenReturn(1);
@@ -157,7 +157,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void fantasticFourColorActionTest() {
+    void fantasticFourColorActionTest() {
         FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
         Mockito.when(fantasticFourDTO.getColor()).thenReturn(Color.RED);
         Mockito.when(fantasticFourDTO.getTargets()).thenReturn(Collections.singletonMap("testIdentity", 4));
@@ -169,7 +169,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void fantasticFourNumberActionTest() {
+    void fantasticFourNumberActionTest() {
         FantasticFourDTO fantasticFourDTO = Mockito.mock(FantasticFourDTO.class);
         Mockito.when(fantasticFourDTO.getColor()).thenReturn(null);
         Mockito.when(fantasticFourDTO.getNumber()).thenReturn(1);
@@ -182,7 +182,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void equalityActionTest() {
+    void equalityActionTest() {
         EqualityDTO equalityDTO = Mockito.mock(EqualityDTO.class);
         Mockito.when(equalityDTO.getColor()).thenReturn(Color.RED);
         Mockito.when(equalityDTO.getTarget()).thenReturn("testTarget");
@@ -194,7 +194,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void counterActionTest() {
+    void counterActionTest() {
         CounterAttackDTO counterAttackDTO = Mockito.mock(CounterAttackDTO.class);
         Mockito.when(counterAttackDTO.getColor()).thenReturn(Color.RED);
 
@@ -205,7 +205,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void niceTryTest() {
+    void niceTryTest() {
         NiceTryDTO niceTryDTO = Mockito.mock(NiceTryDTO.class);
         Mockito.when(niceTryDTO.getColor()).thenReturn(Color.RED);
 
@@ -216,7 +216,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void surprisePartyTest() {
+    void surprisePartyTest() {
         SurprisePartyDTO surprisePartyDTO = Mockito.mock(SurprisePartyDTO.class);
         Mockito.when(surprisePartyDTO.getCard()).thenReturn(3);
         Mockito.when(surprisePartyDTO.getTarget()).thenReturn("testTarget");
@@ -227,7 +227,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void merryChristmasTest() {
+    void merryChristmasTest() {
         MerryChristmasDTO merryChristmasDTO = Mockito.mock(MerryChristmasDTO.class);
         Mockito.when(merryChristmasDTO.getTargets()).thenReturn(new HashMap<>());
 
@@ -237,7 +237,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void recessionTest() {
+    void recessionTest() {
         RecessionDTO recessionDTO = Mockito.mock(RecessionDTO.class);
         Mockito.when(recessionDTO.getCards()).thenReturn(new int[]{1});
 
@@ -247,7 +247,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void marketTest() {
+    void marketTest() {
         MarketDTO marketDTO = Mockito.mock(MarketDTO.class);
         Mockito.when(marketDTO.getCard()).thenReturn(1);
 
@@ -257,7 +257,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void gamblingManTest() {
+    void gamblingManTest() {
         GamblingManDTO gamblingManDTO = Mockito.mock(GamblingManDTO.class);
         Mockito.when(gamblingManDTO.getCard()).thenReturn(1);
 
@@ -267,14 +267,14 @@ public class GameServiceTest {
     }
 
     @Test
-    public void endTurnTest() {
+    void endTurnTest() {
         gameService.endTurn("testLobbyId", "testIdentity");
 
         Mockito.verify(gameRound).playerFinishesTurn(Mockito.any());
     }
 
     @Test
-    public void sendChatMessageTest() {
+    void sendChatMessageTest() {
         Chat chat = new Chat("msg", "avatar:testPlayer", "testMessage");
         gameService.sendChatMessage("testLobbyId", chat);
 
@@ -282,7 +282,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendChatListMessageTest() {
+    void sendChatListMessageTest() {
         List<Chat> chat = new ArrayList<>();
         chat.add(new Chat("msg", "avatar:testPlayer", "testMessage"));
         gameService.sendChatMessage("testLobbyId", chat);
@@ -291,21 +291,21 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendStartGameTest() {
+    void sendStartGameTest() {
         gameService.sendStartGame("testLobbyId");
 
         Mockito.verify(webSocketService).sendToLobby("testLobbyId", "/start-game");
     }
 
     @Test
-    public void sendStartGameRoundTest() {
+    void sendStartGameRoundTest() {
         gameService.sendStartGameRound("testLobbyId");
 
         Mockito.verify(webSocketService).sendToLobby("testLobbyId", "/start-round");
     }
 
     @Test
-    public void sendGameStateTest() {
+    void sendGameStateTest() {
         List<Player> players = new ArrayList<>();
         player.pushCardToHand(new Card(Color.RED, Type.NUMBER, Value.THREE));
         players.add(player);
@@ -317,7 +317,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendHandTest() {
+    void sendHandTest() {
         Mockito.when(player.getHandSize()).thenReturn(5);
         Mockito.when(player.peekCard(Mockito.anyInt())).thenReturn(card);
 
@@ -327,14 +327,14 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendStartTurnTest() {
+    void sendStartTurnTest() {
         gameService.sendStartTurn("testLobbyId", "testPlayer");
 
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/start-turn"), Mockito.any());
     }
 
     @Test
-    public void sendPlayableCardsTest() {
+    void sendPlayableCardsTest() {
         int[] playable = {1, 4};
 
         gameService.sendPlayable("testLobbyId", player, playable, false, false);
@@ -342,79 +342,79 @@ public class GameServiceTest {
     }
 
     @Test
-    public void sendTimerTest() {
+    void sendTimerTest() {
         gameService.sendTimer("testLobbyId", 30);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/timer"), Mockito.any());
     }
 
     @Test
-    public void sendAnimationSpeedTest() {
+    void sendAnimationSpeedTest() {
         gameService.sendAnimationSpeed("testLobbyId", 500);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/animation-speed"), Mockito.any());
     }
 
     @Test
-    public void sendDrawAnimationTest() {
+    void sendDrawAnimationTest() {
         gameService.sendDrawAnimation("testLobbyId", 4);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/draw"), Mockito.any());
     }
 
     @Test
-    public void sendActionResponseTest() {
+    void sendActionResponseTest() {
         gameService.sendActionResponse("testLobbyId", player, card);
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/action-response"), Mockito.any());
     }
 
     @Test
-    public void sendEventActionResponseTest() {
+    void sendEventActionResponseTest() {
         gameService.sendEventActionResponse("testLobbyId", "testEvent");
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/action-response"), Mockito.any());
     }
 
     @Test
-    public void sendAttackTurnTest() {
+    void sendAttackTurnTest() {
         gameService.sendAttackTurn("testLobbyId", "testPlayer");
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/attack-turn"), Mockito.any());
     }
 
     @Test
-    public void sendOverlayTest() {
+    void sendOverlayTest() {
         gameService.sendOverlay("testLobbyId", player, "testIcon", "testTitle", "testMessage", 10);
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/overlay"), Mockito.any());
     }
 
     @Test
-    public void sendEventTest() {
+    void sendEventTest() {
         gameService.sendEvent("testLobbyId", new FridayTheThirteenthEvent(this.gameRound));
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/event"), Mockito.any());
     }
 
     @Test
-    public void sendRecessionTest() {
+    void sendRecessionTest() {
         gameService.sendRecession("testLobbyId", player, 2);
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/recession"), Mockito.any());
     }
 
     @Test
-    public void sendGamblingManTest() {
+    void sendGamblingManTest() {
         gameService.sendGamblingMan("testLobbyId", player, new int[]{1});
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/gambling-man-window"), Mockito.any());
     }
 
     @Test
-    public void sendMarketWindowTest() {
+    void sendMarketWindowTest() {
         gameService.sendMarketWindow("testLobbyId", player, new Card[]{card}, new Boolean[]{false});
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("testLobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/market-window"), Mockito.any());
     }
 
     @Test
-    public void sendEndRoundTest() {
+    void sendEndRoundTest() {
         gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154, 20,null, null);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }
 
     @Test
-    public void sendEndGameTest() {
+    void sendEndGameTest() {
         Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
 
         gameService.sendEndGame("testLobbyId", Collections.singletonList(player), new HashMap<>(), null, null);

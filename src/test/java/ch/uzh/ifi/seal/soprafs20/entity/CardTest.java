@@ -10,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class CardTest {
 
     @Test
-    public void createCards_throwsException() {
+    void createCards_throwsException() {
         Exception e = assertThrows(RuntimeException.class, () -> new Card(Color.BLUE, 12, 1));
         String msg = e.getMessage();
         assertTrue(msg.contains("Invalid number"));
     }
 
     @Test
-    public void isPlayableOnTest() {
+    void isPlayableOnTest() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
         Card red1 = new Card(Color.RED, 1, 2);
         Card green1 = new Card(Color.GREEN, 1, 3);

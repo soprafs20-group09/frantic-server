@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HandTest {
 
     @Test
-    public void pushCardToHandAndPopCardFromHand() {
+    void pushCardToHandAndPopCardFromHand() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
 
         Hand hand = new Hand();
@@ -19,7 +19,7 @@ class HandTest {
     }
 
     @Test
-    public void pushCardToHandOrdering() {
+    void pushCardToHandOrdering() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
         Card blue2 = new Card(Color.BLUE, 2, 2);
         Card blue3 = new Card(Color.BLUE, 3, 3);
@@ -50,7 +50,7 @@ class HandTest {
     }
 
     @Test
-    public void sizeOfHand() {
+    void sizeOfHand() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
         Card red2 = new Card(Color.RED, 2, 2);
 
@@ -67,7 +67,7 @@ class HandTest {
     }
 
     @Test
-    public void clearAllCardsFromHand() {
+    void clearAllCardsFromHand() {
         Card blue1 = new Card(Color.BLUE, 1, 1);
         Card red2 = new Card(Color.RED, 2, 2);
 

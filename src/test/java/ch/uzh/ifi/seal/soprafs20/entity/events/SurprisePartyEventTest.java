@@ -25,7 +25,7 @@ public class SurprisePartyEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -34,13 +34,13 @@ public class SurprisePartyEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         SurprisePartyEvent surpriseParty = new SurprisePartyEvent(this.gameRound);
         assertEquals("surprise-party", surpriseParty.getName());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendEventActionResponse(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
@@ -51,7 +51,7 @@ public class SurprisePartyEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         SurprisePartyEvent surpriseParty = new SurprisePartyEvent(this.gameRound);
         assertEquals("Surprise another player by gifting them one of your cards!", surpriseParty.getMessage());
     }

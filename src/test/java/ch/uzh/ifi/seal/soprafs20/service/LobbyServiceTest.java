@@ -47,7 +47,7 @@ public class LobbyServiceTest {
     private LobbyStateDTO testState;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.initMocks(this);
 
         // given
@@ -73,7 +73,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void getLobbiesWithoutFilter_returnLobbies() {
+    void getLobbiesWithoutFilter_returnLobbies() {
         //setup
         Lobby lobby1 = new Lobby();
         Lobby lobby2 = new Lobby();
@@ -95,7 +95,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void getLobbiesWithFilter_returnLobbies() {
+    void getLobbiesWithFilter_returnLobbies() {
         //setup
         Lobby lobby1 = new Lobby();
         lobby1.setName("alpha");
@@ -118,7 +118,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void getLobbies_returnPublicLobbies() {
+    void getLobbies_returnPublicLobbies() {
         //setup
         Lobby lobby1 = new Lobby();
         lobby1.setName("alpha");
@@ -143,7 +143,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void createLobby_returnLobbyId() {
+    void createLobby_returnLobbyId() {
         String response = lobbyService.createLobby(testPlayer);
 
         Mockito.verify(lobbyRepository, Mockito.times(1)).save(Mockito.any());
@@ -153,7 +153,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void joinLobby_addPlayer() {
+    void joinLobby_addPlayer() {
         lobbyService.joinLobby("abc", testPlayer);
 
         Mockito.verify(lobbyRepository, Mockito.times(1)).findByLobbyId(Mockito.any());
@@ -161,7 +161,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void getLobbyState_returnLobbyStateDTO() {
+    void getLobbyState_returnLobbyStateDTO() {
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
         assertEquals(testLobby.getGameDuration(), response.getSettings().getDuration());
@@ -171,7 +171,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void updateLobbySettings_returnLobbyState() {
+    void updateLobbySettings_returnLobbyState() {
         //setup
         testSettings.setDuration(GameLength.LONG);
         testSettings.setLobbyName("newName");
@@ -188,17 +188,17 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_false() {
+    void isUsernameAlreadyInLobby_false() {
         assertFalse(lobbyService.isUsernameAlreadyInLobby("abc", "someUsername"));
     }
 
     @Test
-    public void isUsernameAlreadyInLobby_true() {
+    void isUsernameAlreadyInLobby_true() {
         assertTrue(lobbyService.isUsernameAlreadyInLobby("abc", "testPlayer"));
     }
 
     @Test
-    public void checkLobbyCreate_inputNull_throwResponseStatusException() {
+    void checkLobbyCreate_inputNull_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(null);
         }
@@ -210,7 +210,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void checkLobbyCreate_inputNotValid_throwResponseStatusException() {
+    void checkLobbyCreate_inputNotValid_throwResponseStatusException() {
         try {
             lobbyService.checkLobbyCreate(" ");
         }
@@ -328,7 +328,7 @@ public class LobbyServiceTest {
     }
 
     @Test
-    public void rematchTest() {
+    void rematchTest() {
         lobbyService.rematch("lobbyId", "testIdentity");
         Mockito.verify(webSocketService).sendToPlayerInLobby(Mockito.matches("lobbyId"), Mockito.matches("testIdentity"), Mockito.matches("/lobby-state"), Mockito.any());
     }

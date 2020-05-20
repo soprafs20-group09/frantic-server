@@ -31,7 +31,7 @@ public class TimeBombEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -40,13 +40,13 @@ public class TimeBombEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         assertEquals("time-bomb", timeBomb.getName());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(this.gameRound).setTimeBomb();
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         timeBomb.performEvent();
@@ -56,7 +56,7 @@ public class TimeBombEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         assertEquals("Tick ... Tick ... Tick ... Boom! Everyone has three turns left! Defuse the Bomb and earn a reward by winning the round or let the Bomb explode and everyone's points in this round get doubled!", timeBomb.getMessage());
     }

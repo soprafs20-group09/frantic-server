@@ -28,7 +28,7 @@ class EqualityActionTest {
     private final Card colorWishBlue = new Card(Color.BLUE, Type.WISH, Value.COLORWISH, false, 7);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.initiator = new Player();
         this.initiator.pushCardToHand(blue1);
         this.initiator.pushCardToHand(blue2);
@@ -48,7 +48,7 @@ class EqualityActionTest {
     }
 
     @Test
-    public void performTest() {
+    void performTest() {
         List<Chat> resultChat = equalityAction.perform();
         assertEquals(3, this.initiator.getHandSize());
         assertEquals(3, this.target.getHandSize());
@@ -69,17 +69,17 @@ class EqualityActionTest {
     }
 
     @Test
-    public void getTargetsTest() {
+    void getTargetsTest() {
         assertEquals(this.target, equalityAction.getTargets()[0]);
     }
 
     @Test
-    public void getInitiatorTest() {
+    void getInitiatorTest() {
         assertEquals(this.initiator, equalityAction.getInitiator());
     }
 
     @Test
-    public void isCounterableTest() {
+    void isCounterableTest() {
         assertTrue(equalityAction.isCounterable());
     }
 }

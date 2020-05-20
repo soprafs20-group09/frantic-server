@@ -28,7 +28,7 @@ public class EarthquakeEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -37,19 +37,19 @@ public class EarthquakeEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         EarthquakeEvent earthquake = new EarthquakeEvent(this.gameRound);
         assertEquals("earthquake", earthquake.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         EarthquakeEvent earthquake = new EarthquakeEvent(this.gameRound);
         assertEquals("Oh no! Everything is shaken up! Good luck with the cards of your neighbor!", earthquake.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         
         Player player1 = new Player();
         List<Card> player1Cards = new ArrayList<>();

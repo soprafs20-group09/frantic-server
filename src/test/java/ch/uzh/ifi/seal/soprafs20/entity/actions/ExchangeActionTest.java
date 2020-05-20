@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ExchangeActionTest {
 
     @Test
-    public void exchange_bothHaveTwoCards() {
+    void exchange_bothHaveTwoCards() {
         Player initiator = new Player();
         Player target = new Player();
         Card blue1 = new Card(Color.BLUE, 1, 1);
@@ -31,7 +31,7 @@ class ExchangeActionTest {
     }
 
     @Test
-    public void targetHasOneCard() {
+    void targetHasOneCard() {
         Player initiator = new Player();
         Player target = new Player();
         Card blue1 = new Card(Color.BLUE, 1, 1);
@@ -49,7 +49,7 @@ class ExchangeActionTest {
     }
 
     @Test
-    public void initiatorHasOneCard() {
+    void initiatorHasOneCard() {
         Player initiator = new Player();
         Player target = new Player();
         Card blue1 = new Card(Color.BLUE, 1, 1);

@@ -56,6 +56,8 @@ public class Game {
             this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers, changes, icon, message);
             onGameOver();
         }
+        this.gameService.sendReconnect(this.lobbyId);
+        startReconnectTimer(5);
     }
 
     private void onGameOver() {
@@ -143,6 +145,36 @@ public class Game {
         if (this.timer != null) {
             this.timer.cancel();
         }
+    }
+
+    private void startReconnectTimer(int seconds) {
+        int milliseconds = seconds * 1000;
+        this.timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                updatePlayerIdentities();
+            }
+        };
+        timer.schedule(timerTask, milliseconds);
+    }
+
+    private void updatePlayerIdentities() {
+        List<Player> newListOfPlayers = this.gameService.getPlayersInGame(this.lobbyId);
+        Map<String, Player> mapOfPlayers = new HashMap<>();
+        for (Player p : this.listOfPlayers) {
+            mapOfPlayers.put(p.getUsername(), p);
+        }
+        for (Player newPlayer : newListOfPlayers) {
+            Player oldPlayer = mapOfPlayers.get(newPlayer.getUsername());
+            if (oldPlayer != null) {
+                newPlayer.setPoints(oldPlayer.getPoints());
+            }
+            if (newPlayer.getUsername().equals(this.firstPlayer.getUsername())) {
+                this.firstPlayer = newPlayer;
+            }
+        }
+        this.listOfPlayers = newListOfPlayers;
     }
 
     private void removeFromPlayerList(Player player) {

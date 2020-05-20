@@ -17,7 +17,7 @@ class FantasticFourActionTest {
 
 
     @Test
-    public void colorWish_OneTarget() {
+    void colorWish_OneTarget() {
         DrawStack drawStack = new DrawStack();
         DiscardPile discardPile = new DiscardPile();
 
@@ -38,7 +38,7 @@ class FantasticFourActionTest {
     }
 
     @Test
-    public void valueWish_threeTargets() {
+    void valueWish_threeTargets() {
         DrawStack drawStack = new DrawStack();
         DiscardPile discardPile = new DiscardPile();
 

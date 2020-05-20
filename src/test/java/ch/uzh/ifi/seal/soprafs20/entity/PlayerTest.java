@@ -17,7 +17,7 @@ public class PlayerTest {
     private Card someCard;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testPlayer = new Player();
         someCard = new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0);
 
@@ -32,73 +32,73 @@ public class PlayerTest {
     }
 
     @Test
-    public void getIdTest() {
+    void getIdTest() {
         assertEquals(1L, testPlayer.getId());
     }
 
     @Test
-    public void setIdTest() {
+    void setIdTest() {
         assertEquals(1L, testPlayer.getId());
         testPlayer.setId(2L);
         assertEquals(2L, testPlayer.getId());
     }
 
     @Test
-    public void getUsernameTest() {
+    void getUsernameTest() {
         assertEquals("testPlayer", testPlayer.getUsername());
     }
 
     @Test
-    public void setUsernameTest() {
+    void setUsernameTest() {
         assertEquals("testPlayer", testPlayer.getUsername());
         testPlayer.setUsername("SuperDuckling");
         assertEquals("SuperDuckling", testPlayer.getUsername());
     }
 
     @Test
-    public void getIdentityTest() {
+    void getIdentityTest() {
         assertEquals("FANCY_IDENTITY_FOR_TEST", testPlayer.getIdentity());
     }
 
     @Test
-    public void setIdentityTest() {
+    void setIdentityTest() {
         assertEquals("FANCY_IDENTITY_FOR_TEST", testPlayer.getIdentity());
         testPlayer.setIdentity("SUPER_SECRET_IDENTITY");
         assertEquals("SUPER_SECRET_IDENTITY", testPlayer.getIdentity());
     }
 
     @Test
-    public void getLobbyIdTest() {
+    void getLobbyIdTest() {
         assertEquals("I like bread", testPlayer.getLobbyId());
     }
 
     @Test
-    public void setLobbyIdTest() {
+    void setLobbyIdTest() {
         assertEquals("I like bread", testPlayer.getLobbyId());
         testPlayer.setLobbyId("Pros only");
         assertEquals("Pros only", testPlayer.getLobbyId());
     }
 
     @Test
-    public void getPointsTest() {
+    void getPointsTest() {
         assertEquals(12, testPlayer.getPoints());
     }
 
     @Test
-    public void setPointsTest() {
+    void setPointsTest() {
         assertEquals(12, testPlayer.getPoints());
         testPlayer.setPoints(15);
         assertEquals(15, testPlayer.getPoints());
     }
 
     @Test
-    public void popCardTest() {
+    void popCardTest() {
         assertEquals(someCard, testPlayer.popCard(0));
         assertEquals(0, testPlayer.getHandSize());
     }
 
     @Test
-    public void pushCardToHandTest() {
+    void pushCardToHandTest() {
         assertEquals(1, testPlayer.getHandSize());
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
@@ -106,29 +106,29 @@ public class PlayerTest {
     }
 
     @Test
-    public void isBlockedTest() {
+    void isBlockedTest() {
         assertFalse(testPlayer.isBlocked());
     }
 
     @Test
-    public void setBlockedTest() {
+    void setBlockedTest() {
         assertFalse(testPlayer.isBlocked());
         testPlayer.setBlocked(true);
         assertTrue(testPlayer.isBlocked());
     }
 
     @Test
-    public void getHandSizeTest() {
+    void getHandSizeTest() {
         assertEquals(1, testPlayer.getHandSize());
     }
 
     @Test
-    public void isAdminTest() {
+    void isAdminTest() {
         assertFalse(testPlayer.isAdmin());
     }
 
     @Test
-    public void setAdminTest() {
+    void setAdminTest() {
         assertFalse(testPlayer.isAdmin());
         testPlayer.setAdmin(true);
         assertTrue(testPlayer.isAdmin());
@@ -168,13 +168,13 @@ public class PlayerTest {
     }
 
     @Test
-    public void calculatePointsTest() {
+    void calculatePointsTest() {
         //TODO: test with special cards & FuckYouCard
         assertEquals(7, testPlayer.calculatePoints());
     }
 
     @Test
-    public void clearHandTest() {
+    void clearHandTest() {
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
         testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 3));

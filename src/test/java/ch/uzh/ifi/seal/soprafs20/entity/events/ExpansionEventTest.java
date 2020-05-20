@@ -26,7 +26,7 @@ public class ExpansionEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,19 +35,19 @@ public class ExpansionEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         ExpansionEvent expansion = new ExpansionEvent(this.gameRound);
         assertEquals("expansion", expansion.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         ExpansionEvent expansion = new ExpansionEvent(this.gameRound);
         assertEquals("Cards are selling like hot cakes! Grab one or two or three ...", expansion.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 1));

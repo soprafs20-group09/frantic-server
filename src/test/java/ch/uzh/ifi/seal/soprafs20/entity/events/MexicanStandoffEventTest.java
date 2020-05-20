@@ -27,7 +27,7 @@ public class MexicanStandoffEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -36,19 +36,19 @@ public class MexicanStandoffEventTest {
     }
     
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event mexicanStandoff = new MexicanStandoffEvent(this.gameRound);
         assertEquals("mexican-standoff", mexicanStandoff.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event mexicanStandoff = new MexicanStandoffEvent(this.gameRound);
         assertEquals("Show your skills off! Everyone gets rid of their cards and gets three new ones! Who can finish first?", mexicanStandoff.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.RED, 7, 11));
         player1.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12));
