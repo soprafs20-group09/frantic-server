@@ -6,6 +6,8 @@ import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
@@ -133,6 +135,37 @@ public class PlayerTest {
     }
 
     //TODO: hasNiceTryTest() & hasCounterAttackTest()
+    @Test
+    public void hasNiceTryTest() {
+        Player testPlayer2 = new Player();
+        Card niceTry = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.NICETRY, false, 10);
+        Card someCard2 = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        testPlayer2.pushCardToHand(someCard);
+        testPlayer2.pushCardToHand(niceTry);
+        testPlayer2.pushCardToHand(someCard2);
+
+        int[] result = { };
+        int[] result2 = new int[]{1};
+
+        assertArrayEquals(result, testPlayer.hasNiceTry());
+        assertArrayEquals(result2, testPlayer2.hasNiceTry());
+    }
+
+    @Test
+    public void hasCounterAttackTest() {
+        Player testPlayer2 = new Player();
+        Card counterAttack = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, true, 11);
+        Card someCard2 = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        testPlayer2.pushCardToHand(someCard);
+        testPlayer2.pushCardToHand(counterAttack);
+        testPlayer2.pushCardToHand(someCard2);
+
+        int[] result = { };
+        int[] result2 = new int[]{1};
+
+        assertArrayEquals(result, testPlayer.hasCounterAttack());
+        assertArrayEquals(result2, testPlayer2.hasCounterAttack());
+    }
 
     @Test
     public void calculatePointsTest() {
