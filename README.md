@@ -79,5 +79,5 @@ Sina Krumhard
 
 ### Aknowledgements
 
-First of all we want to thank our tutor Moritz Eck, who always provided useful advice to get cleaner code and more user friendlyness.
-Further, we would like to say thank you to our friends and families, who tested our game extensively and also provided improvements in terms of user friendlyness. 
+First of all we want to thank Rulefactory for creating such an amazing game. We all had a fun time implementing the game, and also learned a lot.
+Further we would like to thank our tutor Moritz Eck, who always provided useful advice to get cleaner code and more user friendlyness. We are also very grateful for our friends and families for testing our game extensively and also providing improvements in terms of user friendlyness 
