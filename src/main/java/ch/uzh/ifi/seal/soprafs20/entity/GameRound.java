@@ -1137,6 +1137,7 @@ public class GameRound {
         eventList.add(new VandalismEvent(this));
 
         Collections.shuffle(eventList);
+        Collections.shuffle(eventList);
         return eventList;
     }
 
