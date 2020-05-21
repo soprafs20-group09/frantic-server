@@ -31,7 +31,7 @@ To establish a connection between the front- and backend REST is used. When furt
 
 ## High-level Components
 
-The [GameConroller](src/main/java/ch/uzh/ifi/seal/soprafs20/controller/GameController.java) receives all game-related packages and passes them to the [GameService](src/main/java/ch/uzh/ifi/seal/soprafs20/service/GameService.java). The GameService then reads the packages and assigns the tasks to the Game and GameRound.
+The [GameController](src/main/java/ch/uzh/ifi/seal/soprafs20/controller/GameController.java) receives all game-related packages and passes them to the [GameService](src/main/java/ch/uzh/ifi/seal/soprafs20/service/GameService.java). The GameService then reads the packages and assigns the tasks to the Game and GameRound.
 
 The [Game](src/main/java/ch/uzh/ifi/seal/soprafs20/entity/Game.java) class handles the overall state of the game (game starts, round starts, round or game ends etc). </br> The [GameRound](src/main/java/ch/uzh/ifi/seal/soprafs20/entity/GameRound.java) class manages the individual rounds. Which means it decides what happens when a (special) card is played, event gets triggered etc. The GameRound class is by far the largest class of the backend.
 
