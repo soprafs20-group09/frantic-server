@@ -182,6 +182,8 @@ public class LobbyService {
                     Player p = this.playerRepository.findByUsernameAndLobbyId(username, lobbyId);
                     this.webSocketService.sendToPlayerInLobby(lobbyId, p.getIdentity(), "/lobby-state", getLobbyState(lobbyId));
                 }
+                Chat chat = new EventChat("avatar:" + player.getUsername(), player.getUsername() + " accepted a rematch!");
+                this.webSocketService.sendChatMessage(lobbyId, chat);
             }
         }
     }
