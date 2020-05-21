@@ -134,17 +134,16 @@ public class PlayerTest {
         assertTrue(testPlayer.isAdmin());
     }
 
-    //TODO: hasNiceTryTest() & hasCounterAttackTest()
     @Test
     public void hasNiceTryTest() {
         Player testPlayer2 = new Player();
-        Card niceTry = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.NICETRY, false, 10);
-        Card someCard2 = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        Card niceTry = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.NICETRY, false, 10);
+        Card someCard2 = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
         testPlayer2.pushCardToHand(someCard);
         testPlayer2.pushCardToHand(niceTry);
         testPlayer2.pushCardToHand(someCard2);
 
-        int[] result = { };
+        int[] result = {};
         int[] result2 = new int[]{1};
 
         assertArrayEquals(result, testPlayer.hasNiceTry());
@@ -154,13 +153,13 @@ public class PlayerTest {
     @Test
     public void hasCounterAttackTest() {
         Player testPlayer2 = new Player();
-        Card counterAttack = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, true, 11);
-        Card someCard2 = new Card (Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        Card counterAttack = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, true, 11);
+        Card someCard2 = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
         testPlayer2.pushCardToHand(someCard);
         testPlayer2.pushCardToHand(counterAttack);
         testPlayer2.pushCardToHand(someCard2);
 
-        int[] result = { };
+        int[] result = {};
         int[] result2 = new int[]{1};
 
         assertArrayEquals(result, testPlayer.hasCounterAttack());
@@ -169,8 +168,28 @@ public class PlayerTest {
 
     @Test
     void calculatePointsTest() {
-        //TODO: test with special cards & FuckYouCard
         assertEquals(7, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 1));
+        assertEquals(8, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 2));
+        assertEquals(13, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.NINE, false, 3));
+        assertEquals(22, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.FOUR, false, 4));
+        assertEquals(26, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, 5));
+        assertEquals(33, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.EXCHANGE, true, 6));
+        assertEquals(40, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 7));
+        assertEquals(82, testPlayer.calculatePoints());
     }
 
     @Test
