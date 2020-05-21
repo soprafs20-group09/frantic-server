@@ -52,7 +52,7 @@ public class MatingSeasonEvent implements Event {
 
             if (discardedCards > 0) {
                 chat.add(new EventChat("avatar:" + playerOfInterest.getUsername(),
-                        playerOfInterest.getUsername() + " discarded " + discardedCards + " cards"));
+                        playerOfInterest.getUsername() + " discarded " + discardedCards + " cards."));
             }
         }
         this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);

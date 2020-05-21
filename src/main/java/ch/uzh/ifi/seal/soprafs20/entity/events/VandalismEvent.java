@@ -50,7 +50,7 @@ public class VandalismEvent implements Event {
             }
             if (discardedCards > 0) {
                 chat.add(new EventChat("avatar:" + player.getUsername(),
-                        player.getUsername() + " discarded " + discardedCards + (discardedCards == 1 ? " card" : " cards")));
+                        player.getUsername() + " discarded " + discardedCards + (discardedCards == 1 ? " card." : " cards.")));
             }
         }
 

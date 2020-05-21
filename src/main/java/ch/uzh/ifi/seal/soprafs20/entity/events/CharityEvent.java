@@ -54,7 +54,7 @@ public class CharityEvent implements Event {
                         playerOfInterest.pushCardToHand(target.popCard(random));
 
                         chat.add(new EventChat("avatar:" + playerOfInterest.getUsername(),
-                                playerOfInterest.getUsername() + " drew a card from " + target.getUsername()));
+                                playerOfInterest.getUsername() + " drew a card from " + target.getUsername() + "."));
                     }
                 }
             }
