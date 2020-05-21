@@ -202,4 +202,24 @@ public class PlayerTest {
         testPlayer.clearHand();
         assertEquals(0, testPlayer.getHandSize());
     }
+
+    @Test
+    void getPlayableCards_FuckYou() {
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 2));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 3));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FOUR, false, 4));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 6));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 7));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 8));
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 9));
+
+        //player does not have 10 cards
+        Card reference = new Card(Color.YELLOW, Type.NUMBER, Value.NINE, false, 11);
+        assertEquals(0, testPlayer.getPlayableCards(reference).length);
+
+        //player has 10 cards
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FOUR, false, 10));
+        assertEquals(1, testPlayer.getPlayableCards(reference).length);
+    }
 }
