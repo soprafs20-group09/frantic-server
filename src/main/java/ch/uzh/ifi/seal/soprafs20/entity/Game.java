@@ -49,11 +49,15 @@ public class Game {
         if (!gameOver()) {
             message = message + " Watch everyone's standings and wait for the next round to start!";
             this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, 20, icon, message);
+            Chat chat = new EventChat(null, "The round is over!");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
             startTimer(20);
         }
         else {
             message = message + " The game is over. See who won below and challenge them to a rematch!";
             this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers, changes, icon, message);
+            Chat chat = new EventChat(null, "The game is over!");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
             onGameOver();
         }
         this.gameService.sendReconnect(this.lobbyId);

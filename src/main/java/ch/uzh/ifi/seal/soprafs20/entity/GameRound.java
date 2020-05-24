@@ -90,6 +90,8 @@ public class GameRound {
         for (Player player : this.listOfPlayers) {
             this.bombMap.put(player, 0);
         }
+        Chat chat = new EventChat(null, "The round has started!");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
     }
 
     private void prepareNewTurn() {
