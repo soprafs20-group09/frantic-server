@@ -190,10 +190,11 @@ public class LobbyService {
 
     public LobbyStateDTO getLobbyState(String lobbyId) {
         Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
+        List<String> listOfPlayers = lobby.getListOfPlayers();
 
-        LobbyPlayerDTO[] players = new LobbyPlayerDTO[lobby.getPlayers()];
+        LobbyPlayerDTO[] players = new LobbyPlayerDTO[listOfPlayers.size()];
         int c = 0;
-        for (String p : lobby.getListOfPlayers()) {
+        for (String p : listOfPlayers) {
             Player currentPlayer = this.playerRepository.findByUsernameAndLobbyId(p, lobbyId);
             LobbyPlayerDTO player = new LobbyPlayerDTO();
             player.setUsername(currentPlayer.getUsername());
