@@ -27,6 +27,8 @@ Please find the current build under [frantic.online](http://frantic.online/).
 
 ## Technologies
 
+The server is written in Java using the Spring Boot framework. JPA is used for persistence and deployment is handled by Heroku.
+
 To establish a connection between the front- and backend REST is used. When further proceeding in the game (joining a lobby), a websocket connection gets established.
 
 ## High-level Components
