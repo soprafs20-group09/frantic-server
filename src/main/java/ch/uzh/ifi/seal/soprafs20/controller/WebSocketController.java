@@ -57,7 +57,7 @@ public class WebSocketController {
         if (p != null) {
             log.info("Player " + p.getName() + ": Connection lost");
 
-            this.webSocketService.startReconnectTimer(2, p.getName());
+            this.webSocketService.startReconnectTimer(5, p.getName());
         }
     }
 }

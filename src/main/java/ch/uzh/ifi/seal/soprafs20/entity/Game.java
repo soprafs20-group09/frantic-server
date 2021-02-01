@@ -69,7 +69,7 @@ public class Game {
             onGameOver();
         }
         this.gameService.sendReconnect(this.lobbyId);
-        startReconnectTimer(5);
+        startReconnectTimer(7);
     }
 
     private void onGameOver() {
