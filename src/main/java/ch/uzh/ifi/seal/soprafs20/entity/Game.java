@@ -4,10 +4,14 @@ import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class Game {
+
+    Logger log = LoggerFactory.getLogger(Game.class);
 
     private final String lobbyId;
     private GameRound currentGameRound;
@@ -47,6 +51,8 @@ public class Game {
         setFirstPlayer(playerWithMaxPoints);
         removeCardsFromHands();
         if (!gameOver()) {
+            log.info("Lobby " + this.lobbyId + ": Round over");
+
             message = message + " Watch everyone's standings and wait for the next round to start!";
             this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, 20, icon, message);
             Chat chat = new EventChat(null, "The round is over!");
@@ -54,6 +60,8 @@ public class Game {
             startTimer(20);
         }
         else {
+            log.info("Lobby " + this.lobbyId + ": Game over");
+
             message = message + " The game is over. See who won below and challenge them to a rematch!";
             this.gameService.sendEndGame(this.lobbyId, this.listOfPlayers, changes, icon, message);
             Chat chat = new EventChat(null, "The game is over!");

@@ -1,10 +1,11 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
-import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
 import ch.uzh.ifi.seal.soprafs20.service.WebSocketService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,6 +23,8 @@ import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 @Controller
 public class WebSocketController {
 
+    Logger log = LoggerFactory.getLogger(WebSocketController.class);
+
     private final RegisterService registerService;
     private final WebSocketService webSocketService;
 
@@ -32,6 +35,8 @@ public class WebSocketController {
 
     @MessageMapping("/register")
     public synchronized void registerPlayer(SimpMessageHeaderAccessor sha, RegisterDTO dto) {
+        log.info("Player " + getIdentity(sha) + ": Connection established");
+
         if (this.webSocketService.isReconnecting(dto.getToken())) {
             webSocketService.reconnect(getIdentity(sha), dto.getToken());
         }
@@ -50,6 +55,8 @@ public class WebSocketController {
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         Principal p = event.getUser();
         if (p != null) {
+            log.info("Player " + p.getName() + ": Connection lost");
+
             this.webSocketService.startReconnectTimer(2, p.getName());
         }
     }

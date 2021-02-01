@@ -10,6 +10,8 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.CardDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import java.util.Map;
 @Service
 @Transactional
 public class GameService {
+
+    Logger log = LoggerFactory.getLogger(GameService.class);
 
     private static GameService instance;
     private final WebSocketService webSocketService;
@@ -306,6 +310,8 @@ public class GameService {
 
     public void sendReconnect(String lobbyId) {
         for (Player player : this.playerRepository.findByLobbyId(lobbyId)) {
+            log.info("Lobby " + lobbyId + ": Reconnect sent to Player " + player.getIdentity());
+
             webSocketService.sendReconnect(player.getIdentity());
         }
     }

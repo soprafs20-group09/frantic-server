@@ -13,6 +13,8 @@ import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,8 @@ import java.util.List;
 @Service
 @Transactional
 public class LobbyService {
+
+    Logger log = LoggerFactory.getLogger(LobbyService.class);
 
     private final WebSocketService webSocketService;
     private final PlayerService playerService;
@@ -111,6 +115,8 @@ public class LobbyService {
             String lobbyId = this.playerService.removePlayer(player);
             Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
             if (lobby != null) {
+                log.info("Lobby " + lobbyId + ": Player " + identity + " left");
+
                 Chat chat = new EventChat("avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
                 this.webSocketService.sendChatMessage(lobbyId, chat);
                 List<Player> playerList = this.playerRepository.findByLobbyId(lobbyId);

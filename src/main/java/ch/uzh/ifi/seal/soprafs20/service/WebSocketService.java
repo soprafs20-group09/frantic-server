@@ -8,8 +8,9 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.RegisterDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RegisteredDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -26,6 +27,8 @@ import java.util.*;
 @Service
 @Transactional
 public class WebSocketService {
+
+    Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
     protected final PlayerRepository playerRepository;
     private final LobbyService lobbyService;
@@ -91,6 +94,9 @@ public class WebSocketService {
             Player player = this.playerRepository.findByIdentity(oldIdentity);
             if (player != null) {
                 this.reconnectTimer.get(oldIdentity).cancel();
+
+                log.info("Lobby " + player.getLobbyId() + ": Reconnect received from Player " + oldIdentity + " as " + newIdentity);
+
                 RegisteredDTO registeredDTO = this.playerService.registerPlayer(newIdentity, player, player.getLobbyId());
                 this.sendToPlayer(newIdentity, "/queue/register", registeredDTO);
                 this.reconnectMap.remove(token);

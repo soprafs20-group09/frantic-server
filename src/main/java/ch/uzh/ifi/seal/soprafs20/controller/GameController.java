@@ -2,6 +2,8 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -15,6 +17,8 @@ import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 @Controller
 public class GameController {
 
+    Logger log = LoggerFactory.getLogger(GameController.class);
+
     private final GameService gameService;
 
     public GameController(GameService gameService) {
@@ -24,6 +28,8 @@ public class GameController {
     @MessageMapping("/lobby/{lobbyId}/start-game")
     public void startGame(@DestinationVariable String lobbyId,
                           SimpMessageHeaderAccessor sha) {
+        log.info("Lobby " + lobbyId + ": Game started");
+
         gameService.startGame(lobbyId, getIdentity(sha));
     }
 
