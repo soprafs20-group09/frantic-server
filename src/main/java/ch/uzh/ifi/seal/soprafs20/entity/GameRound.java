@@ -151,7 +151,7 @@ public class GameRound {
 
     public void playCard(String identity, int index) {
         Player player = getPlayerByIdentity(identity);
-        if (player != null && startProcess()) {
+        if (player != null && startProcess() && index < player.getHandSize()) {
             Card relevantCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
             if (relevantCard != null && cardToPlay != null) {
