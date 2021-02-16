@@ -135,7 +135,7 @@ public class GameIntegrationTest {
         assertEquals(0, player1.getHandSize());
         assertEquals(0, player2.getHandSize());
         assertEquals(0, player3.getHandSize());
-        Mockito.verify(this.gameService).sendEndRound(this.testLobbyId, playerList, changes, 137, 20, "icon", "message: Watch everyone's standings and wait for the next round to start!");
+        Mockito.verify(this.gameService).sendEndRound(this.testLobbyId, playerList, changes, 137, "icon", "message: Watch everyone's standings and wait for the next round to start!");
     }
 
     @Test

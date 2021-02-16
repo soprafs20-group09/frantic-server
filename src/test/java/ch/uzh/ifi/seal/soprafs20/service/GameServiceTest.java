@@ -409,7 +409,7 @@ public class GameServiceTest {
 
     @Test
     void sendEndRoundTest() {
-        gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154, 20,null, null);
+        gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154,null, null);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }
 
