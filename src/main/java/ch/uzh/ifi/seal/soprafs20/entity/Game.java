@@ -47,6 +47,13 @@ public class Game {
         this.currentGameRound.startGameRound();
     }
 
+    private void triggerNewGameRound() {
+        Chat chat = new EventChat(null, "A new round starts in 10 seconds");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        this.gameService.sendTimer(this.lobbyId, 10);
+        startTimer(10);
+    }
+
     public void endGameRound(Player playerWithMaxPoints, Map<String, Integer> changes, String icon, String message) {
         setFirstPlayer(playerWithMaxPoints);
         removeCardsFromHands();
@@ -57,7 +64,6 @@ public class Game {
             this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, icon, message);
             Chat chat = new EventChat(null, "The round is over!");
             this.gameService.sendChatMessage(this.lobbyId, chat);
-            startTimer(20);
         }
         else {
             log.info("Lobby " + this.lobbyId + ": Game over");
