@@ -1,10 +1,12 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.GameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.mapper.DTOMapper;
+import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
 import org.jsoup.Jsoup;
@@ -23,12 +25,13 @@ import java.util.List;
 public class RESTController {
 
     private final LobbyService lobbyService;
-
     private final RegisterService registerService;
+    private final GameService gameService;
 
-    RESTController(LobbyService lobbyService, RegisterService registerService) {
+    RESTController(LobbyService lobbyService, RegisterService registerService, GameService gameService) {
         this.lobbyService = lobbyService;
         this.registerService = registerService;
+        this.gameService = gameService;
     }
 
     @GetMapping("/lobbies")
@@ -41,6 +44,13 @@ public class RESTController {
             response.add(DTOMapper.INSTANCE.convertLobbyToLobbyListDTO(lobby));
         }
         return response;
+    }
+
+    @GetMapping("/games")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<GameDTO> getAllGames() {
+        return this.gameService.getGames();
     }
 
     @PostMapping("/lobbies")

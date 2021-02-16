@@ -2,7 +2,9 @@ package ch.uzh.ifi.seal.soprafs20.repository;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GameRepository {
 
@@ -21,5 +23,9 @@ public class GameRepository {
 
     public static Game findByLobbyId(String lobbyId) {
         return gameRepo.get(lobbyId);
+    }
+
+    public static List<Game> findAll() {
+        return new ArrayList<>(gameRepo.values());
     }
 }
