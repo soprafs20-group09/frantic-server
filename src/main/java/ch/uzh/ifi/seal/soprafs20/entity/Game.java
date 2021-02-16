@@ -54,7 +54,7 @@ public class Game {
             log.info("Lobby " + this.lobbyId + ": Round over");
 
             message = message + " Watch everyone's standings and wait for the next round to start!";
-            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, 20, icon, message);
+            this.gameService.sendEndRound(this.lobbyId, this.listOfPlayers, changes, this.maxPoints, icon, message);
             Chat chat = new EventChat(null, "The round is over!");
             this.gameService.sendChatMessage(this.lobbyId, chat);
             startTimer(20);

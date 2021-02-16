@@ -294,8 +294,8 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window", dto);
     }
 
-    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, int seconds, String icon, String message) {
-        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, pointLimit, seconds, icon, message);
+    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, String icon, String message) {
+        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, pointLimit, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 

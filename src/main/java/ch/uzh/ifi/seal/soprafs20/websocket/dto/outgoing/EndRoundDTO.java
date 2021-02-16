@@ -10,17 +10,14 @@ public class EndRoundDTO {
 
     private int pointLimit;
 
-    private int seconds;
-
     private String icon;
 
     private String message;
 
-    public EndRoundDTO(Map<String, Integer> players, Map<String, Integer> changes, int pointLimit, int seconds, String icon, String message) {
+    public EndRoundDTO(Map<String, Integer> players, Map<String, Integer> changes, int pointLimit, String icon, String message) {
         this.players = players;
         this.changes = changes;
         this.pointLimit = pointLimit;
-        this.seconds = seconds;
         this.icon = icon;
         this.message = message;
     }
@@ -47,14 +44,6 @@ public class EndRoundDTO {
 
     public void setPointLimit(int pointLimit) {
         this.pointLimit = pointLimit;
-    }
-
-    public int getSeconds() {
-        return seconds;
-    }
-
-    public void setSeconds(int seconds) {
-        this.seconds = seconds;
     }
 
     public String getIcon() {
