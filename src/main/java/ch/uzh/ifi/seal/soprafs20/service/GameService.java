@@ -73,6 +73,13 @@ public class GameService {
         }
     }
 
+    public void startRound(String lobbyId, String identity) {
+        if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.triggerNewGameRound();
+        }
+    }
+
     public void playCard(String lobbyId, String identity, PlayCardDTO play) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);

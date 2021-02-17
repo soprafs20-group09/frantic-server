@@ -47,7 +47,7 @@ public class Game {
         this.currentGameRound.startGameRound();
     }
 
-    private void triggerNewGameRound() {
+    public void triggerNewGameRound() {
         Chat chat = new EventChat(null, "A new round starts in 10 seconds");
         this.gameService.sendChatMessage(this.lobbyId, chat);
         this.gameService.sendTimer(this.lobbyId, 10);
