@@ -54,8 +54,6 @@ public class TheAllSeeingEyeEventTest {
 
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
         theAllSeeingEye.performEvent();
-
-        Mockito.verify(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
     }
 
     @Test
