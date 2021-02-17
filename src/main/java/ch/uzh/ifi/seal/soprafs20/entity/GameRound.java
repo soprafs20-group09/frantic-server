@@ -20,6 +20,7 @@ public class GameRound {
     private final List<Player> listOfPlayers;
     private Player currentPlayer;
     private final TurnDuration turnDuration;
+    private final int seconds;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
@@ -48,6 +49,7 @@ public class GameRound {
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
         this.turnDuration = turnDuration;
+        this.seconds = turnDuration.getValue();
         this.gameService = GameService.getInstance();
         this.drawStack = new DrawStack();
         this.isDrawStackLow = false;
@@ -136,12 +138,9 @@ public class GameRound {
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
-        if (this.turnDuration == TurnDuration.NORMAL) {
-            this.gameService.sendTimer(this.lobbyId, 30);
-            startTurnTimer(30);
-        } else if (this.turnDuration == TurnDuration.LONG) {
-            this.gameService.sendTimer(this.lobbyId, 60);
-            startTurnTimer(60);
+        if (this.turnDuration != TurnDuration.INFINITE) {
+            this.gameService.sendTimer(this.lobbyId, this.seconds);
+            startTurnTimer(this.seconds);
         }
 
     }
@@ -199,25 +198,15 @@ public class GameRound {
                             else {
                                 sendGameState();
                                 this.timer.cancel();
-                                if (this.turnDuration == TurnDuration.NORMAL) {
+                                if (this.turnDuration != TurnDuration.INFINITE) {
                                     if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                        this.gameService.sendTimer(this.lobbyId, 45);
+                                        this.gameService.sendTimer(this.lobbyId, (int)(this.seconds * 1.5));
                                         this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                        startTurnTimer(45);
+                                        startTurnTimer((int)(this.seconds * 1.5));
                                     } else {
-                                        this.gameService.sendTimer(this.lobbyId, 30);
+                                        this.gameService.sendTimer(this.lobbyId, this.seconds);
                                         this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                        startTurnTimer(30);
-                                    }
-                                } else if (this.turnDuration == TurnDuration.LONG) {
-                                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                        this.gameService.sendTimer(this.lobbyId, 90);
-                                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                        startTurnTimer(90);
-                                    } else {
-                                        this.gameService.sendTimer(this.lobbyId, 60);
-                                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                        startTurnTimer(60);
+                                        startTurnTimer(this.seconds);
                                     }
                                 }
                             }
@@ -251,21 +240,14 @@ public class GameRound {
                     this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
 
-                    if (this.turnDuration == TurnDuration.NORMAL) {
+                    if (this.turnDuration != TurnDuration.INFINITE) {
                         if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                            this.gameService.sendTimer(this.lobbyId, 45);
-                            startCounterAttackTimer(45);
-                        } else {
-                            this.gameService.sendTimer(this.lobbyId, 30);
-                            startCounterAttackTimer(30);
+                            this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                            startCounterAttackTimer((int) (this.seconds * 1.5));
                         }
-                    } else if (this.turnDuration == TurnDuration.LONG) {
-                        if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                            this.gameService.sendTimer(this.lobbyId, 90);
-                            startCounterAttackTimer(90);
-                        } else {
-                            this.gameService.sendTimer(this.lobbyId, 60);
-                            startCounterAttackTimer(60);
+                        else {
+                            this.gameService.sendTimer(this.lobbyId, this.seconds);
+                            startCounterAttackTimer(this.seconds);
                         }
                     }
                 }
@@ -291,14 +273,10 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
-        if (this.turnDuration == TurnDuration.NORMAL) {
-            this.gameService.sendTimer(this.lobbyId, 30);
+        if (this.turnDuration != TurnDuration.INFINITE) {
+            this.gameService.sendTimer(this.lobbyId, this.seconds);
             startInterTurnTimer(30);
-        } else if (this.turnDuration == TurnDuration.LONG) {
-            this.gameService.sendTimer(this.lobbyId, 60);
-            startInterTurnTimer(60);
         }
-
     }
 
     // in a turn, the current player can choose to draw a card

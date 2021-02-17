@@ -8,10 +8,12 @@ public class SurprisePartyEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
+    private final int seconds;
 
     public SurprisePartyEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
+        this.seconds = gameRound.getTurnDuration().getValue();
     }
 
     public String getName() {
@@ -20,12 +22,9 @@ public class SurprisePartyEvent implements Event {
 
     public void performEvent() {
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
-        if (gameRound.getTurnDuration() == TurnDuration.NORMAL) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
-            this.gameRound.startSurprisePartyTimer(30);
-        } else if (gameRound.getTurnDuration() == TurnDuration.LONG) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), 60);
-            this.gameRound.startSurprisePartyTimer(60);
+        if (gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+            this.gameRound.startSurprisePartyTimer(seconds);
         }
 
     }

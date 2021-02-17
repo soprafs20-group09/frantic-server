@@ -32,15 +32,13 @@ public class MerryChristmasEvent implements Event {
                 maxHand = hand;
             }
         }
-        int seconds = 20 + (maxHand % 20) * 2;
+        int baseValue = 20 + (maxHand % 20) * 2;
+        int seconds = this.gameRound.getTurnDuration() == TurnDuration.NORMAL ? baseValue : baseValue * 2;
 
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
-        if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
+        if (this.gameRound.getTurnDuration() != TurnDuration.INFINITE) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startMerryChristmasTimer(seconds);
-        } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds * 2);
-            this.gameRound.startMerryChristmasTimer(seconds * 2);
         }
     }
 

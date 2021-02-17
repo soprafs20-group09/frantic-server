@@ -16,12 +16,14 @@ public class GamblingManEvent implements Event {
     private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Pile<Card> discardPile;
+    private final int seconds;
 
     public GamblingManEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.discardPile = gameRound.getDiscardPile();
+        this.seconds = gameRound.getTurnDuration().getValue();
     }
 
     public String getName() {
@@ -64,12 +66,9 @@ public class GamblingManEvent implements Event {
             }
         }
         if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size() - 1) {
-            if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
-                this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
-                this.gameRound.startGamblingManTimer(30);
-            } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
-                this.gameService.sendTimer(this.gameRound.getLobbyId(), 60);
-                this.gameRound.startGamblingManTimer(60);
+            if (this.gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+                this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+                this.gameRound.startGamblingManTimer(seconds);
             }
         }
         else {

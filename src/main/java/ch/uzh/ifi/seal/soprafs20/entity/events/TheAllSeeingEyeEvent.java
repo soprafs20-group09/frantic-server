@@ -8,10 +8,12 @@ public class TheAllSeeingEyeEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
+    private final int seconds;
 
     public TheAllSeeingEyeEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
+        this.seconds = gameRound.getTurnDuration().getValue();
     }
 
     public String getName() {
@@ -20,12 +22,9 @@ public class TheAllSeeingEyeEvent implements Event {
 
     public void performEvent() {
         this.gameRound.setShowCards(true);
-        if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
-            this.gameRound.startAllSeeingEyeTimer(30);
-        } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), 60);
-            this.gameRound.startAllSeeingEyeTimer(60);
+        if (this.gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+            this.gameRound.startAllSeeingEyeTimer(seconds);
         }
     }
 
