@@ -169,6 +169,9 @@ public class LobbyService {
             if (dto.getDuration() != null) {
                 lobbyToUpdate.setGameDuration(dto.getDuration());
             }
+            if (dto.getTurnDuration() != null) {
+                lobbyToUpdate.setTurnDuration(dto.getTurnDuration());
+            }
             if (dto.getPublicLobby() != null) {
                 lobbyToUpdate.setIsPublic(dto.getPublicLobby());
             }
