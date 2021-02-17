@@ -1,12 +1,15 @@
 package ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 
 public class LobbySettingsDTO {
 
     private String lobbyName;
 
     private GameLength duration;
+
+    private TurnDuration turnDuration;
 
     private DurationItem[] durationItems;
 
@@ -30,6 +33,14 @@ public class LobbySettingsDTO {
 
     public void setDuration(GameLength duration) {
         this.duration = duration;
+    }
+
+    public TurnDuration getTurnDuration() {
+        return turnDuration;
+    }
+
+    public void setTurnDuration(TurnDuration turnDuration) {
+        this.turnDuration = turnDuration;
     }
 
     public Boolean getPublicLobby() {
