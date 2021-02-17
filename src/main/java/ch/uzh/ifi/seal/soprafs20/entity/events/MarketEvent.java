@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Pile;
@@ -15,14 +16,12 @@ public class MarketEvent implements Event {
     private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Pile<Card> drawStack;
-    private final int seconds;
 
     public MarketEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.drawStack = gameRound.getDrawStack();
-        this.seconds = 15;
     }
 
     public String getName() {
@@ -53,8 +52,14 @@ public class MarketEvent implements Event {
         this.gameService.sendAttackTurn(this.gameRound.getLobbyId(), firstPlayer.getUsername());
         this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cardArray, disabledArray);
         this.gameRound.setMarketList(cardArray, disabledArray);
-        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-        this.gameRound.startMarketTimer(seconds, firstPlayer);
+
+        if (gameRound.getTurnDuration() == TurnDuration.NORMAL) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), 15);
+            this.gameRound.startMarketTimer(15, firstPlayer);
+        } else if (gameRound.getTurnDuration() == TurnDuration.LONG) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
+            this.gameRound.startMarketTimer(30, firstPlayer);
+        }
     }
 
     public String getMessage() {

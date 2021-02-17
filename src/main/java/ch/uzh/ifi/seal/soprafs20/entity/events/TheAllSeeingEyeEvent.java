@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
@@ -7,12 +8,10 @@ public class TheAllSeeingEyeEvent implements Event {
 
     private final GameRound gameRound;
     private final GameService gameService;
-    private final int seconds;
 
     public TheAllSeeingEyeEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
-        seconds = 30;
     }
 
     public String getName() {
@@ -21,9 +20,13 @@ public class TheAllSeeingEyeEvent implements Event {
 
     public void performEvent() {
         this.gameRound.setShowCards(true);
-        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-
-        this.gameRound.startAllSeeingEyeTimer(seconds);
+        if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
+            this.gameRound.startAllSeeingEyeTimer(30);
+        } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), 60);
+            this.gameRound.startAllSeeingEyeTimer(60);
+        }
     }
 
     public String getMessage() {

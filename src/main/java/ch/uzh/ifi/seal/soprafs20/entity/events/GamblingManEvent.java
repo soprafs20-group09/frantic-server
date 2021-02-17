@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -15,14 +16,12 @@ public class GamblingManEvent implements Event {
     private final GameService gameService;
     private final List<Player> listOfPlayers;
     private final Pile<Card> discardPile;
-    private final int seconds;
 
     public GamblingManEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.discardPile = gameRound.getDiscardPile();
-        this.seconds = 30;
     }
 
     public String getName() {
@@ -65,8 +64,13 @@ public class GamblingManEvent implements Event {
             }
         }
         if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size() - 1) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-            this.gameRound.startGamblingManTimer(seconds);
+            if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
+                this.gameService.sendTimer(this.gameRound.getLobbyId(), 30);
+                this.gameRound.startGamblingManTimer(30);
+            } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
+                this.gameService.sendTimer(this.gameRound.getLobbyId(), 60);
+                this.gameRound.startGamblingManTimer(60);
+            }
         }
         else {
             Chat chat = new EventChat("event:gambling-man", "Too few players were able to gamble.");

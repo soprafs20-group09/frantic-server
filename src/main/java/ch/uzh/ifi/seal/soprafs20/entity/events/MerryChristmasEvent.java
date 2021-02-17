@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -34,8 +35,13 @@ public class MerryChristmasEvent implements Event {
         int seconds = 20 + (maxHand % 20) * 2;
 
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
-        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-        this.gameRound.startMerryChristmasTimer(seconds);
+        if (this.gameRound.getTurnDuration() == TurnDuration.NORMAL) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+            this.gameRound.startMerryChristmasTimer(seconds);
+        } else if (this.gameRound.getTurnDuration() == TurnDuration.LONG) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds * 2);
+            this.gameRound.startMerryChristmasTimer(seconds * 2);
+        }
     }
 
     public String getMessage() {
