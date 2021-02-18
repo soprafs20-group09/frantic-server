@@ -302,7 +302,10 @@ public class GameService {
     }
 
     public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, String icon, String message) {
-        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, pointLimit, icon, message);
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        String admin = lobby.getCreator();
+
+        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, admin, pointLimit, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 

@@ -409,6 +409,9 @@ public class GameServiceTest {
 
     @Test
     void sendEndRoundTest() {
+        Mockito.when(lobbyRepository.findByLobbyId(Mockito.anyString())).thenReturn(lobby);
+        Mockito.when(lobby.getCreator()).thenReturn("theAdmin");
+
         gameService.sendEndRound("testLobbyId", Collections.singletonList(player), new HashMap<>(), 154,null, null);
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("testLobbyId"), Mockito.matches("/end-round"), Mockito.any());
     }
