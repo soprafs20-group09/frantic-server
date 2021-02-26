@@ -7,16 +7,19 @@ public class LobbySettingsDTO {
 
     private String lobbyName;
 
-    private GameLength duration;
+    private GameLength gameDuration;
 
     private TurnDuration turnDuration;
 
-    private DurationItem[] durationItems;
+    private DurationItem[] gameDurationItems;
+
+    private DurationItem[] turnDurationItems;
 
     private Boolean publicLobby;
 
     public LobbySettingsDTO() {
-        this.durationItems = setDurationItems();
+        this.gameDurationItems = setGameDurationItems();
+        this.turnDurationItems = setTurnDurationItems();
     }
 
     public String getLobbyName() {
@@ -27,12 +30,12 @@ public class LobbySettingsDTO {
         this.lobbyName = lobbyName;
     }
 
-    public GameLength getDuration() {
-        return duration;
+    public GameLength getGameDuration() {
+        return gameDuration;
     }
 
-    public void setDuration(GameLength duration) {
-        this.duration = duration;
+    public void setGameDuration(GameLength gameDuration) {
+        this.gameDuration = gameDuration;
     }
 
     public TurnDuration getTurnDuration() {
@@ -51,7 +54,7 @@ public class LobbySettingsDTO {
         this.publicLobby = publicLobby;
     }
 
-    public DurationItem[] setDurationItems() {
+    public DurationItem[] setGameDurationItems() {
         String[] names = new String[]{"Short", "Medium", "Long"};
         String[] values = new String[]{"SHORT", "MEDIUM", "LONG"};
 
@@ -66,8 +69,27 @@ public class LobbySettingsDTO {
         return items;
     }
 
-    public DurationItem[] getDurationItems() {
-        return durationItems;
+    public DurationItem[] getGameDurationItems() {
+        return gameDurationItems;
+    }
+
+    public DurationItem[] setTurnDurationItems() {
+        String[] names = new String[]{"Normal", "Long", "Infinite"};
+        String[] values = new String[]{"NORMAL", "LONG", "INFINITE"};
+
+        DurationItem[] items = new DurationItem[3];
+
+        for (int i = 0; i < names.length; i++) {
+            DurationItem d = new DurationItem();
+            d.name = names[i];
+            d.value = values[i];
+            items[i] = d;
+        }
+        return items;
+    }
+
+    public DurationItem[] getTurnDurationItems() {
+        return turnDurationItems;
     }
 
 
