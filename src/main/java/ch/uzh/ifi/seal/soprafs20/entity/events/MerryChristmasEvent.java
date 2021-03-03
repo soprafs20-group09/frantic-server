@@ -36,7 +36,7 @@ public class MerryChristmasEvent implements Event {
         int seconds = this.gameRound.getTurnDuration() == TurnDuration.NORMAL ? baseValue : baseValue * 2;
 
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
-        if (this.gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+        if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startMerryChristmasTimer(seconds);
         }

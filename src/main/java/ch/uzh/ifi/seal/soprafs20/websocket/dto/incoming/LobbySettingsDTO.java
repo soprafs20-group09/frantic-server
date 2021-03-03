@@ -74,8 +74,8 @@ public class LobbySettingsDTO {
     }
 
     public DurationItem[] setTurnDurationItems() {
-        String[] names = new String[]{"Normal", "Long", "Infinite"};
-        String[] values = new String[]{"NORMAL", "LONG", "INFINITE"};
+        String[] names = new String[]{"Normal", "Long", "Off"};
+        String[] values = new String[]{"NORMAL", "LONG", "OFF"};
 
         DurationItem[] items = new DurationItem[3];
 

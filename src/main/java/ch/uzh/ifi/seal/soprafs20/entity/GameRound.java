@@ -138,7 +138,7 @@ public class GameRound {
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
-        if (this.turnDuration != TurnDuration.INFINITE) {
+        if (this.turnDuration != TurnDuration.OFF) {
             this.gameService.sendTimer(this.lobbyId, this.seconds);
             startTurnTimer(this.seconds);
         }
@@ -198,7 +198,7 @@ public class GameRound {
                             else {
                                 sendGameState();
                                 this.timer.cancel();
-                                if (this.turnDuration != TurnDuration.INFINITE) {
+                                if (this.turnDuration != TurnDuration.OFF) {
                                     if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
                                         this.gameService.sendTimer(this.lobbyId, (int)(this.seconds * 1.5));
                                         this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
@@ -240,7 +240,7 @@ public class GameRound {
                     this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
 
-                    if (this.turnDuration != TurnDuration.INFINITE) {
+                    if (this.turnDuration != TurnDuration.OFF) {
                         if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
                             this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
                             startCounterAttackTimer((int) (this.seconds * 1.5));
@@ -273,7 +273,7 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
-        if (this.turnDuration != TurnDuration.INFINITE) {
+        if (this.turnDuration != TurnDuration.OFF) {
             this.gameService.sendTimer(this.lobbyId, this.seconds);
             startInterTurnTimer(30);
         }

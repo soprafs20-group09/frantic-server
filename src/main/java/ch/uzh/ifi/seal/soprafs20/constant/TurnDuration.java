@@ -3,7 +3,7 @@ package ch.uzh.ifi.seal.soprafs20.constant;
 public enum TurnDuration {
     NORMAL(30),
     LONG(60),
-    INFINITE(0);
+    OFF(0);
 
     private final int value;
 

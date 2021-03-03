@@ -22,7 +22,7 @@ public class SurprisePartyEvent implements Event {
 
     public void performEvent() {
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
-        if (gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+        if (gameRound.getTurnDuration() != TurnDuration.OFF) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startSurprisePartyTimer(seconds);
         }

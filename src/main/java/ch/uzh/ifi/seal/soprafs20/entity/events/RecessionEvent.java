@@ -36,7 +36,7 @@ public class RecessionEvent implements Event {
             this.gameService.sendRecession(this.gameRound.getLobbyId(), player, Math.min(this.amount, player.getHandSize()));
             this.amount++;
         }
-        if (this.gameRound.getTurnDuration() != TurnDuration.INFINITE) {
+        if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startRecessionTimer(seconds);
         }
