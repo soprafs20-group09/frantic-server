@@ -197,15 +197,15 @@ public class GameRound {
                             }
                             else {
                                 sendGameState();
-                                this.timer.cancel();
+                                cancelTimer();
+                                this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                                 if (this.turnDuration != TurnDuration.OFF) {
                                     if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                        this.gameService.sendTimer(this.lobbyId, (int)(this.seconds * 1.5));
-                                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                        startTurnTimer((int)(this.seconds * 1.5));
-                                    } else {
+                                        this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                                        startTurnTimer((int) (this.seconds * 1.5));
+                                    }
+                                    else {
                                         this.gameService.sendTimer(this.lobbyId, this.seconds);
-                                        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
                                         startTurnTimer(this.seconds);
                                     }
                                 }
@@ -228,7 +228,9 @@ public class GameRound {
             for (Player target : this.currentAction.getTargets()) {
                 this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
                 if (counterAttacker.equals(target)) {
-                    this.timer.cancel();
+                    if (this.timer != null) {
+                        this.timer.cancel();
+                    }
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
@@ -256,7 +258,9 @@ public class GameRound {
     }
 
     private void playNiceTry(Player niceTryPlayer, int index) {
-        this.timer.cancel();
+        if (this.timer != null) {
+            this.timer.cancel();
+        }
         Card cardToPlay = niceTryPlayer.popCard(index);
         this.discardPile.push(cardToPlay);
         this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
@@ -299,7 +303,8 @@ public class GameRound {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
-        this.timer.cancel();
+        cancelTimer();
+
         //return empty playable cards after turn finished
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         prepareNewTurn();
@@ -319,7 +324,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new SkipAction(initiator, target);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("skip");
     }
 
@@ -327,7 +332,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new GiftAction(initiator, target, cards);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("gift");
     }
 
@@ -335,7 +340,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new ExchangeAction(initiator, target, cards);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("exchange");
     }
 
@@ -347,7 +352,7 @@ public class GameRound {
         else {
             this.currentAction = new FantasticAction(initiator, color, (DiscardPile) this.discardPile);
         }
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
@@ -365,7 +370,7 @@ public class GameRound {
             this.currentAction = new FantasticFourAction(initiator, distribution, color,
                     (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         }
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("fantastic-four");
     }
 
@@ -373,7 +378,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
-        timer.cancel();
+        cancelTimer();
         if (this.currentAction.getTargets().length != 0) {
             prepareCounterAttack("equality");
         }
@@ -386,7 +391,7 @@ public class GameRound {
     public void storeCounterAttackAction(String identity, Color color) {
         Player initiator = getPlayerByIdentity(identity);
         this.currentAction = new CounterAttackAction(initiator, color, (DiscardPile) this.discardPile);
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
@@ -394,12 +399,12 @@ public class GameRound {
     public void storeNiceTryAction(String identity, Color color) {
         Player initiator = getPlayerByIdentity(identity);
         this.currentAction = new NiceTryAction(initiator, color, (DiscardPile) this.discardPile);
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
     private void performAction() {
-        this.timer.cancel();
+        cancelTimer();
         this.attackState = false;
         List<Chat> chat = this.currentAction.perform();
         this.gameService.sendChatMessage(this.lobbyId, chat);
@@ -462,7 +467,7 @@ public class GameRound {
     //================================================================================
 
     private void prepareEvent() {
-        this.timer.cancel();
+        cancelTimer();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         sendGameState();
 
@@ -497,7 +502,7 @@ public class GameRound {
     }
 
     private void performRecession() {
-        this.timer.cancel();
+        cancelTimer();
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
             chat.add(new EventChat("event:recession",
@@ -525,7 +530,7 @@ public class GameRound {
     }
 
     private void performSurpriseParty() {
-        timer.cancel();
+        cancelTimer();
         for (Map.Entry<Card, Player> entry : this.surprisePartyMap.entrySet()) {
             entry.getValue().pushCardToHand(entry.getKey());
         }
@@ -568,7 +573,7 @@ public class GameRound {
     }
 
     private void performMerryChristmas() {
-        timer.cancel();
+        cancelTimer();
         this.gameService.sendAnimationSpeed(this.lobbyId, 0);
         sendCompleteGameState();
         for (Map.Entry<Player, List<Card>> entry : this.christmasMap.entrySet()) {
@@ -592,7 +597,7 @@ public class GameRound {
         int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
         Player expectedPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
         if (player != null && player == expectedPlayer) {
-            this.timer.cancel();
+            cancelTimer();
             Card choice = this.marketArray[card];
             this.marketDisabledArray[card] = true;
             performMarket(player, choice);
@@ -755,7 +760,7 @@ public class GameRound {
     }
 
     public void onRoundOver(boolean emptyStack) {
-        this.timer.cancel();
+        cancelTimer();
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer;
         List<Player> finishedPlayers = new ArrayList<>();
@@ -891,7 +896,7 @@ public class GameRound {
                 player.pushCardToHand(this.drawStack.pop());
             }
             else {
-                this.timer.cancel();
+                cancelTimer();
                 onRoundOver(true);
             }
         }
@@ -932,7 +937,7 @@ public class GameRound {
     public void playerLostConnection(Player player) {
         if (this.listOfPlayers.size() > 1) {
             if (player == this.currentPlayer) {
-                this.timer.cancel();
+                cancelTimer();
                 prepareNewTurn();
             }
             this.bombMap.remove(player);
@@ -940,7 +945,7 @@ public class GameRound {
             sendGameState();
         }
         else {
-            this.timer.cancel();
+            cancelTimer();
         }
     }
 
@@ -1134,6 +1139,12 @@ public class GameRound {
             }
         };
         this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void cancelTimer() {
+        if (this.turnDuration != TurnDuration.OFF) {
+            this.timer.cancel();
+        }
     }
 
     //================================================================================
