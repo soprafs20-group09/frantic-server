@@ -24,8 +24,4 @@ public class GameRepository {
     public static Game findByLobbyId(String lobbyId) {
         return gameRepo.get(lobbyId);
     }
-
-    public static List<Game> findAll() {
-        return new ArrayList<>(gameRepo.values());
-    }
 }

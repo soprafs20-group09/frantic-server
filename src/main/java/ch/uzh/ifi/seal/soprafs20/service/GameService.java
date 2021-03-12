@@ -5,7 +5,6 @@ import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.GameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
@@ -60,27 +59,19 @@ public class GameService {
         return this.playerRepository.findByLobbyId(lobbyId);
     }
 
-    public List<GameDTO> getGames() {
-        List<Game> allGames = GameRepository.findAll();
-        List<GameDTO> gameDTOs = new ArrayList<>();
+    public List<PlayerScoreDTO> getPlayersAndPointsInGame(String lobbyId) {
+        Game game = GameRepository.findByLobbyId(lobbyId);
+        List<PlayerScoreDTO> playerScoreDTOs = new ArrayList<>();
 
-        for (Game game : allGames) {
-            GameDTO dto = new GameDTO();
-            GameRound gameRound = game.getCurrentGameRound();
-            List<Player> players = gameRound.getListOfPlayers();
-
-            List<PlayerScoreDTO> playerScoreDTOs = new ArrayList<>();
-            for (Player player : players) {
-                playerScoreDTOs.add(new PlayerScoreDTO(player.getUsername(), player.getPoints()));
-            }
-
-            dto.setLobbyId(gameRound.getLobbyId());
-            dto.setPlayerScores(playerScoreDTOs);
-            dto.setRoundCount(game.getRoundCount());
-
-            gameDTOs.add(dto);
+        for (Player player : game.getListOfPlayers()) {
+            playerScoreDTOs.add(new PlayerScoreDTO(player.getUsername(), player.getPoints()));
         }
-        return gameDTOs;
+        return playerScoreDTOs;
+    }
+
+    public int getRoundCount(String lobbyId) {
+        Game game = GameRepository.findByLobbyId(lobbyId);
+        return (game != null) ? game.getRoundCount() : 0;
     }
 
     public void startGame(String lobbyId, String identity) {

@@ -1,12 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.controller;
 
-import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
-import ch.uzh.ifi.seal.soprafs20.rest.dto.GameDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
-import ch.uzh.ifi.seal.soprafs20.rest.mapper.DTOMapper;
-import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
 import org.jsoup.Jsoup;
@@ -15,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,31 +21,17 @@ public class RESTController {
 
     private final LobbyService lobbyService;
     private final RegisterService registerService;
-    private final GameService gameService;
 
-    RESTController(LobbyService lobbyService, RegisterService registerService, GameService gameService) {
+    RESTController(LobbyService lobbyService, RegisterService registerService) {
         this.lobbyService = lobbyService;
         this.registerService = registerService;
-        this.gameService = gameService;
     }
 
     @GetMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<LobbyListElementDTO> getAllLobbies(@RequestParam(required = false) String q) {
-        List<Lobby> lobbies = lobbyService.getLobbies(q);
-        List<LobbyListElementDTO> response = new ArrayList<>();
-        for (Lobby lobby : lobbies) {
-            response.add(DTOMapper.INSTANCE.convertLobbyToLobbyListDTO(lobby));
-        }
-        return response;
-    }
-
-    @GetMapping("/games")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public List<GameDTO> getAllGames() {
-        return this.gameService.getGames();
+        return lobbyService.getLobbies(q);
     }
 
     @PostMapping("/lobbies")

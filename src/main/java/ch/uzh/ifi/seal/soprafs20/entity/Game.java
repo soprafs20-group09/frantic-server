@@ -209,6 +209,10 @@ public class Game {
         return this.firstPlayer;
     }
 
+    public List<Player> getListOfPlayers() {
+        return this.listOfPlayers;
+    }
+
     //needed for testing
     public void setListOfPlayers(List<Player> playerList) {
         this.listOfPlayers = playerList;

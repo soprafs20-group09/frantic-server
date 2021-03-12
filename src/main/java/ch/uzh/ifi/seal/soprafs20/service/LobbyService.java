@@ -8,6 +8,8 @@ import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,21 +38,24 @@ public class LobbyService {
 
     private final WebSocketService webSocketService;
     private final PlayerService playerService;
+    private final GameService gameService;
 
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
     public LobbyService(WebSocketService webSocketService, PlayerService playerService,
+                        GameService gameService,
                         @Qualifier("playerRepository") PlayerRepository playerRepository,
                         @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.webSocketService = webSocketService;
         this.playerService = playerService;
+        this.gameService = gameService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
     }
 
-    public List<Lobby> getLobbies(String q) {
+    public List<LobbyListElementDTO> getLobbies(String q) {
         List<Lobby> allLobbies;
         if (q != null) {
             allLobbies = this.lobbyRepository.findByNameContainsOrCreatorContains(q, q);
@@ -57,9 +63,25 @@ public class LobbyService {
         else {
             allLobbies = this.lobbyRepository.findAll();
         }
-        allLobbies.removeIf(l -> !l.isPublic() || l.isPlaying() || l.getPlayers() == 0);
-        allLobbies.removeIf(l -> !l.getListOfPlayers().contains(l.getCreator()));
-        return allLobbies;
+        List<LobbyListElementDTO> lobbyList = new ArrayList<>();
+        for (Lobby lobby : allLobbies) {
+            LobbyListElementDTO dto = new LobbyListElementDTO();
+            dto.setLobbyId(lobby.isPublic() ? lobby.getLobbyId() : "");
+            dto.setName(lobby.getName());
+            dto.setCreator(lobby.getCreator());
+            if (lobby.isPlaying()) {
+                dto.setPlayers(this.gameService.getPlayersAndPointsInGame(lobby.getLobbyId()));
+                dto.setRoundCount(this.gameService.getRoundCount(lobby.getLobbyId()));
+            }
+            else {
+                dto.setPlayers(this.getPlayersInLobby(lobby.getLobbyId()));
+            }
+            dto.setType(lobby.isPublic() ? "public" : "private");
+            dto.setRunning(lobby.isPlaying());
+            dto.setStartTime(lobby.getStartTime());
+            lobbyList.add(dto);
+        }
+        return lobbyList;
     }
 
     public synchronized String createLobby(Player creator) {
@@ -241,5 +263,13 @@ public class LobbyService {
         if (username == null || !username.matches("^\\S{2,20}$")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username missing or invalid.");
         }
+    }
+
+    private List<PlayerScoreDTO> getPlayersInLobby(String lobbyId) {
+        List<PlayerScoreDTO> playerScoreDTOs = new ArrayList<>();
+        for (Player player : this.playerService.getPlayersInLobby(lobbyId)) {
+            playerScoreDTOs.add(new PlayerScoreDTO(player.getUsername(), 0));
+        }
+        return playerScoreDTOs;
     }
 }
