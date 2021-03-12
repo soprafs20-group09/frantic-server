@@ -66,8 +66,8 @@ public class GamblingManEvent implements Event {
             }
         }
         if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size() - 1) {
+            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
-                this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
                 this.gameRound.startGamblingManTimer(seconds);
             }
         }

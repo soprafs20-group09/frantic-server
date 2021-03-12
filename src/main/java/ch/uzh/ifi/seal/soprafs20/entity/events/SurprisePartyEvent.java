@@ -22,8 +22,8 @@ public class SurprisePartyEvent implements Event {
 
     public void performEvent() {
         this.gameService.sendEventActionResponse(this.gameRound.getLobbyId(), this.getName());
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
         if (gameRound.getTurnDuration() != TurnDuration.OFF) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startSurprisePartyTimer(seconds);
         }
 

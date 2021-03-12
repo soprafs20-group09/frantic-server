@@ -138,11 +138,10 @@ public class GameRound {
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
+        this.gameService.sendTimer(this.lobbyId, this.seconds);
         if (this.turnDuration != TurnDuration.OFF) {
-            this.gameService.sendTimer(this.lobbyId, this.seconds);
             startTurnTimer(this.seconds);
         }
-
     }
 
     public void playerFinishesTurn(String identity) {
@@ -208,6 +207,8 @@ public class GameRound {
                                         this.gameService.sendTimer(this.lobbyId, this.seconds);
                                         startTurnTimer(this.seconds);
                                     }
+                                } else {
+                                    this.gameService.sendTimer(this.lobbyId, this.seconds);
                                 }
                             }
                         }
@@ -251,6 +252,8 @@ public class GameRound {
                             this.gameService.sendTimer(this.lobbyId, this.seconds);
                             startCounterAttackTimer(this.seconds);
                         }
+                    } else {
+                        this.gameService.sendTimer(this.lobbyId, this.seconds);
                     }
                 }
             }
@@ -277,9 +280,9 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
+        this.gameService.sendTimer(this.lobbyId, this.seconds);
         if (this.turnDuration != TurnDuration.OFF) {
-            this.gameService.sendTimer(this.lobbyId, this.seconds);
-            startInterTurnTimer(30);
+            startInterTurnTimer(this.seconds);
         }
     }
 
@@ -629,13 +632,9 @@ public class GameRound {
             Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
             this.gameService.sendAttackTurn(this.lobbyId, nextPlayer.getUsername());
             this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketArray, this.marketDisabledArray);
-            if (this.getTurnDuration() == TurnDuration.NORMAL) {
-                this.gameService.sendTimer(this.lobbyId, 15);
-                startMarketTimer(15, nextPlayer);
-            } else if (this.getTurnDuration() == TurnDuration.LONG) {
-                this.gameService.sendTimer(this.lobbyId, 30);
-                startMarketTimer(30, nextPlayer);
-            }
+            int seconds = this.getTurnDuration().getValue();
+            this.gameService.sendTimer(this.lobbyId, seconds/2);
+            startMarketTimer(seconds/2, nextPlayer);
         }
         else {
             this.marketArray = new Card[0];

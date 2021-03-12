@@ -22,9 +22,11 @@ public class TheAllSeeingEyeEvent implements Event {
 
     public void performEvent() {
         this.gameRound.setShowCards(true);
-        if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-            this.gameRound.startAllSeeingEyeTimer(seconds);
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
+        if (this.seconds == 30) {
+            this.gameRound.startAllSeeingEyeTimer(30);
+        } else {
+            this.gameRound.startAllSeeingEyeTimer(60);
         }
     }
 

@@ -55,8 +55,8 @@ public class MarketEvent implements Event {
         this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cardArray, disabledArray);
         this.gameRound.setMarketList(cardArray, disabledArray);
 
+        this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
         if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
-            this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startMarketTimer(seconds, firstPlayer);
         }
     }
