@@ -122,7 +122,7 @@ public class WebSocketService {
 
     protected boolean checkSender(String lobbyId, String identity) {
         Player toCheck = this.playerRepository.findByIdentity(identity);
-        return toCheck.getLobbyId().equals(lobbyId);
+        return toCheck != null && toCheck.getLobbyId().equals(lobbyId);
     }
 
     protected void sendChatMessage(String lobbyId, List<Chat> chats) {
