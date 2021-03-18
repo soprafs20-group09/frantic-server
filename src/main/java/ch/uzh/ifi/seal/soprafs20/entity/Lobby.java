@@ -117,6 +117,11 @@ public class Lobby implements Serializable {
         this.players = this.listOfPlayers.size();
     }
 
+    public void removeAllPlayers() {
+        this.listOfPlayers.clear();
+        this.players = 0;
+    }
+
     public List<String> getListOfPlayers() {
         return this.listOfPlayers;
     }

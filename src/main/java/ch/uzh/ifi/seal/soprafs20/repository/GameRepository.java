@@ -13,7 +13,10 @@ public class GameRepository {
     }
 
     public static void removeGame(String lobbyId) {
-        gameRepo.remove(lobbyId);
+        if (gameRepo.containsKey(lobbyId)) {
+            gameRepo.get(lobbyId).stopTimer();
+            gameRepo.remove(lobbyId);
+        }
     }
 
     public static Game findByLobbyId(String lobbyId) {

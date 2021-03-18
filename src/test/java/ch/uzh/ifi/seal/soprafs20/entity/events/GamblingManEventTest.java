@@ -26,7 +26,7 @@ public class GamblingManEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,13 +35,13 @@ public class GamblingManEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         GamblingManEvent gamblingMan = new GamblingManEvent(this.gameRound);
         assertEquals("gambling-man", gamblingMan.getName());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendGamblingMan(Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
@@ -64,7 +64,7 @@ public class GamblingManEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         GamblingManEvent gamblingMan = new GamblingManEvent(this.gameRound);
         assertEquals("It's time to gamble! Choose a number card of the last played color. The player with the highest digit has to take all of them. So choose wisely!", gamblingMan.getMessage());
     }

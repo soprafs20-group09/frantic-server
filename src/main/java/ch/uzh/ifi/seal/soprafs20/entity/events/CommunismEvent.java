@@ -3,18 +3,15 @@ package ch.uzh.ifi.seal.soprafs20.entity.events;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CommunismEvent implements Event {
 
     private final GameRound gameRound;
-    private final GameService gameService;
     private final List<Player> listOfPlayers;
 
     public CommunismEvent(GameRound gameRound) {
         this.gameRound = gameRound;
-        this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
     }
 

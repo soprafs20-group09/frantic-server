@@ -30,7 +30,7 @@ public class TheAllSeeingEyeEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -39,13 +39,13 @@ public class TheAllSeeingEyeEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
-        assertEquals("You can't run! You can't hide! The all-seeing eye is here! Take a good look at everyone cards!", theAllSeeingEye.getMessage());
+        assertEquals("You can't run! You can't hide! The all-seeing eye is here! Take a good look at everyone's cards!", theAllSeeingEye.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendGameState(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
@@ -59,7 +59,7 @@ public class TheAllSeeingEyeEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
         assertEquals("the-all-seeing-eye", theAllSeeingEye.getName());
     }

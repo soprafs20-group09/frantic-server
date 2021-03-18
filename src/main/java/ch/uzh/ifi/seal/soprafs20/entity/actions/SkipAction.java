@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.actions;
 
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.EventChat;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class SkipAction implements Action {
         if (!this.target.isBlocked()) {
             this.target.setBlocked(true);
         }
-        chat.add(new Chat("event", "special:skip", this.initiator.getUsername()
+        chat.add(new EventChat("special:skip", this.initiator.getUsername()
                 + " skipped " + this.target.getUsername() + "."));
         return chat;
     }

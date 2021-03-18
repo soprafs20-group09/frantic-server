@@ -22,7 +22,7 @@ public class LobbyRepositoryIntegrationTest {
     private LobbyRepository lobbyRepository;
 
     @Test
-    public void find_single_lobby_ByName_success() {
+    void find_single_lobby_ByName_success() {
         //given two lobbies
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -56,7 +56,7 @@ public class LobbyRepositoryIntegrationTest {
     }
 
     @Test
-    public void find_single_lobby_ByName_unsuccessful() {
+    void find_single_lobby_ByName_unsuccessful() {
         //given a lobby
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -78,7 +78,7 @@ public class LobbyRepositoryIntegrationTest {
     }
 
     @Test
-    public void find_multiple_lobbies_ByName_success() {
+    void find_multiple_lobbies_ByName_success() {
         //given two lobbies
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -116,7 +116,7 @@ public class LobbyRepositoryIntegrationTest {
     }
 
     @Test
-    public void find_lobby_ByCreator_success() {
+    void find_lobby_ByCreator_success() {
         //given two lobbies
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");
@@ -150,7 +150,7 @@ public class LobbyRepositoryIntegrationTest {
     }
 
     @Test
-    public void findById_success() {
+    void findById_success() {
         //given a lobby
         Player testPlayer1 = new Player();
         testPlayer1.setUsername("testPlayer1");

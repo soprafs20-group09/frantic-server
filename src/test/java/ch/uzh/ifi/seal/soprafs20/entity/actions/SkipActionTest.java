@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SkipActionTest {
 
     @Test
-    public void targetIsNotBlocked() {
+    void targetIsNotBlocked() {
         Player initiator = new Player();
         Player target = new Player();
 
@@ -18,7 +18,7 @@ class SkipActionTest {
     }
 
     @Test
-    public void targetIsAlreadyBlocked() {
+    void targetIsAlreadyBlocked() {
         Player initiator = new Player();
         Player target = new Player();
         target.setBlocked(true);

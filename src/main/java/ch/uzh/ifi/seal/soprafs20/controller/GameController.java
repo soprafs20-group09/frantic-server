@@ -2,6 +2,8 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -9,8 +11,13 @@ import org.springframework.stereotype.Controller;
 
 import static ch.uzh.ifi.seal.soprafs20.utils.FranticUtils.getIdentity;
 
+/**
+ * Provides game-related WebSocket endpoints
+ */
 @Controller
 public class GameController {
+
+    Logger log = LoggerFactory.getLogger(GameController.class);
 
     private final GameService gameService;
 
@@ -21,7 +28,17 @@ public class GameController {
     @MessageMapping("/lobby/{lobbyId}/start-game")
     public void startGame(@DestinationVariable String lobbyId,
                           SimpMessageHeaderAccessor sha) {
+        log.info("Lobby " + lobbyId + ": Game started");
+
         gameService.startGame(lobbyId, getIdentity(sha));
+    }
+
+    @MessageMapping("/lobby/{lobbyId}/start-round")
+    public void startRound(@DestinationVariable String lobbyId,
+                          SimpMessageHeaderAccessor sha) {
+        log.info("Lobby " + lobbyId + ": New GameRound started");
+
+        gameService.startRound(lobbyId, getIdentity(sha));
     }
 
     @MessageMapping("/lobby/{lobbyId}/play")
@@ -86,37 +103,37 @@ public class GameController {
 
     @MessageMapping("/lobby/{lobbyId}/action/nice-try")
     public void niceTry(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
+                        SimpMessageHeaderAccessor sha, NiceTryDTO dto) {
         gameService.niceTry(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/surprise-party")
     public void surpriseParty(@DestinationVariable String lobbyId,
-                          SimpMessageHeaderAccessor sha, SurprisePartyDTO dto) {
+                              SimpMessageHeaderAccessor sha, SurprisePartyDTO dto) {
         gameService.surpriseParty(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/merry-christmas")
     public void merryChristmas(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, MerryChristmasDTO dto) {
+                               SimpMessageHeaderAccessor sha, MerryChristmasDTO dto) {
         gameService.merryChristmas(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/recession")
     public void recession(@DestinationVariable String lobbyId,
-                              SimpMessageHeaderAccessor sha, RecessionDTO dto) {
+                          SimpMessageHeaderAccessor sha, RecessionDTO dto) {
         gameService.recession(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/market")
     public void market(@DestinationVariable String lobbyId,
-                          SimpMessageHeaderAccessor sha, MarketDTO dto) {
+                       SimpMessageHeaderAccessor sha, MarketDTO dto) {
         gameService.market(lobbyId, getIdentity(sha), dto);
     }
 
     @MessageMapping("/lobby/{lobbyId}/action/gambling-man")
     public void gamblingMan(@DestinationVariable String lobbyId,
-                       SimpMessageHeaderAccessor sha, GamblingManDTO dto) {
+                            SimpMessageHeaderAccessor sha, GamblingManDTO dto) {
         gameService.gamblingMan(lobbyId, getIdentity(sha), dto);
     }
 }

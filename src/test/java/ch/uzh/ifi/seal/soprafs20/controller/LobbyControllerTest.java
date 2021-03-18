@@ -50,7 +50,7 @@ public class LobbyControllerTest {
     private LobbyController lobbyController;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         stompClient = new WebSocketStompClient(new SockJsClient(
                 Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()))));
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
@@ -59,7 +59,7 @@ public class LobbyControllerTest {
     }
 
     @Test
-    public void testChangeLobbySettings() throws Exception {
+    void testChangeLobbySettings() throws Exception {
         BlockingQueue<LobbyStateDTO> bq = new LinkedBlockingDeque<>();
 
         LobbySettingsDTO lobbySettings = generateLobbySettings();

@@ -8,9 +8,10 @@ import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.CardDTO;
-import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.RecessionAmountDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,20 +21,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * - Receives game-related DTOs and forwards content to GameRound
+ * - Compiles game-related information into DTO and sends it to players
+ */
 @Service
 @Transactional
 public class GameService {
 
+    Logger log = LoggerFactory.getLogger(GameService.class);
+
     private static GameService instance;
     private final WebSocketService webSocketService;
+    private final PlayerService playerService;
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
     public GameService(WebSocketService webSocketService,
+                       PlayerService playerService,
                        @Qualifier("playerRepository") PlayerRepository playerRepository,
                        @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.webSocketService = webSocketService;
+        this.playerService = playerService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
         instance = this;
@@ -43,11 +53,30 @@ public class GameService {
         return instance;
     }
 
+    public List<Player> getPlayersInGame(String lobbyId) {
+        return this.playerRepository.findByLobbyId(lobbyId);
+    }
+
     public void startGame(String lobbyId, String identity) {
         if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
             Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+            List<Player> players = this.playerRepository.findByLobbyId(lobbyId);
+            for (Player p : players) {
+                if (!lobby.getListOfPlayers().contains(p.getUsername())) {
+                    DisconnectDTO disconnectDTO = new DisconnectDTO("A new game has been started without you.");
+                    this.webSocketService.sendToPlayer(p.getIdentity(), "/queue/disconnect", disconnectDTO);
+                    this.playerService.removePlayer(p);
+                }
+            }
             sendStartGame(lobbyId);
             lobby.startGame();
+        }
+    }
+
+    public void startRound(String lobbyId, String identity) {
+        if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.triggerNewGameRound();
         }
     }
 
@@ -139,7 +168,7 @@ public class GameService {
     public void recession(String lobbyId, String identity, RecessionDTO dto) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
-            game.getCurrentGameRound().performRecession(identity, dto.getCards());
+            game.getCurrentGameRound().prepareRecession(identity, dto.getCards());
         }
     }
 
@@ -250,7 +279,7 @@ public class GameService {
 
     public void sendRecession(String lobbyId, Player player, int amount) {
         RecessionAmountDTO dto = new RecessionAmountDTO(amount);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession" , dto);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/recession", dto);
     }
 
     public void sendGamblingMan(String lobbyId, Player player, int[] playable) {
@@ -258,26 +287,48 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/gambling-man-window", dto);
     }
 
-    public void sendMarketWindow(String lobbyId, Player player, List<Card> cards) {
-        CardDTO[] cardDTO = new CardDTO[cards.size()];
-        for (int i = 0; i < cards.size(); i++) {
-            cardDTO[i] = cardToDTO(cards.get(i));
+    public void sendMarketWindow(String lobbyId, Player player, Card[] cards, Boolean[] disabled) {
+        CardDisabledDTO[] cardDTO = new CardDisabledDTO[cards.length];
+        for (int i = 0; i < cards.length; i++) {
+            cardDTO[i] = new CardDisabledDTO();
+            cardDTO[i].setColor(FranticUtils.getStringRepresentation(cards[i].getColor()));
+            cardDTO[i].setKey(cards[i].getKey());
+            cardDTO[i].setType(FranticUtils.getStringRepresentation(cards[i].getType()));
+            cardDTO[i].setValue(FranticUtils.getStringRepresentation(cards[i].getValue()));
+            cardDTO[i].setDisabled(disabled[i]);
         }
         MarketWindowDTO dto = new MarketWindowDTO(cardDTO);
-        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window" , dto);
+        webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window", dto);
     }
 
-    public void sendEndRound(String lobbyId, List<Player> players, int pointLimit) {
-        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), pointLimit);
+    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, String icon, String message) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        String admin = lobby.getCreator();
+
+        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, admin, pointLimit, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 
-    public void sendEndGame(String lobbyId, List<Player> players) {
+    public void sendEndGame(String lobbyId, List<Player> players, Map<String, Integer> changes, String icon, String message) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.setIsPlaying(false);
+        lobbyRepository.flush();
 
-        EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players));
+        EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players), changes, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-game", dto);
+    }
+
+    public void sendReconnect(String lobbyId) {
+        for (Player player : this.playerRepository.findByLobbyId(lobbyId)) {
+            log.info("Lobby " + lobbyId + ": Reconnect sent to Player " + player.getIdentity());
+
+            webSocketService.sendReconnect(player.getIdentity());
+        }
+    }
+
+    public void endGame(String lobbyId) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        lobby.removeAllPlayers();
     }
 
     private CardDTO cardToDTO(Card card) {

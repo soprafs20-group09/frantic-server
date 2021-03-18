@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class GameRound {
 
-    private final GameService gameService;
+    private GameService gameService;
     private final Game game;
     private final String lobbyId;
     private final List<Player> listOfPlayers;
@@ -24,6 +24,7 @@ public class GameRound {
     private final HashMap<Player, Integer> bombMap;
     private final List<Event> events;
     private final Pile<Card> drawStack;
+    private boolean isDrawStackLow;
     private final Pile<Card> discardPile;
     private Action currentAction;
     private boolean isProcessing;
@@ -31,10 +32,13 @@ public class GameRound {
     private boolean attackState;
     private boolean showCards;
     private List<Player> eventResponses;
-    private Map<Player, Card> surprisePartyMap;
+    private List<Chat> eventLogs;
+    private Map<Player, Integer> recessionMap;
+    private Map<Card, Player> surprisePartyMap;
     private Map<Player, List<Card>> christmasMap;
-    private Map<Player, Integer> gamblingManMap;
-    private List<Card> marketList;
+    private final Map<Player, Integer> gamblingManMap;
+    private Card[] marketArray;
+    private Boolean[] marketDisabledArray;
 
     public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
         this.game = game;
@@ -43,26 +47,35 @@ public class GameRound {
         this.currentPlayer = firstPlayer;
         this.gameService = GameService.getInstance();
         this.drawStack = new DrawStack();
+        this.isDrawStackLow = false;
         this.discardPile = new DiscardPile();
         this.timeBomb = false;
         this.bombMap = new HashMap<>();
         this.currentAction = null;
-        this.events = new ArrayList<>();
+        this.events = initEvents();
         this.isProcessing = false;
         this.turnIsRunning = false;
         this.attackState = false;
         this.showCards = false;
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
         this.surprisePartyMap = new HashMap<>();
         this.christmasMap = new HashMap<>();
         this.gamblingManMap = new HashMap<>();
-        this.marketList = new ArrayList<>();
     }
 
-    //creates Piles & player hands
-    public void initializeGameRound() {
-        initEvents();
+    //================================================================================
+    // Start Game / Turn
+    //================================================================================
 
+    public void startGameRound() {
+        initializeGameRound();
+        sendCompleteGameState();
+        startTurn();
+    }
+
+    private void initializeGameRound() {
         //move 7 initial cards to player hands
         for (Player player : this.listOfPlayers) {
             for (int i = 1; i <= 7; i++) {
@@ -77,31 +90,22 @@ public class GameRound {
         for (Player player : this.listOfPlayers) {
             this.bombMap.put(player, 0);
         }
-    }
-
-    public void sendCompleteGameState() {
-        for (Player player : this.listOfPlayers) {
-            this.gameService.sendHand(this.lobbyId, player);
-        }
-        sendGameState();
-    }
-
-    public void sendGameState() {
-        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
-    }
-
-    public void startGameRound() {
-        initializeGameRound();
-        sendCompleteGameState();
-        startTurn();
+        Chat chat = new EventChat(null, "The round has started!");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
     }
 
     private void prepareNewTurn() {
-        if (!isRoundOver()) {
+        if (this.drawStack.size() == 0) {
+            endProcess();
+            sendGameState();
+            FranticUtils.wait(1000);
+            onRoundOver(true);
+        }
+        else if (!isRoundOver()) {
             changePlayer();
             endProcess(); //makes sure that the previous player can not invoke methods until the current player has changed
-            if (timeBomb) {
-                this.bombMap.put(this.currentPlayer, bombMap.get(this.currentPlayer) + 1);
+            if (this.timeBomb) {
+                this.bombMap.put(this.currentPlayer, this.bombMap.get(this.currentPlayer) + 1);
                 if (isTimeBombExploding()) {
                     bombExploded();
                     return;
@@ -120,11 +124,14 @@ public class GameRound {
 
     private void startTurn() {
         this.turnIsRunning = true;
-        int timeBomb = Collections.max(this.bombMap.values());
-        if (timeBomb > 0) {
-            timeBomb = - timeBomb + 4;
+        int timeBombRounds = 0;
+        if (this.timeBomb) {
+            timeBombRounds = Collections.max(this.bombMap.values());
+            if (timeBombRounds > 0) {
+                timeBombRounds = -timeBombRounds + 4;
+            }
         }
-        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBomb);
+        this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
         this.gameService.sendTimer(this.lobbyId, 30);
         startTurnTimer(30);
@@ -135,6 +142,135 @@ public class GameRound {
         //the process is only started when no process is running
         if (player != null && player == this.currentPlayer && startProcess()) {
             finishTurn();
+        }
+    }
+
+    //================================================================================
+    // Play / Draw Cards
+    //================================================================================
+
+    public void playCard(String identity, int index) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null && startProcess() && index < player.getHandSize()) {
+            Card relevantCard = getRelevantCardOnDiscardPile();
+            Card cardToPlay = player.peekCard(index);
+            if (relevantCard != null && cardToPlay != null) {
+                if (attackState) {
+                    playCounterattack(player, relevantCard, cardToPlay, index);
+                }
+                else if (cardToPlay.isPlayableOn(relevantCard) &&
+                        (cardToPlay.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
+                    if (player == this.currentPlayer) {
+                        cardToPlay = player.popCard(index);
+                        this.discardPile.push(cardToPlay);
+                        this.gameService.sendHand(this.lobbyId, player);
+                        this.hasCurrentPlayerMadeMove = true;
+
+                        if (cardToPlay.getType() == Type.NUMBER) {
+                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
+                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
+                            this.gameService.sendChatMessage(this.lobbyId, chat);
+                            if (cardToPlay.getColor() == Color.BLACK) {
+                                prepareEvent();
+                            }
+                            else {
+                                finishTurn();
+                            }
+                        }
+                        else if (cardToPlay.getType() == Type.SPECIAL) {
+                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
+                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
+                            this.gameService.sendChatMessage(this.lobbyId, chat);
+                            if (cardToPlay.getValue() == Value.FUCKYOU) {
+                                finishTurn();
+                            }
+                            else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                                finishSecondChance();
+                            }
+                            else {
+                                sendGameState();
+                                this.timer.cancel();
+                                int seconds = 30;
+                                // fantastic four action is given more time to perform
+                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                                    seconds = 45;
+                                }
+                                this.gameService.sendTimer(this.lobbyId, seconds);
+                                this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                                startTurnTimer(seconds);
+                            }
+                        }
+                    }
+
+                    //nice try case
+                    else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
+                        playNiceTry(player, index);
+                    }
+                }
+            }
+            endProcess();
+        }
+    }
+
+    private synchronized void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
+        if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
+            for (Player target : this.currentAction.getTargets()) {
+                this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
+                if (counterAttacker.equals(target)) {
+                    this.timer.cancel();
+                    cardToPlay = counterAttacker.popCard(index);
+                    this.discardPile.push(cardToPlay);
+                    this.gameService.sendHand(this.lobbyId, counterAttacker);
+                    Chat chat = new EventChat("avatar:" + counterAttacker.getUsername(),
+                            counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + "!");
+                    this.gameService.sendChatMessage(this.lobbyId, chat);
+                    sendGameState();
+
+                    int seconds = 30;
+                    // fantastic four action is given more time to perform
+                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                        seconds = 45;
+                    }
+                    this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
+                    this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
+                    this.gameService.sendTimer(this.lobbyId, seconds);
+                    startCounterAttackTimer(seconds);
+                }
+            }
+        }
+    }
+
+    private void playNiceTry(Player niceTryPlayer, int index) {
+        this.timer.cancel();
+        Card cardToPlay = niceTryPlayer.popCard(index);
+        this.discardPile.push(cardToPlay);
+        this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
+        this.gameService.sendHand(this.lobbyId, niceTryPlayer);
+        Chat chat = new EventChat("avatar:" + niceTryPlayer.getUsername(),
+                niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + "!");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+
+        for (Player potentialWinner : this.listOfPlayers) {
+            if (potentialWinner.getHandSize() == 0) {
+                drawCardFromStack(potentialWinner, 3);
+                this.gameService.sendHand(this.lobbyId, potentialWinner);
+            }
+        }
+        sendGameState();
+        this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
+        this.gameService.sendTimer(this.lobbyId, 30);
+        startInterTurnTimer(30);
+    }
+
+    // in a turn, the current player can choose to draw a card
+
+    public void currentPlayerDrawCard(String identity) {
+        Player player = getPlayerByIdentity(identity);
+        if (player != null && player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
+            drawCardFromStack(this.currentPlayer, 1);
+            sendGameState();
+            this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), false, true);
+            this.hasCurrentPlayerMadeMove = true;
         }
     }
 
@@ -154,167 +290,13 @@ public class GameRound {
 
     private void finishSecondChance() {
         this.hasCurrentPlayerMadeMove = false;
-        this.gameService.sendHand(this.lobbyId, this.currentPlayer);
         sendGameState();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
     }
 
-    public void playCard(String identity, int index) {
-        Player player = getPlayerByIdentity(identity);
-        if (player != null && startProcess()) {
-            Card relevantCard = getRelevantCardOnDiscardPile();
-            Card cardToPlay = player.peekCard(index);
-            if (relevantCard != null && cardToPlay != null) {
-                if (attackState) {
-                    playCounterattack(player, relevantCard, cardToPlay, index);
-                }
-                else if (cardToPlay.isPlayableOn(relevantCard) &&
-                        (cardToPlay.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
-                    if (player == this.currentPlayer) {
-                        cardToPlay = player.popCard(index);
-                        this.discardPile.push(cardToPlay);
-                        this.gameService.sendHand(this.lobbyId, player);
-                        this.hasCurrentPlayerMadeMove = true;
-
-                        if (cardToPlay.getType() == Type.NUMBER) {
-                            Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfNumberCard(cardToPlay) + ".");
-                            this.gameService.sendChatMessage(this.lobbyId, chat);
-                            if (cardToPlay.getColor() == Color.BLACK) {
-                                prepareEvent();
-                            }
-                            else {
-                                finishTurn();
-                            }
-                        }
-                        else if (cardToPlay.getType() == Type.SPECIAL) {
-                            Chat chat = new Chat("event", "avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
-                            this.gameService.sendChatMessage(this.lobbyId, chat);
-                            if (cardToPlay.getValue() == Value.FUCKYOU) {
-                                finishTurn();
-                            }
-                            else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
-                                finishSecondChance();
-                            }
-                            else {
-                                sendGameState();
-                                this.gameService.sendTimer(this.lobbyId, 30);
-                                this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                startTurnTimer(30);
-                            }
-                        }
-                    }
-
-                    //nice try case
-                    else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
-                        playNiceTry(player, index);
-                    }
-                }
-            }
-            endProcess();
-        }
-    }
-
-    private void playCounterattack(Player counterAttacker, Card relevantCard, Card cardToPlay, int index) {
-        if (this.currentAction != null && this.currentAction.isCounterable() && cardToPlay.getValue() == Value.COUNTERATTACK) {
-            for (Player target : this.currentAction.getTargets()) {
-                if (counterAttacker.equals(target)) {
-                    this.timer.cancel();
-                    cardToPlay = counterAttacker.popCard(index);
-                    this.discardPile.push(cardToPlay);
-                    this.gameService.sendPlayable(this.lobbyId, counterAttacker, new int[0], false, false);
-                    this.gameService.sendHand(this.lobbyId, counterAttacker);
-                    Chat chat = new Chat("event", "avatar:" + counterAttacker.getUsername(),
-                            counterAttacker.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
-                    this.gameService.sendChatMessage(this.lobbyId, chat);
-                    sendGameState();
-
-                    this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-                    this.gameService.sendTimer(this.lobbyId, 30);
-                    startCounterAttackTimer(30);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void playNiceTry(Player niceTryPlayer, int index) {
-        this.timer.cancel();
-        Card cardToPlay = niceTryPlayer.popCard(index);
-        this.discardPile.push(cardToPlay);
-        this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
-        this.gameService.sendHand(this.lobbyId, niceTryPlayer);
-        Chat chat = new Chat("event", "avatar:" + niceTryPlayer.getUsername(),
-                niceTryPlayer.getUsername() + " played " + FranticUtils.getStringRepresentation(cardToPlay.getValue()) + ".");
-        this.gameService.sendChatMessage(this.lobbyId, chat);
-
-        for (Player potentialWinner : this.listOfPlayers) {
-            if (potentialWinner.getHandSize() == 0) {
-                drawCardFromStack(potentialWinner, 3);
-                this.gameService.sendHand(this.lobbyId, potentialWinner);
-            }
-        }
-        sendGameState();
-        this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
-        this.gameService.sendTimer(this.lobbyId, 30);
-        startInterTurnTimer(30);
-    }
-
-    // in a turn, the current player can choose to draw a card
-    public void currentPlayerDrawCard(String identity) {
-        Player player = getPlayerByIdentity(identity);
-        if (player != null && player == currentPlayer && !this.hasCurrentPlayerMadeMove) {
-            drawCardFromStack(this.currentPlayer, 1);
-            sendGameState();
-            this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), false, true);
-            this.hasCurrentPlayerMadeMove = true;
-        }
-    }
-
-    // moves #amount cards from Stack to players hand
-    public void drawCardFromStack(Player player, int amount) {
-        for (int i = 1; i <= amount; i++) {
-            //if the drawStack is empty and a player has to draw a card, the gameround is over
-            if (this.drawStack.size() <= 0) {
-                this.timer.cancel();
-                onRoundOver();
-            }
-            player.pushCardToHand(this.drawStack.pop());
-        }
-        Chat chat;
-        if (amount == 1) {
-            chat = new Chat("event", "avatar:" + player.getUsername(),
-                    player.getUsername() + " drew a card.");
-        }
-        else {
-            chat = new Chat("event", "avatar:" + player.getUsername(),
-                    player.getUsername() + " drew " + amount + " cards");
-        }
-        this.gameService.sendChatMessage(this.lobbyId, chat);
-        this.gameService.sendDrawAnimation(this.lobbyId, amount);
-        this.gameService.sendHand(this.lobbyId, player);
-    }
-
-    //if the fuck-you card is the uppermost card, then the second card is considered to evaluate
-    private Card getRelevantCardOnDiscardPile() {
-        Card card = this.discardPile.peek();
-        if (card == null) {
-            return null;
-        }
-        if (card.getValue() == Value.FUCKYOU && this.discardPile.size() > 1) {
-            return this.discardPile.peekN(2);
-        }
-        if (card.getValue() == Value.COUNTERATTACK) {
-            //search card that performed action
-            for (int n = 2; n <= 5; n++) {
-                if (this.discardPile.size() >= n && this.discardPile.peekN(n).getValue() != Value.COUNTERATTACK) {
-                    return this.discardPile.peekN(n);
-                }
-            }
-        }
-        return this.discardPile.peek();
-    }
+    //================================================================================
+    // Action Handling
+    //================================================================================
 
     public void storeSkipAction(String identity, String username) {
         Player initiator = getPlayerByIdentity(identity);
@@ -404,12 +386,12 @@ public class GameRound {
         this.attackState = false;
         List<Chat> chat = this.currentAction.perform();
         this.gameService.sendChatMessage(this.lobbyId, chat);
-        Player initiator = currentAction.getInitiator();
         Player[] targets = currentAction.getTargets();
         sendGameState();
-        this.gameService.sendHand(this.lobbyId, initiator);
+        this.gameService.sendHand(this.lobbyId, currentAction.getInitiator());
         if (targets != null) {
             for (Player target : targets) {
+                this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
                 this.gameService.sendHand(this.lobbyId, target);
             }
         }
@@ -429,7 +411,7 @@ public class GameRound {
         String attacker = this.currentAction.getInitiator().getUsername();
 
         if (!targets.isEmpty()) {
-            Chat chat = new Chat("event", "special:" + attackType,
+            Chat chat = new EventChat("special:" + attackType,
                     attacker + " is attacking " + String.join(", ", targetUsernames) + ".");
             this.gameService.sendChatMessage(this.lobbyId, chat);
         }
@@ -458,57 +440,67 @@ public class GameRound {
         startNiceTryTimer(5);
     }
 
+    //================================================================================
+    // Event Handling
+    //================================================================================
+
     private void prepareEvent() {
         this.timer.cancel();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         sendGameState();
-        try {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException ignored) {
-        }
+
+        FranticUtils.wait(1000);
+
         Event event = this.events.get(0);
         this.gameService.sendEvent(this.lobbyId, event);
+        this.gameService.sendTimer(this.lobbyId, 11);
         startAnimationTimer(11);
     }
 
     private void performEvent() {
         Event event = this.events.remove(0);
-        Chat chat = new Chat("event", "event:" + event.getName(), event.getMessage());
+        Chat chat = new EventChat("event:" + event.getName(), event.getMessage());
         this.gameService.sendChatMessage(this.lobbyId, chat);
         event.performEvent();
     }
 
-    public void performRecession(String identity, int[] cards) {
+    public synchronized void prepareRecession(String identity, int[] cards) {
         Player player = getPlayerByIdentity(identity);
         if (player != null && cards.length > 0) {
             this.eventResponses.add(player);
+            Arrays.sort(cards);
             for (int i = cards.length - 1; i >= 0; i--) {
                 player.popCard(cards[i]);
             }
-            Chat chat;
-            if (cards.length == 1) {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards 1 card.");
-            }
-            else {
-                chat = new Chat("event", "event:recession", player.getUsername() + " discards " + cards.length + " cards.");
-            }
-            this.gameService.sendChatMessage(this.lobbyId, chat);
-            sendCompleteGameState();
+            this.recessionMap.put(player, cards.length);
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
-            this.timer.cancel();
-            finishTurn();
-            this.eventResponses = new ArrayList<>();
+            performRecession();
         }
     }
 
-    public void prepareSurpriseParty(String identity, int card, String targetUsername) {
+    private void performRecession() {
+        this.timer.cancel();
+        List<Chat> chat = new ArrayList<>();
+        for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
+            chat.add(new EventChat("event:recession",
+                    entry.getKey().getUsername() + " discards " + entry.getValue() + (entry.getValue() == 1 ? " card." : " cards.")));
+        }
+
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        sendCompleteGameState();
+        this.eventResponses = new ArrayList<>();
+        this.recessionMap = new HashMap<>();
+        finishTurn();
+    }
+
+    public synchronized void prepareSurpriseParty(String identity, int card, String targetUsername) {
         Player player = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(targetUsername);
         if (player != null && target != null) {
             this.eventResponses.add(player);
-            this.surprisePartyMap.put(target, player.popCard(card));
+            this.surprisePartyMap.put(player.popCard(card), target);
+            this.eventLogs.add(new EventChat("event:surprise-party", player.getUsername() + " gave " + target.getUsername() + " a card."));
         }
         if (this.eventResponses.size() == this.listOfPlayers.size()) {
             performSurpriseParty();
@@ -517,26 +509,39 @@ public class GameRound {
 
     private void performSurpriseParty() {
         timer.cancel();
-        for (Map.Entry<Player, Card> entry : this.surprisePartyMap.entrySet()) {
-            entry.getKey().pushCardToHand(entry.getValue());
+        for (Map.Entry<Card, Player> entry : this.surprisePartyMap.entrySet()) {
+            entry.getValue().pushCardToHand(entry.getKey());
         }
+        this.gameService.sendChatMessage(this.lobbyId, this.eventLogs);
         sendCompleteGameState();
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
         this.surprisePartyMap = new HashMap<>();
         finishTurn();
     }
 
-    public void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
+    public synchronized void prepareMerryChristmas(String identity, Map<String, Integer[]> targets) {
         Player player = getPlayerByIdentity(identity);
         if (player != null) {
             this.eventResponses.add(player);
             for (Map.Entry<String, Integer[]> entry : targets.entrySet()) {
                 Player target = getPlayerByUsername(entry.getKey());
-                List<Card> cards = new ArrayList<>();
-                for (int i = 0; i < entry.getValue().length; i++) {
-                    cards.add(player.peekCard(entry.getValue()[i]));
+                if (target != null) {
+                    List<Card> cards = new ArrayList<>();
+                    for (int i = 0; i < entry.getValue().length; i++) {
+                        cards.add(player.peekCard(entry.getValue()[i]));
+                    }
+                    this.eventLogs.add(new EventChat("event:merry-christmas",
+                            player.getUsername() + " gave " + target.getUsername() + " " + cards.size() + (cards.size() == 1 ? " card." : " cards.")));
+                    if (this.christmasMap.containsKey(target)) {
+                        List<Card> previous = this.christmasMap.get(target);
+                        previous.addAll(cards);
+                        this.christmasMap.put(target, previous);
+                    }
+                    else {
+                        this.christmasMap.put(target, cards);
+                    }
                 }
-                this.christmasMap.put(target, cards);
             }
             player.clearHand();
         }
@@ -555,38 +560,58 @@ public class GameRound {
             }
         }
         this.gameService.sendAnimationSpeed(this.lobbyId, 500);
+        this.gameService.sendChatMessage(this.lobbyId, this.eventLogs);
         sendCompleteGameState();
         this.eventResponses = new ArrayList<>();
+        this.eventLogs = new ArrayList<>();
         this.christmasMap = new HashMap<>();
         finishTurn();
     }
 
     public void prepareMarket(String identity, int card) {
         Player player = getPlayerByIdentity(identity);
-        if (player != null) {
-            Card choice = this.marketList.remove(card);
+        int numOfPlayers = this.listOfPlayers.size();
+        int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
+        int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
+        Player expectedPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
+        if (player != null && player == expectedPlayer) {
+            this.timer.cancel();
+            Card choice = this.marketArray[card];
+            this.marketDisabledArray[card] = true;
             performMarket(player, choice);
         }
     }
 
     private void prepareRandomMarket(Player player) {
-        Card choice = this.marketList.remove(FranticUtils.random.nextInt(this.marketList.size()));
-        performMarket(player, choice);
+        int randomCard = 0;
+        while (this.marketDisabledArray[randomCard]) {
+            randomCard++;
+        }
+        if (randomCard < this.marketArray.length) {
+            Card choice = this.marketArray[randomCard];
+            this.marketDisabledArray[randomCard] = true;
+            performMarket(player, choice);
+        }
     }
 
     private void performMarket(Player player, Card choice) {
         player.pushCardToHand(choice);
+        Chat chat = new EventChat("event:market", player.getUsername() + " took " + FranticUtils.getStringRepresentationOfCard(choice) + ".");
+        this.gameService.sendChatMessage(this.lobbyId, chat);
         this.sendCompleteGameState();
 
-        if (!this.marketList.isEmpty()) {
+        if (countMarketLeft() > 0) {
             int numOfPlayers = this.listOfPlayers.size();
             int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
-            Player nextPlayer = this.listOfPlayers.get((initiatorIndex + 1) % numOfPlayers);
-            this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketList);
+            int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
+            Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
+            this.gameService.sendAttackTurn(this.lobbyId, nextPlayer.getUsername());
+            this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketArray, this.marketDisabledArray);
             this.gameService.sendTimer(this.lobbyId, 15);
+            startMarketTimer(15, nextPlayer);
         }
         else {
-            this.marketList = new ArrayList<>();
+            this.marketArray = new Card[0];
             finishTurn();
         }
     }
@@ -603,14 +628,20 @@ public class GameRound {
     }
 
     private void performGamblingMan() {
+        List<Chat> chat = new ArrayList<>();
         Value max = Value.ONE;
         List<Player> highest = new ArrayList<>();
         for (Player player : this.listOfPlayers) {
             if (this.gamblingManMap.containsKey(player)) {
                 Integer cardIndex = this.gamblingManMap.get(player);
                 Card card = player.peekCard(cardIndex);
+                chat.add(new EventChat("event:gambling-man", player.getUsername() + " bet " + FranticUtils.getStringRepresentation(card.getValue()) + "."));
                 if (card.getValue().ordinal() > max.ordinal()) {
                     max = card.getValue();
+                    highest.clear();
+                    highest.add(player);
+                }
+                else if (card.getValue().ordinal() == max.ordinal()) {
                     highest.add(player);
                 }
             }
@@ -622,7 +653,7 @@ public class GameRound {
         else {
             loser = highest.get(0);
         }
-        Chat chat = new Chat("event", "event:gambling-man", loser.getUsername() + " gambles wrong and collects " + this.gamblingManMap.size() + " cards.");
+        chat.add(new EventChat("event:gambling-man", loser.getUsername() + " gambled wrong and collected " + this.gamblingManMap.size() + " cards."));
         this.gameService.sendChatMessage(this.lobbyId, chat);
         for (Map.Entry<Player, Integer> entry : this.gamblingManMap.entrySet()) {
             if (!entry.getKey().equals(loser)) {
@@ -665,33 +696,34 @@ public class GameRound {
         this.gamblingManMap.put(player, card);
     }
 
-    public void setMarketList(List<Card> cards) {
-        this.marketList = cards;
+    public void setMarketList(Card[] cards, Boolean[] disabled) {
+        this.marketArray = cards;
+        this.marketDisabledArray = disabled;
+    }
+
+    public int countMarketLeft() {
+        int c = 0;
+        for (Boolean aBoolean : this.marketDisabledArray) {
+            if (!aBoolean) {
+                c++;
+            }
+        }
+        return c;
     }
 
     public void setTimeBomb() {
         this.timeBomb = true;
     }
 
-    private void changePlayer() {
-        if (!this.listOfPlayers.isEmpty()) {
-            int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
-            playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
-            this.currentPlayer = this.listOfPlayers.get(playersIndex);
-
-            //go to the next player, if the current player is skipped
-            if (this.currentPlayer.isBlocked()) {
-                Chat chat = new Chat("event", "special:skip", this.currentPlayer.getUsername()
-                        + " is skipped.");
-                this.gameService.sendChatMessage(this.lobbyId, chat);
-                this.currentPlayer.setBlocked(false);
-                changePlayer();
-            }
-        }
+    public void setShowCards(boolean show) {
+        this.showCards = show;
+        sendGameState();
     }
 
-    //a Gameround is over, if someone has 0 cards in his hand (and no nice-try was played)
-    // or in case of the time-bomb event, if the 3 rounds are played
+    //================================================================================
+    // End Of Round
+    //================================================================================
+
     private boolean isRoundOver() {
         return (getHandSizes().containsValue(0));
     }
@@ -700,22 +732,30 @@ public class GameRound {
         return this.bombMap.get(this.currentPlayer) >= 4;
     }
 
-    public void onRoundOver() {
+    public void onRoundOver(boolean emptyStack) {
         this.timer.cancel();
         int maxPoints = 0;
-        Player playerWithMaxPoints = this.currentPlayer; //to make sure playerWithMaxPoints is initialized in all cases
+        Player playerWithMaxPoints = this.currentPlayer;
+        List<Player> finishedPlayers = new ArrayList<>();
+        Map<String, Integer> changes = new HashMap<>();
         for (Player player : listOfPlayers) {
             player.setBlocked(false);
+            if (player.getHandSize() == 0) {
+                finishedPlayers.add(player);
+            }
 
             int playersPoints = player.calculatePoints();
             if (!this.timeBomb) {
+                changes.put(player.getUsername(), playersPoints);
                 player.setPoints(player.getPoints() + playersPoints);
             }
             else {
                 if (playersPoints == 0) {
+                    changes.put(player.getUsername(), -10);
                     player.setPoints(player.getPoints() - 10);
                 }
                 else {
+                    changes.put(player.getUsername(), playersPoints + 10);
                     player.setPoints(player.getPoints() + playersPoints + 10);
                 }
             }
@@ -725,14 +765,37 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String icon = null;
+        String message = "";
+        int playersToCome = finishedPlayers.size();
+        for (Player player : finishedPlayers) {
+            message += player.getUsername();
+            playersToCome--;
+            if (playersToCome > 0) {
+                message += ", ";
+            }
+        }
+
+        if (this.timeBomb) {
+            icon = "event:time-bomb";
+            message += " defused the bomb!";
+        }
+        else if (emptyStack) {
+            message = "The card stack is empty!";
+        }
+        else {
+            message += " played " + (finishedPlayers.size() != 1 ? "their last card!" : "his/her last card!");
+        }
+        this.game.endGameRound(playerWithMaxPoints, changes, icon, message);
     }
 
     private void bombExploded() {
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer;
+        Map<String, Integer> changes = new HashMap<>();
         for (Player player : listOfPlayers) {
             int playersPoints = player.calculatePoints();
+            changes.put(player.getUsername(), 2 * playersPoints);
             player.setPoints(player.getPoints() + 2 * playersPoints);
 
             if (playersPoints >= maxPoints) {
@@ -740,7 +803,108 @@ public class GameRound {
                 playerWithMaxPoints = player;
             }
         }
-        this.game.endGameRound(playerWithMaxPoints);
+        String message = "The bomb exploded!";
+        this.game.endGameRound(playerWithMaxPoints, changes, "event:time-bomb", message);
+    }
+
+    //================================================================================
+    // Accessors
+    //================================================================================
+
+    public List<Player> getListOfPlayers() {
+        return this.listOfPlayers;
+    }
+
+    public Player getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    public Action getCurrentAction() {
+        return this.currentAction;
+    }
+
+    public GameService getGameService() {
+        return this.gameService;
+    }
+
+    public String getLobbyId() {
+        return this.lobbyId;
+    }
+
+    public Pile<Card> getDiscardPile() {
+        return this.discardPile;
+    }
+
+    public Pile<Card> getDrawStack() {
+        return this.drawStack;
+    }
+
+    //================================================================================
+    // Utility Methods
+    //================================================================================
+
+    private void changePlayer() {
+        if (!this.listOfPlayers.isEmpty()) {
+            int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+            playersIndex = (playersIndex + 1) % this.listOfPlayers.size();
+            this.currentPlayer = this.listOfPlayers.get(playersIndex);
+
+            //go to the next player, if the current player is skipped
+            if (this.currentPlayer.isBlocked()) {
+                this.gameService.sendOverlay(this.lobbyId, this.currentPlayer, "special:skip", "You are skipped!", null, 2);
+                Chat chat = new EventChat("special:skip", this.currentPlayer.getUsername()
+                        + " is skipped.");
+                this.gameService.sendChatMessage(this.lobbyId, chat);
+                this.currentPlayer.setBlocked(false);
+                changePlayer();
+            }
+        }
+    }
+
+    // moves #amount cards from Stack to players hand
+    public void drawCardFromStack(Player player, int amount) {
+        for (int i = 1; i <= amount; i++) {
+            //if the drawStack is empty and a player has to draw a card, the gameround is over
+            if (this.drawStack.size() > 0) {
+                player.pushCardToHand(this.drawStack.pop());
+            }
+            else {
+                this.timer.cancel();
+                onRoundOver(true);
+            }
+        }
+        Chat chat;
+        if (amount == 1) {
+            chat = new EventChat("avatar:" + player.getUsername(),
+                    player.getUsername() + " drew a card.");
+        }
+        else {
+            chat = new EventChat("avatar:" + player.getUsername(),
+                    player.getUsername() + " drew " + amount + " cards.");
+        }
+        this.gameService.sendChatMessage(this.lobbyId, chat);
+        this.gameService.sendDrawAnimation(this.lobbyId, amount);
+        this.gameService.sendHand(this.lobbyId, player);
+    }
+
+    private Card getRelevantCardOnDiscardPile() {
+        Card card = this.discardPile.peek();
+        if (card == null) {
+            return null;
+        }
+        //if the fuck-you card is the uppermost card, then the second card is considered to evaluate
+        if (card.getValue() == Value.FUCKYOU && this.discardPile.size() > 1) {
+            return this.discardPile.peekN(2);
+        }
+        if (card.getValue() == Value.COUNTERATTACK) {
+            //search card that performed action
+            for (int n = 2; n <= 5; n++) {
+                if (this.discardPile.size() >= n && this.discardPile.peekN(n).getValue() != Value.COUNTERATTACK) {
+                    return this.discardPile.peekN(n);
+                }
+            }
+        }
+        return this.discardPile.peek();
     }
 
     public void playerLostConnection(Player player) {
@@ -758,6 +922,60 @@ public class GameRound {
         }
     }
 
+    //Helper method to make sure only one action (invoked by a player) is processed at a time
+    private synchronized boolean startProcess() {
+        if (this.isProcessing) {
+            return false;
+        }
+        else {
+            this.isProcessing = true;
+            return true;
+        }
+    }
+
+    private void sendGameState() {
+        this.gameService.sendGameState(this.lobbyId, this.discardPile.peek(), this.listOfPlayers, this.showCards);
+
+        if (!this.isDrawStackLow && this.drawStack.size() <= 10) {
+            Chat chat = new EventChat("misc:warning", "There are only " + this.drawStack.size() + " cards left.");
+            this.gameService.sendChatMessage(this.lobbyId, chat);
+            this.isDrawStackLow = true;
+        }
+    }
+
+    public void sendCompleteGameState() {
+        for (Player player : this.listOfPlayers) {
+            this.gameService.sendHand(this.lobbyId, player);
+        }
+        sendGameState();
+    }
+
+    private synchronized void endProcess() {
+        this.isProcessing = false;
+    }
+
+    private Player getPlayerByIdentity(String identity) {
+        for (Player p : listOfPlayers) {
+            if (p.getIdentity().equals(identity)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private Player getPlayerByUsername(String username) {
+        for (Player p : listOfPlayers) {
+            if (p.getUsername().equals(username)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    //================================================================================
+    // Timers
+    //================================================================================
+
     public void startTurnTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
@@ -770,7 +988,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startCounterAttackTimer(int seconds) {
+    private void startCounterAttackTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -782,20 +1000,20 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startNiceTryTimer(int seconds) {
+    private void startNiceTryTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                onRoundOver();
+                onRoundOver(false);
             }
         };
         this.timer.schedule(timerTask, milliseconds);
     }
 
     //needed for color wish after the nice try was played
-    public void startInterTurnTimer(int seconds) {
+    private void startInterTurnTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -807,7 +1025,7 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    public void startAnimationTimer(int seconds) {
+    private void startAnimationTimer(int seconds) {
         int milliseconds = seconds * 1000;
         this.timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -892,95 +1110,41 @@ public class GameRound {
         this.timer.schedule(timerTask, milliseconds);
     }
 
-    //Helper method to make sure only one action (invoked by a player) is processed at a time
-    private synchronized boolean startProcess() {
-        if (this.isProcessing) {
-            return false;
-        }
-        else {
-            this.isProcessing = true;
-            return true;
-        }
-    }
+    //================================================================================
+    // Event Initialization
+    //================================================================================
 
-    private synchronized void endProcess() {
-        this.isProcessing = false;
-    }
-
-    private Player getPlayerByIdentity(String identity) {
-        for (Player p : listOfPlayers) {
-            if (p.getIdentity().equals(identity)) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    private Player getPlayerByUsername(String username) {
-        for (Player p : listOfPlayers) {
-            if (p.getUsername().equals(username)) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    public void setShowCards(boolean show) {
-        this.showCards = show;
-        sendGameState();
-    }
-
-    public List<Player> getListOfPlayers() {
-        return this.listOfPlayers;
-    }
-
-    public Player getCurrentPlayer() {
-        return this.currentPlayer;
-    }
-
-    public GameService getGameService() {
-        return this.gameService;
-    }
-
-    public String getLobbyId() {
-        return this.lobbyId;
-    }
-
-    public Pile<Card> getDiscardPile() {
-        return this.discardPile;
-    }
-
-    public Pile<Card> getDrawStack() {
-        return this.drawStack;
-    }
-
-    public int getDrawStackSize() {
-        return this.drawStack.size();
-    }
-
-    private void initEvents() {
+    private List<Event> initEvents() {
         //initialize all Events and add them to the list
-        this.events.add(new CharityEvent(this));
-        this.events.add(new CommunismEvent(this));
-        this.events.add(new DoomsdayEvent(this.game, this));
-        this.events.add(new EarthquakeEvent(this));
-        this.events.add(new ExpansionEvent(this));
-        this.events.add(new FinishLineEvent(game, this));
-        this.events.add(new FridayTheThirteenthEvent(this));
-        this.events.add(new GamblingManEvent(this));
-        this.events.add(new MarketEvent(this));
-        this.events.add(new MerryChristmasEvent(this));
-        this.events.add(new MatingSeasonEvent(this));
-        this.events.add(new MexicanStandoffEvent(this));
-        this.events.add(new RecessionEvent(this));
-        this.events.add(new RobinHoodEvent(this));
-        this.events.add(new SurprisePartyEvent(this));
-        this.events.add(new TheAllSeeingEyeEvent(this));
-        this.events.add(new ThirdTimeLuckyEvent(this));
-        this.events.add(new TimeBombEvent(this));
-        this.events.add(new TornadoEvent(this));
-        this.events.add(new VandalismEvent(this));
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(new CharityEvent(this));
+        eventList.add(new CommunismEvent(this));
+        eventList.add(new DoomsdayEvent(this.game, this));
+        eventList.add(new EarthquakeEvent(this));
+        eventList.add(new ExpansionEvent(this));
+        eventList.add(new FinishLineEvent(game, this));
+        eventList.add(new FridayTheThirteenthEvent(this));
+        eventList.add(new GamblingManEvent(this));
+        eventList.add(new MarketEvent(this));
+        eventList.add(new MerryChristmasEvent(this));
+        eventList.add(new MatingSeasonEvent(this));
+        eventList.add(new MexicanStandoffEvent(this));
+        eventList.add(new RecessionEvent(this));
+        eventList.add(new RobinHoodEvent(this));
+        eventList.add(new SurprisePartyEvent(this));
+        eventList.add(new TheAllSeeingEyeEvent(this));
+        eventList.add(new ThirdTimeLuckyEvent(this));
+        eventList.add(new TimeBombEvent(this));
+        eventList.add(new TornadoEvent(this));
+        eventList.add(new VandalismEvent(this));
 
-        Collections.shuffle(this.events);
+        Collections.shuffle(eventList);
+        Collections.shuffle(eventList);
+        return eventList;
+    }
+
+    //needed for testing
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
     }
 }

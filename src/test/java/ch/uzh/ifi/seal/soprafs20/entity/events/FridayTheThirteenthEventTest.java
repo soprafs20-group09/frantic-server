@@ -27,7 +27,7 @@ public class FridayTheThirteenthEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -36,13 +36,13 @@ public class FridayTheThirteenthEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         FridayTheThirteenthEvent fridayTheThirteenth = new FridayTheThirteenthEvent(this.gameRound);
         assertEquals("friday-the-13th", fridayTheThirteenth.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         FridayTheThirteenthEvent fridayTheThirteenth = new FridayTheThirteenthEvent(this.gameRound);
         assertEquals("It’s Friday, the Thirteenth. A hook-handed murderer is among us! But just in the movies, it’s a totally boring, normal Friday, nothing weird happens. The game round continues without further ado.", fridayTheThirteenth.getMessage());
     }

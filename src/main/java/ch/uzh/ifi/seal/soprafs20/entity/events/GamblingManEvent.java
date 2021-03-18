@@ -37,6 +37,8 @@ public class GamblingManEvent implements Event {
                 relevant = this.discardPile.peekN(++index).getColor();
             }
             else {
+                Chat chat = new EventChat("event:gambling-man", "There is no gambling today.");
+                this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
                 this.gameRound.finishTurn();
                 return;
             }
@@ -62,11 +64,13 @@ public class GamblingManEvent implements Event {
                 this.gameRound.drawCardFromStack(player, 2);
             }
         }
-        if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size()) {
+        if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size() - 1) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
             this.gameRound.startGamblingManTimer(seconds);
         }
         else {
+            Chat chat = new EventChat("event:gambling-man", "Too few players were able to gamble.");
+            this.gameService.sendChatMessage(this.gameRound.getLobbyId(), chat);
             this.gameRound.clearEventResponses();
             this.gameRound.finishTurn();
         }

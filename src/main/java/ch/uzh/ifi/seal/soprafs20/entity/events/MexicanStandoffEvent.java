@@ -1,9 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MexicanStandoffEvent implements Event {
@@ -28,8 +28,8 @@ public class MexicanStandoffEvent implements Event {
             for (int i = player.getHandSize() - 1; i >= 0; i--) {
                 player.popCard(i);
             }
-            this.gameService.sendHand(this.gameRound.getLobbyId(), player);
         }
+        this.gameRound.sendCompleteGameState();
 
         this.gameService.sendAnimationSpeed(this.gameRound.getLobbyId(), 500);
         for (Player player : this.listOfPlayers) {

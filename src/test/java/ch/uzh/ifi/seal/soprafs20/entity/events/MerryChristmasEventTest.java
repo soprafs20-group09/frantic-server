@@ -25,7 +25,7 @@ public class MerryChristmasEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -34,13 +34,13 @@ public class MerryChristmasEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         MerryChristmasEvent merryChristmas = new MerryChristmasEvent(this.gameRound);
         assertEquals("merry-christmas", merryChristmas.getName());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Mockito.doNothing().when(gameService).sendEventActionResponse(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
 
@@ -51,7 +51,7 @@ public class MerryChristmasEventTest {
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         MerryChristmasEvent merryChristmas = new MerryChristmasEvent(this.gameRound);
         assertEquals("Merry christmas everyone! It's that time of the year again. Give presents to your loved ones!", merryChristmas.getMessage());
     }

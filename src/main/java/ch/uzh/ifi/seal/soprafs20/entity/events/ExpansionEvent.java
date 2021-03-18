@@ -1,23 +1,18 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
-import ch.uzh.ifi.seal.soprafs20.service.GameService;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ExpansionEvent implements Event {
 
     private final GameRound gameRound;
-    private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player currentPlayer;
 
     public ExpansionEvent(GameRound gameRound) {
         this.gameRound = gameRound;
-        this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.currentPlayer = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
@@ -25,6 +20,8 @@ public class ExpansionEvent implements Event {
     }
 
     public void performEvent() {
+        Player currentPlayer = this.gameRound.getCurrentPlayer();
+
         int numOfPlayers = this.listOfPlayers.size();
         int initiatorIndex = this.listOfPlayers.indexOf(currentPlayer);
 

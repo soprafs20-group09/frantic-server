@@ -26,7 +26,7 @@ public class CommunismEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,19 +35,19 @@ public class CommunismEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         CommunismEvent communism = new CommunismEvent(this.gameRound);
         assertEquals("communism", communism.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         CommunismEvent communism = new CommunismEvent(this.gameRound);
         assertEquals("Everybody is equal, now isn't that great?", communism.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 0));
         this.listOfPlayers.add(player1);

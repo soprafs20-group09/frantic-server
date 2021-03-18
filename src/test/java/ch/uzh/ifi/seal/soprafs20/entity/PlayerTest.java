@@ -1,158 +1,225 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.Type;
+import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
 
-    @Mock
     private Player testPlayer;
 
     private Card someCard;
 
     @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
+    void setup() {
+        testPlayer = new Player();
+        someCard = new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 0);
 
-        Mockito.when(testPlayer.getId()).thenReturn(1L);
-        Mockito.when(testPlayer.getUsername()).thenReturn("testPlayer");
-        Mockito.when(testPlayer.getIdentity()).thenReturn("FANCY_IDENTITY_FOR_TEST");
-        Mockito.when(testPlayer.getLobbyId()).thenReturn("I like bread");
-        Mockito.when(testPlayer.getPoints()).thenReturn(12);
-        Mockito.when(testPlayer.popCard(0)).thenReturn(someCard);
-        Mockito.when(testPlayer.isBlocked()).thenReturn(false);
-        Mockito.when(testPlayer.isAdmin()).thenReturn(false);
-        Mockito.when(testPlayer.getHandSize()).thenReturn(1);
-        Mockito.when(testPlayer.calculatePoints()).thenReturn(1);
+        testPlayer.setId(1L);
+        testPlayer.setUsername("testPlayer");
+        testPlayer.setIdentity("FANCY_IDENTITY_FOR_TEST");
+        testPlayer.setLobbyId("I like bread");
+        testPlayer.setPoints(12);
+        testPlayer.setBlocked(false);
+        testPlayer.setAdmin(false);
+        testPlayer.pushCardToHand(someCard);
     }
 
     @Test
-    public void getIdTest() {
+    void getIdTest() {
         assertEquals(1L, testPlayer.getId());
     }
 
     @Test
-    public void setIdTest() {
-        Mockito.when(testPlayer.getId()).thenReturn(2L);
+    void setIdTest() {
+        assertEquals(1L, testPlayer.getId());
         testPlayer.setId(2L);
         assertEquals(2L, testPlayer.getId());
     }
 
     @Test
-    public void getUsernameTest() {
+    void getUsernameTest() {
         assertEquals("testPlayer", testPlayer.getUsername());
     }
 
     @Test
-    public void setUsernameTest() {
-        Mockito.when(testPlayer.getUsername()).thenReturn("SuperDuckling");
+    void setUsernameTest() {
+        assertEquals("testPlayer", testPlayer.getUsername());
         testPlayer.setUsername("SuperDuckling");
         assertEquals("SuperDuckling", testPlayer.getUsername());
     }
 
     @Test
-    public void getIdentityTest() {
+    void getIdentityTest() {
         assertEquals("FANCY_IDENTITY_FOR_TEST", testPlayer.getIdentity());
     }
 
     @Test
-    public void setIdentityTest() {
-        Mockito.when(testPlayer.getIdentity()).thenReturn("SUPER_SECRET_IDENTITY");
+    void setIdentityTest() {
+        assertEquals("FANCY_IDENTITY_FOR_TEST", testPlayer.getIdentity());
         testPlayer.setIdentity("SUPER_SECRET_IDENTITY");
         assertEquals("SUPER_SECRET_IDENTITY", testPlayer.getIdentity());
     }
 
     @Test
-    public void getLobbyIdTest() {
+    void getLobbyIdTest() {
         assertEquals("I like bread", testPlayer.getLobbyId());
     }
 
     @Test
-    public void setLobbyIdTest() {
-        Mockito.when(testPlayer.getLobbyId()).thenReturn("Pros only");
+    void setLobbyIdTest() {
+        assertEquals("I like bread", testPlayer.getLobbyId());
         testPlayer.setLobbyId("Pros only");
         assertEquals("Pros only", testPlayer.getLobbyId());
     }
 
     @Test
-    public void getPointsTest() {
+    void getPointsTest() {
         assertEquals(12, testPlayer.getPoints());
     }
 
     @Test
-    public void setPointsTest() {
-        Mockito.when(testPlayer.getPoints()).thenReturn(15);
+    void setPointsTest() {
+        assertEquals(12, testPlayer.getPoints());
         testPlayer.setPoints(15);
         assertEquals(15, testPlayer.getPoints());
     }
 
     @Test
-    public void popCardTest() {
-        Mockito.when(testPlayer.getHandSize()).thenReturn(0);
+    void popCardTest() {
         assertEquals(someCard, testPlayer.popCard(0));
         assertEquals(0, testPlayer.getHandSize());
     }
 
     @Test
-    public void pushCardToHandTest() {
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        assertEquals(someCard, testPlayer.popCard(0));
+    void pushCardToHandTest() {
         assertEquals(1, testPlayer.getHandSize());
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
+        assertEquals(3, testPlayer.getHandSize());
     }
 
     @Test
-    public void isBlockedTest() {
+    void isBlockedTest() {
         assertFalse(testPlayer.isBlocked());
     }
 
     @Test
-    public void setBlockedTest() {
-        Mockito.when(testPlayer.isBlocked()).thenReturn(true);
+    void setBlockedTest() {
+        assertFalse(testPlayer.isBlocked());
         testPlayer.setBlocked(true);
         assertTrue(testPlayer.isBlocked());
     }
 
     @Test
-    public void getHandSizeTest() {
+    void getHandSizeTest() {
         assertEquals(1, testPlayer.getHandSize());
     }
 
     @Test
-    public void isAdminTest() {
+    void isAdminTest() {
         assertFalse(testPlayer.isAdmin());
     }
 
     @Test
-    public void setAdminTest() {
-        Mockito.when(testPlayer.isAdmin()).thenReturn(true);
+    void setAdminTest() {
+        assertFalse(testPlayer.isAdmin());
         testPlayer.setAdmin(true);
         assertTrue(testPlayer.isAdmin());
     }
 
-    //TODO: hasNiceTryTest() & hasCounterAttackTest()
-
     @Test
-    public void calculatePointsTest() {
-        //TODO: test with special cards & FuckYouCard
-        assertEquals(1, testPlayer.calculatePoints());
+    public void hasNiceTryTest() {
+        Player testPlayer2 = new Player();
+        Card niceTry = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.NICETRY, false, 10);
+        Card someCard2 = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        testPlayer2.pushCardToHand(someCard);
+        testPlayer2.pushCardToHand(niceTry);
+        testPlayer2.pushCardToHand(someCard2);
+
+        int[] result = {};
+        int[] result2 = new int[]{1};
+
+        assertArrayEquals(result, testPlayer.hasNiceTry());
+        assertArrayEquals(result2, testPlayer2.hasNiceTry());
     }
 
     @Test
-    public void clearHandTest() {
-        Mockito.when(testPlayer.getHandSize()).thenReturn(5);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
-        testPlayer.pushCardToHand(someCard);
+    public void hasCounterAttackTest() {
+        Player testPlayer2 = new Player();
+        Card counterAttack = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.COUNTERATTACK, true, 11);
+        Card someCard2 = new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTIC, false, 12);
+        testPlayer2.pushCardToHand(someCard);
+        testPlayer2.pushCardToHand(counterAttack);
+        testPlayer2.pushCardToHand(someCard2);
+
+        int[] result = {};
+        int[] result2 = new int[]{1};
+
+        assertArrayEquals(result, testPlayer.hasCounterAttack());
+        assertArrayEquals(result2, testPlayer2.hasCounterAttack());
+    }
+
+    @Test
+    void calculatePointsTest() {
+        assertEquals(7, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.ONE, false, 1));
+        assertEquals(8, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.FIVE, false, 2));
+        assertEquals(13, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLUE, Type.NUMBER, Value.NINE, false, 3));
+        assertEquals(22, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.NUMBER, Value.FOUR, false, 4));
+        assertEquals(26, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.MULTICOLOR, Type.SPECIAL, Value.FANTASTICFOUR, true, 5));
+        assertEquals(33, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.EXCHANGE, true, 6));
+        assertEquals(40, testPlayer.calculatePoints());
+
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 7));
+        assertEquals(82, testPlayer.calculatePoints());
+    }
+
+    @Test
+    void clearHandTest() {
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 2));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 3));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.SPECIAL, Value.GIFT, true, 4));
         assertEquals(5, testPlayer.getHandSize());
         testPlayer.clearHand();
-        Mockito.when(testPlayer.getHandSize()).thenReturn(0);
         assertEquals(0, testPlayer.getHandSize());
+    }
+
+    @Test
+    void getPlayableCards_FuckYou() {
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 1));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 2));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 3));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FOUR, false, 4));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.ONE, false, 6));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.TWO, false, 7));
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.THREE, false, 8));
+        testPlayer.pushCardToHand(new Card(Color.BLACK, Type.SPECIAL, Value.FUCKYOU, false, 9));
+
+        //player does not have 10 cards
+        Card reference = new Card(Color.YELLOW, Type.NUMBER, Value.NINE, false, 11);
+        assertEquals(0, testPlayer.getPlayableCards(reference).length);
+
+        //player has 10 cards
+        testPlayer.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.FOUR, false, 10));
+        assertEquals(1, testPlayer.getPlayableCards(reference).length);
     }
 }

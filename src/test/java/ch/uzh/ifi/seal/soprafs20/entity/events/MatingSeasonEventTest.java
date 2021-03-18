@@ -26,7 +26,7 @@ public class MatingSeasonEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,19 +35,19 @@ public class MatingSeasonEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.gameRound);
         assertEquals("mating-season", matingSeason.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         MatingSeasonEvent matingSeason = new MatingSeasonEvent(this.gameRound);
         assertEquals("It's valentines day! Well, at least for your cards! Discard numeral pairs, triples and so on.", matingSeason.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.NINE, false, 1));

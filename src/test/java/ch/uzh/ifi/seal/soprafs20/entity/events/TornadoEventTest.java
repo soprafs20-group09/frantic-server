@@ -26,7 +26,7 @@ public class TornadoEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -35,19 +35,19 @@ public class TornadoEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         Event tornado = new TornadoEvent(this.gameRound);
         assertEquals("tornado", tornado.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void getMessageTest() {
         Event tornado = new TornadoEvent(this.gameRound);
         assertEquals("Oh no! A tornado whirled all the cards around! Looks like we have to redistribute them!", tornado.getMessage());
     }
 
     @Test
-    public void performEventTest() {
+    void performEventTest() {
         Player player1 = new Player();
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.EIGHT, false, 0));
         player1.pushCardToHand(new Card(Color.GREEN, Type.NUMBER, Value.NINE, false, 1));

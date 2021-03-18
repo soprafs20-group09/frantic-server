@@ -24,7 +24,7 @@ public class FantasticFourAction implements Action {
         this.initiator = initiator;
         ArrayList<Player> players = new ArrayList<>(distribution.keySet());
         this.cardDistribution = distribution;
-        this.targets = players.toArray(new Player[players.size()]);
+        this.targets = players.toArray(new Player[0]);
         this.wishedValue = Value.values()[value - 1];
         this.wishedColor = Color.NONE;
         this.discardPile = discardPile;
@@ -34,7 +34,7 @@ public class FantasticFourAction implements Action {
     public FantasticFourAction(Player initiator, Map<Player, Integer> distribution, Color wishedColor, DiscardPile discardPile, DrawStack drawStack) {
         this.initiator = initiator;
         ArrayList<Player> players = new ArrayList<>(distribution.keySet());
-        this.targets = players.toArray(new Player[players.size()]);
+        this.targets = players.toArray(new Player[0]);
         this.cardDistribution = distribution;
         this.wishedValue = Value.NONE;
         this.wishedColor = wishedColor;
@@ -48,26 +48,23 @@ public class FantasticFourAction implements Action {
         List<Chat> chat = new ArrayList<>();
         // distribute cards
         for (Map.Entry<Player, Integer> target : cardDistribution.entrySet()) {
-            for (int i = 0; i < target.getValue(); i++) {
-                Card c = drawStack.pop();
-                target.getKey().pushCardToHand(c);
+            int cardsDrawn = 0;
+            while (cardsDrawn < target.getValue() && this.drawStack.size() > 0) {
+                target.getKey().pushCardToHand(drawStack.pop());
+                cardsDrawn++;
             }
-            if (target.getValue() == 1) {
-                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew 1 card."));
-            }
-            else {
-                chat.add(new Chat("event", "special:fantastic-four", target.getKey().getUsername() + " drew " + target.getValue() + " cards."));
-            }
+            chat.add(new EventChat("special:fantastic-four",
+                    target.getKey().getUsername() + " drew " + cardsDrawn + (cardsDrawn == 1 ? " card." : " cards.")));
         }
         // make a wish
         Card wish = new Card(this.wishedColor, Type.WISH, this.wishedValue);
         discardPile.push(wish);
         if (this.wishedColor != Color.NONE) {
-            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+            chat.add(new EventChat("special:fantastic-four", this.initiator.getUsername()
                     + " wished " + FranticUtils.getStringRepresentation(this.wishedColor) + "."));
         }
         else {
-            chat.add(new Chat("event", "special:fantastic-four", this.initiator.getUsername()
+            chat.add(new EventChat("special:fantastic-four", this.initiator.getUsername()
                     + " wished " + FranticUtils.getStringRepresentation(this.wishedValue) + "."));
         }
         return chat;

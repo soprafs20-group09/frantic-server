@@ -1,6 +1,9 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
-import ch.uzh.ifi.seal.soprafs20.entity.*;
+import ch.uzh.ifi.seal.soprafs20.entity.Chat;
+import ch.uzh.ifi.seal.soprafs20.entity.EventChat;
+import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
+import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
@@ -12,13 +15,11 @@ public class CharityEvent implements Event {
     private final GameRound gameRound;
     private final GameService gameService;
     private final List<Player> listOfPlayers;
-    private final Player initiator;
 
     public CharityEvent(GameRound gameRound) {
         this.gameRound = gameRound;
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
-        this.initiator = gameRound.getCurrentPlayer();
     }
 
     public String getName() {
@@ -26,6 +27,7 @@ public class CharityEvent implements Event {
     }
 
     public void performEvent() {
+        Player initiator = this.gameRound.getCurrentPlayer();
         List<Chat> chat = new ArrayList<>();
 
         int maxCards = 0;
@@ -42,7 +44,7 @@ public class CharityEvent implements Event {
         }
 
         int numOfPlayers = this.listOfPlayers.size();
-        int initiatorIndex = this.listOfPlayers.indexOf(this.initiator);
+        int initiatorIndex = this.listOfPlayers.indexOf(initiator);
         for (int i = 1; i <= numOfPlayers; i++) {
             Player playerOfInterest = this.listOfPlayers.get((initiatorIndex + i) % numOfPlayers);
             if (!maxCardsPlayers.contains(playerOfInterest)) {
@@ -51,8 +53,8 @@ public class CharityEvent implements Event {
                         int random = FranticUtils.random.nextInt(target.getHandSize());
                         playerOfInterest.pushCardToHand(target.popCard(random));
 
-                        chat.add(new Chat("event", "avatar:" + playerOfInterest.getUsername(),
-                                playerOfInterest.getUsername() + " drew a card from " + target.getUsername()));
+                        chat.add(new EventChat("avatar:" + playerOfInterest.getUsername(),
+                                playerOfInterest.getUsername() + " drew a card from " + target.getUsername() + "."));
                     }
                 }
             }

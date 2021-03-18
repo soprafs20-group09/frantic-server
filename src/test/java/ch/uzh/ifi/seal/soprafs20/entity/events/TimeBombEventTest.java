@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.Color;
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
@@ -29,7 +31,7 @@ public class TimeBombEventTest {
     private List<Player> listOfPlayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.listOfPlayers = new ArrayList<>();
 
         MockitoAnnotations.initMocks(this);
@@ -38,13 +40,23 @@ public class TimeBombEventTest {
     }
 
     @Test
-    public void getNameTest() {
+    void getNameTest() {
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         assertEquals("time-bomb", timeBomb.getName());
     }
 
     @Test
-    public void getMessageTest() {
+    void performEventTest() {
+        Mockito.doNothing().when(this.gameRound).setTimeBomb();
+        TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
+        timeBomb.performEvent();
+
+        Mockito.verify(this.gameRound).sendCompleteGameState();
+        Mockito.verify(this.gameRound).finishTurn();
+    }
+
+    @Test
+    void getMessageTest() {
         TimeBombEvent timeBomb = new TimeBombEvent(this.gameRound);
         assertEquals("Tick ... Tick ... Tick ... Boom! Everyone has three turns left! Defuse the Bomb and earn a reward by winning the round or let the Bomb explode and everyone's points in this round get doubled!", timeBomb.getMessage());
     }

@@ -15,7 +15,6 @@ public class EqualityAction implements Action {
     private final Color color;
     private final DiscardPile discardPile;
     private final DrawStack drawStack;
-    private int cardsDrawn;
 
     public EqualityAction(Player initiator, Player target, Color color, DiscardPile discardPile, DrawStack drawStack) {
         this.initiator = initiator;
@@ -23,24 +22,23 @@ public class EqualityAction implements Action {
         this.color = color;
         this.discardPile = discardPile;
         this.drawStack = drawStack;
-        this.cardsDrawn = 0;
     }
 
     @Override
     public List<Chat> perform() {
         List<Chat> chat = new ArrayList<>();
         if (this.target != null) {
-            while (this.initiator.getHandSize() > this.target.getHandSize()) {
+            int cardsDrawn = 0;
+            while (this.initiator.getHandSize() > this.target.getHandSize() && this.drawStack.size() > 0) {
                 this.target.pushCardToHand(drawStack.pop());
-                this.cardsDrawn += 1;
+                cardsDrawn++;
             }
 
-            chat.add(new Chat("event", "special:equality", this.target.getUsername()
-                    + " drew " + this.cardsDrawn + " cards."));
+            chat.add(new EventChat("special:equality", this.target.getUsername()
+                    + " drew " + cardsDrawn + (cardsDrawn == 1 ? " card." : " cards.")));
         }
-        discardPile.pop();
         discardPile.push(new Card(this.color, Type.WISH, Value.COLORWISH, false, 0));
-        chat.add(new Chat("event", "special:equality", this.initiator.getUsername()
+        chat.add(new EventChat("special:equality", this.initiator.getUsername()
                 + " wished " + FranticUtils.getStringRepresentation(this.color) + "."));
 
         return chat;
