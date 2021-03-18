@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
@@ -176,7 +177,8 @@ public class LobbyServiceTest {
     void getLobbyState_returnLobbyStateDTO() {
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
-        assertEquals(testLobby.getGameDuration(), response.getSettings().getDuration());
+        assertEquals(testLobby.getGameDuration(), response.getSettings().getGameDuration());
+        assertEquals(testLobby.getTurnDuration(), response.getSettings().getTurnDuration());
         assertEquals(testLobby.isPublic(), response.getSettings().getPublicLobby());
         assertEquals(testLobby.getName(), response.getSettings().getLobbyName());
         assertNotNull(response.getPlayers());
@@ -185,7 +187,8 @@ public class LobbyServiceTest {
     @Test
     void updateLobbySettings_returnLobbyState() {
         //setup
-        testSettings.setDuration(GameLength.LONG);
+        testSettings.setGameDuration(GameLength.LONG);
+        testSettings.setTurnDuration(TurnDuration.LONG);
         testSettings.setLobbyName("newName");
         testSettings.setPublicLobby(false);
         testState.setSettings(testSettings);
@@ -193,7 +196,8 @@ public class LobbyServiceTest {
         lobbyService.updateLobbySettings("abc", "abc", testSettings);
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
-        assertEquals(testSettings.getDuration(), response.getSettings().getDuration());
+        assertEquals(testSettings.getGameDuration(), response.getSettings().getGameDuration());
+        assertEquals(testSettings.getTurnDuration(), response.getSettings().getTurnDuration());
         assertEquals(testSettings.getLobbyName(), response.getSettings().getLobbyName());
         assertEquals(testSettings.getPublicLobby(), response.getSettings().getPublicLobby());
         assertNotNull(response.getPlayers());

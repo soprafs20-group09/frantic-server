@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -22,7 +23,7 @@ public class GamblingManEvent implements Event {
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.discardPile = gameRound.getDiscardPile();
-        this.seconds = 30;
+        this.seconds = gameRound.getTurnDuration().getValue();
     }
 
     public String getName() {
@@ -66,7 +67,9 @@ public class GamblingManEvent implements Event {
         }
         if (this.gameRound.getEventResponsesSize() < this.listOfPlayers.size() - 1) {
             this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-            this.gameRound.startGamblingManTimer(seconds);
+            if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
+                this.gameRound.startGamblingManTimer(seconds);
+            }
         }
         else {
             Chat chat = new EventChat("event:gambling-man", "Too few players were able to gamble.");

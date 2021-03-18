@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
@@ -140,13 +141,15 @@ public class LobbyServiceIntegrationTest {
         String lobbyId = lobbyService.createLobby(player1);
         LobbySettingsDTO newSettings = new LobbySettingsDTO();
         newSettings.setPublicLobby(false);
-        newSettings.setDuration(GameLength.SHORT);
+        newSettings.setGameDuration(GameLength.SHORT);
+        newSettings.setTurnDuration(TurnDuration.LONG);
         newSettings.setLobbyName("Best Lobby");
 
         //before
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
         assertEquals("Ben's lobby", reference.getName());
         assertEquals(GameLength.MEDIUM, reference.getGameDuration());
+        assertEquals(TurnDuration.NORMAL, reference.getTurnDuration());
         assertTrue(reference.isPublic());
 
         lobbyService.updateLobbySettings(lobbyId, "abc", newSettings);
@@ -155,6 +158,7 @@ public class LobbyServiceIntegrationTest {
         reference = lobbyRepository.findByLobbyId(lobbyId);
         assertEquals("Best Lobby", reference.getName());
         assertEquals(GameLength.SHORT, reference.getGameDuration());
+        assertEquals(TurnDuration.LONG, reference.getTurnDuration());
         assertFalse(reference.isPublic());
     }
 
@@ -164,7 +168,7 @@ public class LobbyServiceIntegrationTest {
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
         LobbyStateDTO response = lobbyService.getLobbyState(lobbyId);
         assertEquals(reference.getName(), response.getSettings().getLobbyName());
-        assertEquals(reference.getGameDuration(), response.getSettings().getDuration());
+        assertEquals(reference.getGameDuration(), response.getSettings().getGameDuration());
         assertEquals(reference.isPublic(), response.getSettings().getPublicLobby());
     }
 

@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
@@ -96,14 +97,16 @@ public class LobbyControllerTest {
         LobbySettingsDTO s = new LobbySettingsDTO();
         s.setPublicLobby(true);
         s.setLobbyName("lobby");
-        s.setDuration(GameLength.MEDIUM);
+        s.setGameDuration(GameLength.MEDIUM);
+        s.setTurnDuration(TurnDuration.NORMAL);
         return s;
     }
 
     private LobbyStateDTO generateLobbyState() {
         LobbyStateDTO l = new LobbyStateDTO();
         LobbySettingsDTO s = new LobbySettingsDTO();
-        s.setDuration(GameLength.MEDIUM);
+        s.setGameDuration(GameLength.MEDIUM);
+        s.setTurnDuration(TurnDuration.NORMAL);
         s.setLobbyName("lobby");
         s.setPublicLobby(true);
         LobbyPlayerDTO p = new LobbyPlayerDTO();

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Pile;
@@ -22,7 +23,7 @@ public class MarketEvent implements Event {
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.drawStack = gameRound.getDrawStack();
-        this.seconds = 15;
+        this.seconds = gameRound.getTurnDuration().getValue()/2;
     }
 
     public String getName() {
@@ -53,8 +54,11 @@ public class MarketEvent implements Event {
         this.gameService.sendAttackTurn(this.gameRound.getLobbyId(), firstPlayer.getUsername());
         this.gameService.sendMarketWindow(this.gameRound.getLobbyId(), firstPlayer, cardArray, disabledArray);
         this.gameRound.setMarketList(cardArray, disabledArray);
+
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-        this.gameRound.startMarketTimer(seconds, firstPlayer);
+        if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
+            this.gameRound.startMarketTimer(seconds, firstPlayer);
+        }
     }
 
     public String getMessage() {

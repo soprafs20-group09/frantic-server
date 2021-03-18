@@ -166,8 +166,11 @@ public class LobbyService {
             if (dto.getLobbyName() != null && !dto.getLobbyName().matches("^\\s*$")) {
                 lobbyToUpdate.setName(dto.getLobbyName());
             }
-            if (dto.getDuration() != null) {
-                lobbyToUpdate.setGameDuration(dto.getDuration());
+            if (dto.getGameDuration() != null) {
+                lobbyToUpdate.setGameDuration(dto.getGameDuration());
+            }
+            if (dto.getTurnDuration() != null) {
+                lobbyToUpdate.setTurnDuration(dto.getTurnDuration());
             }
             if (dto.getPublicLobby() != null) {
                 lobbyToUpdate.setIsPublic(dto.getPublicLobby());
@@ -211,7 +214,8 @@ public class LobbyService {
 
         LobbySettingsDTO settings = new LobbySettingsDTO();
         settings.setLobbyName(lobby.getName());
-        settings.setDuration(lobby.getGameDuration());
+        settings.setGameDuration(lobby.getGameDuration());
+        settings.setTurnDuration(lobby.getTurnDuration());
         settings.setPublicLobby(lobby.isPublic());
 
         return new LobbyStateDTO(players, settings);

@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.actions.*;
@@ -18,6 +19,8 @@ public class GameRound {
     private final String lobbyId;
     private final List<Player> listOfPlayers;
     private Player currentPlayer;
+    private final TurnDuration turnDuration;
+    private final int seconds;
     private boolean hasCurrentPlayerMadeMove;
     private Timer timer;
     private boolean timeBomb; // indicates if the timeBomb-event is currently running
@@ -40,11 +43,13 @@ public class GameRound {
     private Card[] marketArray;
     private Boolean[] marketDisabledArray;
 
-    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer) {
+    public GameRound(Game game, String lobbyId, List<Player> listOfPlayers, Player firstPlayer, TurnDuration turnDuration) {
         this.game = game;
         this.lobbyId = lobbyId;
         this.listOfPlayers = listOfPlayers;
         this.currentPlayer = firstPlayer;
+        this.turnDuration = turnDuration;
+        this.seconds = turnDuration.getValue();
         this.gameService = GameService.getInstance();
         this.drawStack = new DrawStack();
         this.isDrawStackLow = false;
@@ -133,8 +138,10 @@ public class GameRound {
         }
         this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), timeBombRounds);
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, getPlayableCards(this.currentPlayer), true, false);
-        this.gameService.sendTimer(this.lobbyId, 30);
-        startTurnTimer(30);
+        this.gameService.sendTimer(this.lobbyId, this.seconds);
+        if (this.turnDuration != TurnDuration.OFF) {
+            startTurnTimer(this.seconds);
+        }
     }
 
     public void playerFinishesTurn(String identity) {
@@ -189,15 +196,20 @@ public class GameRound {
                             }
                             else {
                                 sendGameState();
-                                this.timer.cancel();
-                                int seconds = 30;
-                                // fantastic four action is given more time to perform
-                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                    seconds = 45;
-                                }
-                                this.gameService.sendTimer(this.lobbyId, seconds);
+                                cancelTimer();
                                 this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                startTurnTimer(seconds);
+                                if (this.turnDuration != TurnDuration.OFF) {
+                                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                                        this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                                        startTurnTimer((int) (this.seconds * 1.5));
+                                    }
+                                    else {
+                                        this.gameService.sendTimer(this.lobbyId, this.seconds);
+                                        startTurnTimer(this.seconds);
+                                    }
+                                } else {
+                                    this.gameService.sendTimer(this.lobbyId, this.seconds);
+                                }
                             }
                         }
                     }
@@ -217,7 +229,9 @@ public class GameRound {
             for (Player target : this.currentAction.getTargets()) {
                 this.gameService.sendPlayable(this.lobbyId, target, new int[0], false, false);
                 if (counterAttacker.equals(target)) {
-                    this.timer.cancel();
+                    if (this.timer != null) {
+                        this.timer.cancel();
+                    }
                     cardToPlay = counterAttacker.popCard(index);
                     this.discardPile.push(cardToPlay);
                     this.gameService.sendHand(this.lobbyId, counterAttacker);
@@ -226,22 +240,30 @@ public class GameRound {
                     this.gameService.sendChatMessage(this.lobbyId, chat);
                     sendGameState();
 
-                    int seconds = 30;
-                    // fantastic four action is given more time to perform
-                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                        seconds = 45;
-                    }
                     this.gameService.sendAttackTurn(this.lobbyId, counterAttacker.getUsername());
                     this.gameService.sendActionResponse(this.lobbyId, counterAttacker, relevantCard);
-                    this.gameService.sendTimer(this.lobbyId, seconds);
-                    startCounterAttackTimer(seconds);
+
+                    if (this.turnDuration != TurnDuration.OFF) {
+                        if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                            this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                            startCounterAttackTimer((int) (this.seconds * 1.5));
+                        }
+                        else {
+                            this.gameService.sendTimer(this.lobbyId, this.seconds);
+                            startCounterAttackTimer(this.seconds);
+                        }
+                    } else {
+                        this.gameService.sendTimer(this.lobbyId, this.seconds);
+                    }
                 }
             }
         }
     }
 
     private void playNiceTry(Player niceTryPlayer, int index) {
-        this.timer.cancel();
+        if (this.timer != null) {
+            this.timer.cancel();
+        }
         Card cardToPlay = niceTryPlayer.popCard(index);
         this.discardPile.push(cardToPlay);
         this.gameService.sendPlayable(this.lobbyId, niceTryPlayer, new int[0], false, false);
@@ -258,8 +280,10 @@ public class GameRound {
         }
         sendGameState();
         this.gameService.sendActionResponse(this.lobbyId, niceTryPlayer, cardToPlay);
-        this.gameService.sendTimer(this.lobbyId, 30);
-        startInterTurnTimer(30);
+        this.gameService.sendTimer(this.lobbyId, this.seconds);
+        if (this.turnDuration != TurnDuration.OFF) {
+            startInterTurnTimer(this.seconds);
+        }
     }
 
     // in a turn, the current player can choose to draw a card
@@ -282,7 +306,8 @@ public class GameRound {
         if (!this.hasCurrentPlayerMadeMove) {
             drawCardFromStack(this.currentPlayer, 1);
         }
-        this.timer.cancel();
+        cancelTimer();
+
         //return empty playable cards after turn finished
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         prepareNewTurn();
@@ -302,7 +327,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new SkipAction(initiator, target);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("skip");
     }
 
@@ -310,7 +335,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new GiftAction(initiator, target, cards);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("gift");
     }
 
@@ -318,7 +343,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new ExchangeAction(initiator, target, cards);
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("exchange");
     }
 
@@ -330,7 +355,7 @@ public class GameRound {
         else {
             this.currentAction = new FantasticAction(initiator, color, (DiscardPile) this.discardPile);
         }
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
@@ -348,7 +373,7 @@ public class GameRound {
             this.currentAction = new FantasticFourAction(initiator, distribution, color,
                     (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
         }
-        timer.cancel();
+        cancelTimer();
         prepareCounterAttack("fantastic-four");
     }
 
@@ -356,7 +381,7 @@ public class GameRound {
         Player initiator = getPlayerByIdentity(identity);
         Player target = getPlayerByUsername(username);
         this.currentAction = new EqualityAction(initiator, target, color, (DiscardPile) this.discardPile, (DrawStack) this.drawStack);
-        timer.cancel();
+        cancelTimer();
         if (this.currentAction.getTargets().length != 0) {
             prepareCounterAttack("equality");
         }
@@ -369,7 +394,7 @@ public class GameRound {
     public void storeCounterAttackAction(String identity, Color color) {
         Player initiator = getPlayerByIdentity(identity);
         this.currentAction = new CounterAttackAction(initiator, color, (DiscardPile) this.discardPile);
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
@@ -377,12 +402,12 @@ public class GameRound {
     public void storeNiceTryAction(String identity, Color color) {
         Player initiator = getPlayerByIdentity(identity);
         this.currentAction = new NiceTryAction(initiator, color, (DiscardPile) this.discardPile);
-        timer.cancel();
+        cancelTimer();
         performAction();
     }
 
     private void performAction() {
-        this.timer.cancel();
+        cancelTimer();
         this.attackState = false;
         List<Chat> chat = this.currentAction.perform();
         this.gameService.sendChatMessage(this.lobbyId, chat);
@@ -445,7 +470,7 @@ public class GameRound {
     //================================================================================
 
     private void prepareEvent() {
-        this.timer.cancel();
+        cancelTimer();
         this.gameService.sendPlayable(this.lobbyId, this.currentPlayer, new int[0], false, false);
         sendGameState();
 
@@ -480,7 +505,7 @@ public class GameRound {
     }
 
     private void performRecession() {
-        this.timer.cancel();
+        cancelTimer();
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
             chat.add(new EventChat("event:recession",
@@ -508,7 +533,7 @@ public class GameRound {
     }
 
     private void performSurpriseParty() {
-        timer.cancel();
+        cancelTimer();
         for (Map.Entry<Card, Player> entry : this.surprisePartyMap.entrySet()) {
             entry.getValue().pushCardToHand(entry.getKey());
         }
@@ -551,7 +576,7 @@ public class GameRound {
     }
 
     private void performMerryChristmas() {
-        timer.cancel();
+        cancelTimer();
         this.gameService.sendAnimationSpeed(this.lobbyId, 0);
         sendCompleteGameState();
         for (Map.Entry<Player, List<Card>> entry : this.christmasMap.entrySet()) {
@@ -575,7 +600,7 @@ public class GameRound {
         int numOfPreviousPlayers = this.listOfPlayers.size() - countMarketLeft();
         Player expectedPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
         if (player != null && player == expectedPlayer) {
-            this.timer.cancel();
+            cancelTimer();
             Card choice = this.marketArray[card];
             this.marketDisabledArray[card] = true;
             performMarket(player, choice);
@@ -607,8 +632,9 @@ public class GameRound {
             Player nextPlayer = this.listOfPlayers.get((initiatorIndex + numOfPreviousPlayers + 1) % numOfPlayers);
             this.gameService.sendAttackTurn(this.lobbyId, nextPlayer.getUsername());
             this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketArray, this.marketDisabledArray);
-            this.gameService.sendTimer(this.lobbyId, 15);
-            startMarketTimer(15, nextPlayer);
+            int seconds = this.getTurnDuration().getValue();
+            this.gameService.sendTimer(this.lobbyId, seconds/2);
+            startMarketTimer(seconds/2, nextPlayer);
         }
         else {
             this.marketArray = new Card[0];
@@ -733,7 +759,7 @@ public class GameRound {
     }
 
     public void onRoundOver(boolean emptyStack) {
-        this.timer.cancel();
+        cancelTimer();
         int maxPoints = 0;
         Player playerWithMaxPoints = this.currentPlayer;
         List<Player> finishedPlayers = new ArrayList<>();
@@ -869,7 +895,7 @@ public class GameRound {
                 player.pushCardToHand(this.drawStack.pop());
             }
             else {
-                this.timer.cancel();
+                cancelTimer();
                 onRoundOver(true);
             }
         }
@@ -910,7 +936,7 @@ public class GameRound {
     public void playerLostConnection(Player player) {
         if (this.listOfPlayers.size() > 1) {
             if (player == this.currentPlayer) {
-                this.timer.cancel();
+                cancelTimer();
                 prepareNewTurn();
             }
             this.bombMap.remove(player);
@@ -918,7 +944,7 @@ public class GameRound {
             sendGameState();
         }
         else {
-            this.timer.cancel();
+            cancelTimer();
         }
     }
 
@@ -970,6 +996,10 @@ public class GameRound {
             }
         }
         return null;
+    }
+
+    public TurnDuration getTurnDuration() {
+        return this.turnDuration;
     }
 
     //================================================================================
@@ -1108,6 +1138,12 @@ public class GameRound {
             }
         };
         this.timer.schedule(timerTask, milliseconds);
+    }
+
+    public void cancelTimer() {
+        if (this.turnDuration != TurnDuration.OFF) {
+            this.timer.cancel();
+        }
     }
 
     //================================================================================

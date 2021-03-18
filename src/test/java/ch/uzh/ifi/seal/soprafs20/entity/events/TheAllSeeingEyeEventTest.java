@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.Card;
@@ -36,6 +37,7 @@ public class TheAllSeeingEyeEventTest {
         MockitoAnnotations.initMocks(this);
         Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
         Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+        Mockito.when(this.gameRound.getTurnDuration()).thenReturn(TurnDuration.NORMAL);
     }
 
     @Test
@@ -54,8 +56,6 @@ public class TheAllSeeingEyeEventTest {
 
         TheAllSeeingEyeEvent theAllSeeingEye = new TheAllSeeingEyeEvent(this.gameRound);
         theAllSeeingEye.performEvent();
-
-        Mockito.verify(gameService).sendTimer(Mockito.any(), Mockito.anyInt());
     }
 
     @Test

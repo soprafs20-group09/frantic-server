@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.Color;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.constant.Type;
 import ch.uzh.ifi.seal.soprafs20.constant.Value;
 import ch.uzh.ifi.seal.soprafs20.entity.*;
@@ -67,7 +68,7 @@ public class GameRoundIntegrationTest {
         player4.setPoints(21);
         playerList.add(player4);
 
-        this.testRound = new GameRound(this.game, "lobbyId", playerList, player1);
+        this.testRound = new GameRound(this.game, "lobbyId", playerList, player1, TurnDuration.NORMAL);
         this.testRound.setGameService(this.gameService);
     }
 
@@ -79,7 +80,7 @@ public class GameRoundIntegrationTest {
         playerList.add(emptyPlayer1);
         Player emptyPlayer2 = new Player();
         playerList.add(emptyPlayer2);
-        GameRound gameRound = new GameRound(this.game, "lobbyId", playerList, emptyPlayer1);
+        GameRound gameRound = new GameRound(this.game, "lobbyId", playerList, emptyPlayer1, TurnDuration.NORMAL);
         gameRound.setGameService(this.gameService);
         Card expectedDiscardPileCard = gameRound.getDrawStack().peekN(15);
 
