@@ -1,9 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
-import ch.uzh.ifi.seal.soprafs20.constant.Color;
-import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
-import ch.uzh.ifi.seal.soprafs20.constant.Type;
-import ch.uzh.ifi.seal.soprafs20.constant.Value;
+import ch.uzh.ifi.seal.soprafs20.constant.*;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -60,13 +57,13 @@ public class GameIntegrationTest {
 
     @Test
     void calculateMaxPoints_2Players() {
-        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT, TurnDuration.NORMAL);
         assertEquals(137, testGame.getMaxPoints());
 
-        testGame = new Game(this.testLobbyId, GameLength.MEDIUM);
+        testGame = new Game(this.testLobbyId, GameLength.MEDIUM, TurnDuration.NORMAL);
         assertEquals(154, testGame.getMaxPoints());
 
-        testGame = new Game(this.testLobbyId, GameLength.LONG);
+        testGame = new Game(this.testLobbyId, GameLength.LONG, TurnDuration.NORMAL);
         assertEquals(179, testGame.getMaxPoints());
     }
 
@@ -76,7 +73,7 @@ public class GameIntegrationTest {
         lobbyService.joinLobby(this.testLobbyId, player3);
         Player player4 = playerService.createPlayer("id4", "player4");
         lobbyService.joinLobby(this.testLobbyId, player4);
-        Game testGame = new Game(this.testLobbyId, GameLength.MEDIUM);
+        Game testGame = new Game(this.testLobbyId, GameLength.MEDIUM, TurnDuration.NORMAL);
 
         assertEquals(154, testGame.getMaxPoints());
     }
@@ -92,13 +89,13 @@ public class GameIntegrationTest {
         Player player6 = playerService.createPlayer("id6", "player6");
         lobbyService.joinLobby(this.testLobbyId, player6);
 
-        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT, TurnDuration.NORMAL);
         assertEquals(113, testGame.getMaxPoints());
 
-        testGame = new Game(this.testLobbyId, GameLength.MEDIUM);
+        testGame = new Game(this.testLobbyId, GameLength.MEDIUM, TurnDuration.NORMAL);
         assertEquals(137, testGame.getMaxPoints());
 
-        testGame = new Game(this.testLobbyId, GameLength.LONG);
+        testGame = new Game(this.testLobbyId, GameLength.LONG, TurnDuration.NORMAL);
         assertEquals(154, testGame.getMaxPoints());
     }
 
@@ -125,7 +122,7 @@ public class GameIntegrationTest {
         assertEquals(1, player2.getHandSize());
         assertEquals(0, player3.getHandSize());
 
-        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT, TurnDuration.NORMAL);
         testGame.setListOfPlayers(playerList);
         testGame.setGameService(this.gameService);
         Map<String, Integer> changes = new HashMap<>();
@@ -135,7 +132,7 @@ public class GameIntegrationTest {
         assertEquals(0, player1.getHandSize());
         assertEquals(0, player2.getHandSize());
         assertEquals(0, player3.getHandSize());
-        Mockito.verify(this.gameService).sendEndRound(this.testLobbyId, playerList, changes, 137, 20, "icon", "message: Watch everyone's standings and wait for the next round to start!");
+        Mockito.verify(this.gameService).sendEndRound(this.testLobbyId, playerList, changes, 137, "icon", "message: Watch everyone's standings and wait for the next round to start!");
     }
 
     @Test
@@ -161,7 +158,7 @@ public class GameIntegrationTest {
         assertEquals(1, player2.getHandSize());
         assertEquals(0, player3.getHandSize());
 
-        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT, TurnDuration.NORMAL);
         testGame.setListOfPlayers(playerList);
         testGame.setGameService(this.gameService);
         Map<String, Integer> changes = new HashMap<>();
@@ -189,7 +186,7 @@ public class GameIntegrationTest {
         Player player3 = new Player();
         player3.setIdentity("player3");
         playerList.add(player3);
-        Game testGame = new Game(this.testLobbyId, GameLength.SHORT);
+        Game testGame = new Game(this.testLobbyId, GameLength.SHORT, TurnDuration.NORMAL);
         testGame.setListOfPlayers(playerList);
 
         testGame.playerLostConnection(player1);

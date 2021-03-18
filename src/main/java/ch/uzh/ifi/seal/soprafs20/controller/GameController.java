@@ -33,6 +33,14 @@ public class GameController {
         gameService.startGame(lobbyId, getIdentity(sha));
     }
 
+    @MessageMapping("/lobby/{lobbyId}/start-round")
+    public void startRound(@DestinationVariable String lobbyId,
+                          SimpMessageHeaderAccessor sha) {
+        log.info("Lobby " + lobbyId + ": New GameRound started");
+
+        gameService.startRound(lobbyId, getIdentity(sha));
+    }
+
     @MessageMapping("/lobby/{lobbyId}/play")
     public void playCard(@DestinationVariable String lobbyId,
                          SimpMessageHeaderAccessor sha, PlayCardDTO dto) {

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
@@ -19,7 +20,7 @@ public class RecessionEvent implements Event {
         this.gameService = gameRound.getGameService();
         this.listOfPlayers = gameRound.getListOfPlayers();
         this.amount = 1;
-        this.seconds = 30;
+        this.seconds = gameRound.getTurnDuration().getValue();
     }
 
     public String getName() {
@@ -36,7 +37,10 @@ public class RecessionEvent implements Event {
             this.amount++;
         }
         this.gameService.sendTimer(this.gameRound.getLobbyId(), seconds);
-        this.gameRound.startRecessionTimer(seconds);
+        if (this.gameRound.getTurnDuration() != TurnDuration.OFF) {
+            this.gameRound.startRecessionTimer(seconds);
+        }
+
     }
 
     public String getMessage() {

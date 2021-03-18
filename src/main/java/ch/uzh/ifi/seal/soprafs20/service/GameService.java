@@ -90,6 +90,13 @@ public class GameService {
         }
     }
 
+    public void startRound(String lobbyId, String identity) {
+        if (webSocketService.checkSender(lobbyId, identity) && playerRepository.findByIdentity(identity).isAdmin()) {
+            Game game = GameRepository.findByLobbyId(lobbyId);
+            game.triggerNewGameRound();
+        }
+    }
+
     public void playCard(String lobbyId, String identity, PlayCardDTO play) {
         if (webSocketService.checkSender(lobbyId, identity)) {
             Game game = GameRepository.findByLobbyId(lobbyId);
@@ -311,8 +318,11 @@ public class GameService {
         webSocketService.sendToPlayerInLobby(lobbyId, player.getIdentity(), "/market-window", dto);
     }
 
-    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, int seconds, String icon, String message) {
-        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, pointLimit, seconds, icon, message);
+    public void sendEndRound(String lobbyId, List<Player> players, Map<String, Integer> changes, int pointLimit, String icon, String message) {
+        Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
+        String admin = lobby.getCreator();
+
+        EndRoundDTO dto = new EndRoundDTO(generatePlayerScoreDTO(players), changes, admin, pointLimit, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-round", dto);
     }
 

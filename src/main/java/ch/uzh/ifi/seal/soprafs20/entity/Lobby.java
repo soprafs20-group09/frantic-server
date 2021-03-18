@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs20.entity;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.sql.DataTruncation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,9 @@ public class Lobby implements Serializable {
     private GameLength gameDuration;
 
     @Column
+    private TurnDuration turnDuration;
+
+    @Column
     private boolean isPublic;
 
     @Column
@@ -50,6 +55,7 @@ public class Lobby implements Serializable {
     public Lobby() {
         this.lobbyId = FranticUtils.generateId(8);
         this.gameDuration = GameLength.MEDIUM;
+        this.turnDuration = TurnDuration.NORMAL;
         this.isPublic = true;
         this.listOfPlayers = new ArrayList<>();
         this.isPlaying = false;
@@ -95,6 +101,14 @@ public class Lobby implements Serializable {
         this.gameDuration = gameDuration;
     }
 
+    public TurnDuration getTurnDuration() {
+        return this.turnDuration;
+    }
+
+    public void setTurnDuration(TurnDuration turnDuration) {
+        this.turnDuration = turnDuration;
+    }
+
     public boolean isPublic() {
         return this.isPublic;
     }
@@ -135,7 +149,7 @@ public class Lobby implements Serializable {
         if (this.players < 2) {
             return;
         }
-        Game game = new Game(this.lobbyId, this.gameDuration);
+        Game game = new Game(this.lobbyId, this.gameDuration, this.turnDuration);
         GameRepository.addGame(this.lobbyId, game);
         game.startGame();
         this.isPlaying = true;
