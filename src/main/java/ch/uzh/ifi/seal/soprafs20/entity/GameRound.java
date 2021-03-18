@@ -162,61 +162,60 @@ public class GameRound {
             Card relevantCard = getRelevantCardOnDiscardPile();
             Card cardToPlay = player.peekCard(index);
             if (relevantCard != null && cardToPlay != null) {
+                // counter attack case
                 if (attackState) {
                     playCounterattack(player, relevantCard, cardToPlay, index);
                 }
-                else if (cardToPlay.isPlayableOn(relevantCard) &&
+                //nice try case
+                else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
+                    playNiceTry(player, index);
+                }
+                else if (player == this.currentPlayer &&
+                        cardToPlay.isPlayableOn(relevantCard) &&
                         (cardToPlay.getValue() != Value.FUCKYOU || player.getHandSize() == 10)) {
-                    if (player == this.currentPlayer) {
-                        cardToPlay = player.popCard(index);
-                        this.discardPile.push(cardToPlay);
-                        this.gameService.sendHand(this.lobbyId, player);
-                        this.hasCurrentPlayerMadeMove = true;
+                    cardToPlay = player.popCard(index);
+                    this.discardPile.push(cardToPlay);
+                    this.gameService.sendHand(this.lobbyId, player);
+                    this.hasCurrentPlayerMadeMove = true;
 
-                        if (cardToPlay.getType() == Type.NUMBER) {
-                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
-                            this.gameService.sendChatMessage(this.lobbyId, chat);
-                            if (cardToPlay.getColor() == Color.BLACK) {
-                                prepareEvent();
-                            }
-                            else {
-                                finishTurn();
-                            }
+                    if (cardToPlay.getType() == Type.NUMBER) {
+                        Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
+                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
+                        this.gameService.sendChatMessage(this.lobbyId, chat);
+                        if (cardToPlay.getColor() == Color.BLACK) {
+                            prepareEvent();
                         }
-                        else if (cardToPlay.getType() == Type.SPECIAL) {
-                            Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
-                                    this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
-                            this.gameService.sendChatMessage(this.lobbyId, chat);
-                            if (cardToPlay.getValue() == Value.FUCKYOU) {
-                                finishTurn();
-                            }
-                            else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
-                                finishSecondChance();
-                            }
-                            else {
-                                sendGameState();
-                                cancelTimer();
-                                this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                                if (this.turnDuration != TurnDuration.OFF) {
-                                    if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                        this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
-                                        startTurnTimer((int) (this.seconds * 1.5));
-                                    }
-                                    else {
-                                        this.gameService.sendTimer(this.lobbyId, this.seconds);
-                                        startTurnTimer(this.seconds);
-                                    }
-                                } else {
-                                    this.gameService.sendTimer(this.lobbyId, this.seconds);
-                                }
-                            }
+                        else {
+                            finishTurn();
                         }
                     }
-
-                    //nice try case
-                    else if (getHandSizes().containsValue(0) && cardToPlay.getValue() == Value.NICETRY) {
-                        playNiceTry(player, index);
+                    else if (cardToPlay.getType() == Type.SPECIAL) {
+                        Chat chat = new EventChat("avatar:" + this.currentPlayer.getUsername(),
+                                this.currentPlayer.getUsername() + " played " + FranticUtils.getStringRepresentationOfCard(cardToPlay) + ".");
+                        this.gameService.sendChatMessage(this.lobbyId, chat);
+                        if (cardToPlay.getValue() == Value.FUCKYOU) {
+                            finishTurn();
+                        }
+                        else if (cardToPlay.getValue() == Value.SECONDCHANCE) {
+                            finishSecondChance();
+                        }
+                        else {
+                            sendGameState();
+                            cancelTimer();
+                            this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+                            if (this.turnDuration != TurnDuration.OFF) {
+                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                                    this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                                    startTurnTimer((int) (this.seconds * 1.5));
+                                }
+                                else {
+                                    this.gameService.sendTimer(this.lobbyId, this.seconds);
+                                    startTurnTimer(this.seconds);
+                                }
+                            } else {
+                                this.gameService.sendTimer(this.lobbyId, this.seconds);
+                            }
+                        }
                     }
                 }
             }
@@ -802,7 +801,10 @@ public class GameRound {
             }
         }
 
-        if (this.timeBomb) {
+        if (finishedPlayers.size() == 0) {
+            message = "The admin ended this round!";
+        }
+        else if (this.timeBomb) {
             icon = "event:time-bomb";
             message += " defused the bomb!";
         }
