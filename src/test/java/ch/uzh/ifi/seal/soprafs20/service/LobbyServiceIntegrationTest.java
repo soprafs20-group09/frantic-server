@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
@@ -76,9 +77,9 @@ public class LobbyServiceIntegrationTest {
 
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
 
-        List<Lobby> response = lobbyService.getLobbies("Peter's lobby");
+        List<LobbyListElementDTO> response = lobbyService.getLobbies("Peter's lobby");
         assertEquals(1, response.size());
-        Lobby responseLobby = response.get(0);
+        LobbyListElementDTO responseLobby = response.get(0);
         assertEquals(reference.getName(), responseLobby.getName());
         assertEquals(reference.getCreator(), responseLobby.getCreator());
         assertEquals(reference.getLobbyId(), responseLobby.getLobbyId());
@@ -92,9 +93,9 @@ public class LobbyServiceIntegrationTest {
 
         Lobby reference = lobbyRepository.findByLobbyId(lobbyId);
 
-        List<Lobby> response = lobbyService.getLobbies("Leila");
+        List<LobbyListElementDTO> response = lobbyService.getLobbies("Leila");
         assertEquals(1, response.size());
-        Lobby responseLobby = response.get(0);
+        LobbyListElementDTO responseLobby = response.get(0);
         assertEquals(reference.getName(), responseLobby.getName());
         assertEquals(reference.getCreator(), responseLobby.getCreator());
         assertEquals(reference.getLobbyId(), responseLobby.getLobbyId());

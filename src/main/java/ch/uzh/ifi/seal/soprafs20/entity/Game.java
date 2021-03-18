@@ -15,6 +15,7 @@ public class Game {
     Logger log = LoggerFactory.getLogger(Game.class);
 
     private final String lobbyId;
+    private int roundCount;
     private GameRound currentGameRound;
     private final GameLength gameDuration;
     private final TurnDuration turnDuration;
@@ -28,6 +29,7 @@ public class Game {
     public Game(String lobbyId, GameLength gameDuration, TurnDuration turnDuration) {
         this.gameService = GameService.getInstance();
         this.lobbyId = lobbyId;
+        this.roundCount = 1;
         this.gameDuration = gameDuration;
         this.turnDuration = turnDuration;
         this.listOfPlayers = PlayerService.getInstance().getPlayersInLobby(lobbyId);
@@ -47,6 +49,7 @@ public class Game {
     private void startNewGameRound() {
         this.gameService.sendStartGameRound(this.lobbyId);
         this.currentGameRound = new GameRound(this, this.lobbyId, this.listOfPlayers, this.firstPlayer, this.turnDuration);
+        this.roundCount++;
         this.currentGameRound.startGameRound();
     }
 
@@ -79,6 +82,10 @@ public class Game {
         }
         this.gameService.sendReconnect(this.lobbyId);
         startReconnectTimer(7);
+    }
+
+    public int getRoundCount() {
+        return this.roundCount;
     }
 
     private void onGameOver() {
@@ -209,6 +216,10 @@ public class Game {
 
     public Player getFirstPlayer() {
         return this.firstPlayer;
+    }
+
+    public List<Player> getListOfPlayers() {
+        return this.listOfPlayers;
     }
 
     //needed for testing

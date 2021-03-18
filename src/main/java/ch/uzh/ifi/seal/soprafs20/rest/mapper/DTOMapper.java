@@ -23,10 +23,4 @@ public interface DTOMapper {
 
     @Mapping(source = "username", target = "username")
     Player convertPlayerUsernameDTOToPlayer(PlayerUsernameDTO playerUsernameDTO);
-
-    @Mapping(source = "lobbyId", target = "lobbyId")
-    @Mapping(source = "name", target = "name")
-    @Mapping(source = "creator", target = "creator")
-    @Mapping(source = "players", target = "players")
-    LobbyListElementDTO convertLobbyToLobbyListDTO(Lobby lobby);
 }

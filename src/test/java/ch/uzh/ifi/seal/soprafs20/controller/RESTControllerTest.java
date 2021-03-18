@@ -3,14 +3,14 @@ package ch.uzh.ifi.seal.soprafs20.controller;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyJoinDTO;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerUsernameDTO;
-import ch.uzh.ifi.seal.soprafs20.service.LobbyService;
-import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
-import ch.uzh.ifi.seal.soprafs20.service.RegisterService;
+import ch.uzh.ifi.seal.soprafs20.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,16 +53,20 @@ public class RESTControllerTest {
     @MockBean
     private RegisterService registerService;
 
+    @MockBean
+    private GameService gameService;
+
     @Test
     void getLobbies_returnsLobbyList() throws Exception {
 
-        Lobby lobby = new Lobby();
+        LobbyListElementDTO lobby = new LobbyListElementDTO();
         lobby.setLobbyId("1");
         lobby.setName("foo");
         lobby.setCreator("bar");
-        lobby.setPlayers(3);
+        lobby.setRunning(false);
+        lobby.setRoundCount(0);
 
-        List<Lobby> allLobbies = Collections.singletonList(lobby);
+        List<LobbyListElementDTO> allLobbies = Collections.singletonList(lobby);
         given(lobbyService.getLobbies(Mockito.any())).willReturn(allLobbies);
 
         // when
@@ -72,7 +76,8 @@ public class RESTControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is(lobby.getName())))
                 .andExpect(jsonPath("$[0].creator", is(lobby.getCreator())))
-                .andExpect(jsonPath("$[0].players", is(lobby.getPlayers())));
+                .andExpect(jsonPath("$[0].running", is(lobby.isRunning())))
+                .andExpect(jsonPath("$[0].roundCount", is(lobby.getRoundCount())));
     }
 
     @Test()

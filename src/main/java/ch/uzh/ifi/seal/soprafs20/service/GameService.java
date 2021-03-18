@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.entity.events.Event;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.DrawDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.*;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,21 @@ public class GameService {
 
     public List<Player> getPlayersInGame(String lobbyId) {
         return this.playerRepository.findByLobbyId(lobbyId);
+    }
+
+    public List<PlayerScoreDTO> getPlayersAndPointsInGame(String lobbyId) {
+        Game game = GameRepository.findByLobbyId(lobbyId);
+        List<PlayerScoreDTO> playerScoreDTOs = new ArrayList<>();
+
+        for (Player player : game.getListOfPlayers()) {
+            playerScoreDTOs.add(new PlayerScoreDTO(player.getUsername(), player.getPoints()));
+        }
+        return playerScoreDTOs;
+    }
+
+    public int getRoundCount(String lobbyId) {
+        Game game = GameRepository.findByLobbyId(lobbyId);
+        return (game != null) ? game.getRoundCount() : 0;
     }
 
     public void startGame(String lobbyId, String identity) {
@@ -312,7 +329,7 @@ public class GameService {
     public void sendEndGame(String lobbyId, List<Player> players, Map<String, Integer> changes, String icon, String message) {
         Lobby lobby = lobbyRepository.findByLobbyId(lobbyId);
         lobby.setIsPlaying(false);
-        lobbyRepository.flush();
+        lobbyRepository.saveAndFlush(lobby);
 
         EndGameDTO dto = new EndGameDTO(generatePlayerScoreDTO(players), changes, icon, message);
         webSocketService.sendToLobby(lobbyId, "/end-game", dto);

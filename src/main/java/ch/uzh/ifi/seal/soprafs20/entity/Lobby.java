@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.sql.DataTruncation;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,9 @@ public class Lobby implements Serializable {
 
     @Column
     private boolean isPlaying;
+
+    @Column
+    private long startTime;
 
     public Lobby() {
         this.lobbyId = FranticUtils.generateId(8);
@@ -149,5 +153,14 @@ public class Lobby implements Serializable {
         GameRepository.addGame(this.lobbyId, game);
         game.startGame();
         this.isPlaying = true;
+        this.startTime = Instant.now().getEpochSecond();
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 }
