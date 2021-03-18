@@ -801,15 +801,15 @@ public class GameRound {
             }
         }
 
-        if (finishedPlayers.size() == 0) {
-            message = "The admin ended this round!";
-        }
-        else if (this.timeBomb) {
+        if (this.timeBomb) {
             icon = "event:time-bomb";
             message += " defused the bomb!";
         }
         else if (emptyStack) {
             message = "The card stack is empty!";
+        }
+        else if (finishedPlayers.size() == 0) {
+            message = "The admin ended this round!";
         }
         else {
             message += " played " + (finishedPlayers.size() != 1 ? "their last card!" : "his/her last card!");
