@@ -1,12 +1,14 @@
 package ch.uzh.ifi.seal.soprafs20.service;
 
 import ch.uzh.ifi.seal.soprafs20.constant.GameLength;
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Chat;
 import ch.uzh.ifi.seal.soprafs20.entity.Lobby;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
 import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.ChatDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
@@ -93,13 +95,13 @@ public class LobbyServiceTest {
         Mockito.when(lobbyRepository.findAll()).thenReturn(listOfLobbies);
 
         //when
-        List<Lobby> returnedList = lobbyService.getLobbies(null);
+        List<LobbyListElementDTO> returnedList = lobbyService.getLobbies(null);
 
         // then
         assertEquals(listOfLobbies.size(), returnedList.size());
-        assertEquals(listOfLobbies.get(0), returnedList.get(0));
-        assertEquals(listOfLobbies.get(1), returnedList.get(1));
-        assertEquals(listOfLobbies.get(2), returnedList.get(2));
+        assertEquals(listOfLobbies.get(0).getLobbyId(), returnedList.get(0).getLobbyId());
+        assertEquals(listOfLobbies.get(1).getLobbyId(), returnedList.get(1).getLobbyId());
+        assertEquals(listOfLobbies.get(2).getLobbyId(), returnedList.get(2).getLobbyId());
     }
 
     @Test
@@ -120,38 +122,11 @@ public class LobbyServiceTest {
         Mockito.when(lobbyRepository.findByNameContainsOrCreatorContains("alpha", "alpha")).thenReturn(listOfLobbies);
 
         //when
-        List<Lobby> returnedList = lobbyService.getLobbies("alpha");
+        List<LobbyListElementDTO> returnedList = lobbyService.getLobbies("alpha");
 
         // then
         assertEquals(listOfLobbies.size(), returnedList.size());
-        assertEquals(listOfLobbies.get(0), returnedList.get(0));
-    }
-
-    @Test
-    void getLobbies_returnPublicLobbies() {
-        //setup
-        Lobby lobby1 = new Lobby();
-        lobby1.setName("alpha");
-        lobby1.setCreator("Brian");
-        lobby1.setIsPublic(false);
-        lobby1.addPlayer(testPlayer);
-        Lobby lobby2 = new Lobby();
-        lobby2.setName("beta");
-        lobby2.setCreator("testPlayer");
-        lobby2.addPlayer(testPlayer);
-
-        List<Lobby> listOfLobbies = new ArrayList<>();
-        listOfLobbies.add(lobby1);
-        listOfLobbies.add(lobby2);
-        Mockito.when(lobbyRepository.findAll()).thenReturn(listOfLobbies);
-
-        //when
-        List<Lobby> reference = new ArrayList<>(listOfLobbies);
-        List<Lobby> returnedList = lobbyService.getLobbies(null);
-
-        // then
-        assertEquals(1, returnedList.size());
-        assertEquals(reference.get(1), returnedList.get(0));
+        assertEquals(listOfLobbies.get(0).getLobbyId(), returnedList.get(0).getLobbyId());
     }
 
     @Test
@@ -176,7 +151,8 @@ public class LobbyServiceTest {
     void getLobbyState_returnLobbyStateDTO() {
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
-        assertEquals(testLobby.getGameDuration(), response.getSettings().getDuration());
+        assertEquals(testLobby.getGameDuration(), response.getSettings().getGameDuration());
+        assertEquals(testLobby.getTurnDuration(), response.getSettings().getTurnDuration());
         assertEquals(testLobby.isPublic(), response.getSettings().getPublicLobby());
         assertEquals(testLobby.getName(), response.getSettings().getLobbyName());
         assertNotNull(response.getPlayers());
@@ -185,7 +161,8 @@ public class LobbyServiceTest {
     @Test
     void updateLobbySettings_returnLobbyState() {
         //setup
-        testSettings.setDuration(GameLength.LONG);
+        testSettings.setGameDuration(GameLength.LONG);
+        testSettings.setTurnDuration(TurnDuration.LONG);
         testSettings.setLobbyName("newName");
         testSettings.setPublicLobby(false);
         testState.setSettings(testSettings);
@@ -193,7 +170,8 @@ public class LobbyServiceTest {
         lobbyService.updateLobbySettings("abc", "abc", testSettings);
         LobbyStateDTO response = lobbyService.getLobbyState("abc");
 
-        assertEquals(testSettings.getDuration(), response.getSettings().getDuration());
+        assertEquals(testSettings.getGameDuration(), response.getSettings().getGameDuration());
+        assertEquals(testSettings.getTurnDuration(), response.getSettings().getTurnDuration());
         assertEquals(testSettings.getLobbyName(), response.getSettings().getLobbyName());
         assertEquals(testSettings.getPublicLobby(), response.getSettings().getPublicLobby());
         assertNotNull(response.getPlayers());

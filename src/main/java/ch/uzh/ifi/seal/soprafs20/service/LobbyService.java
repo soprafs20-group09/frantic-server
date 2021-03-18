@@ -8,8 +8,11 @@ import ch.uzh.ifi.seal.soprafs20.exceptions.PlayerServiceException;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.LobbyRepository;
 import ch.uzh.ifi.seal.soprafs20.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.LobbyListElementDTO;
+import ch.uzh.ifi.seal.soprafs20.rest.dto.PlayerScoreDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.KickDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.incoming.LobbySettingsDTO;
+import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.AnimationSpeedDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.DisconnectDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyPlayerDTO;
 import ch.uzh.ifi.seal.soprafs20.websocket.dto.outgoing.LobbyStateDTO;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,21 +39,24 @@ public class LobbyService {
 
     private final WebSocketService webSocketService;
     private final PlayerService playerService;
+    private final GameService gameService;
 
     private final PlayerRepository playerRepository;
     private final LobbyRepository lobbyRepository;
 
     @Autowired
     public LobbyService(WebSocketService webSocketService, PlayerService playerService,
+                        GameService gameService,
                         @Qualifier("playerRepository") PlayerRepository playerRepository,
                         @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.webSocketService = webSocketService;
         this.playerService = playerService;
+        this.gameService = gameService;
         this.playerRepository = playerRepository;
         this.lobbyRepository = lobbyRepository;
     }
 
-    public List<Lobby> getLobbies(String q) {
+    public List<LobbyListElementDTO> getLobbies(String q) {
         List<Lobby> allLobbies;
         if (q != null) {
             allLobbies = this.lobbyRepository.findByNameContainsOrCreatorContains(q, q);
@@ -57,9 +64,25 @@ public class LobbyService {
         else {
             allLobbies = this.lobbyRepository.findAll();
         }
-        allLobbies.removeIf(l -> !l.isPublic() || l.isPlaying() || l.getPlayers() == 0);
-        allLobbies.removeIf(l -> !l.getListOfPlayers().contains(l.getCreator()));
-        return allLobbies;
+        List<LobbyListElementDTO> lobbyList = new ArrayList<>();
+        for (Lobby lobby : allLobbies) {
+            LobbyListElementDTO dto = new LobbyListElementDTO();
+            dto.setLobbyId(lobby.isPublic() ? lobby.getLobbyId() : "");
+            dto.setName(lobby.getName());
+            dto.setCreator(lobby.getCreator());
+            if (lobby.isPlaying()) {
+                dto.setPlayers(this.gameService.getPlayersAndPointsInGame(lobby.getLobbyId()));
+                dto.setRoundCount(this.gameService.getRoundCount(lobby.getLobbyId()));
+            }
+            else {
+                dto.setPlayers(this.getPlayersInLobby(lobby.getLobbyId()));
+            }
+            dto.setType(lobby.isPublic() ? "public" : "private");
+            dto.setRunning(lobby.isPlaying());
+            dto.setStartTime(lobby.getStartTime());
+            lobbyList.add(dto);
+        }
+        return lobbyList;
     }
 
     public synchronized String createLobby(Player creator) {
@@ -98,11 +121,12 @@ public class LobbyService {
             if (!admin.equals(toKick)) {
                 DisconnectDTO disconnectDTO = new DisconnectDTO("You were kicked out of the Lobby.");
                 this.webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
-                this.playerService.removePlayer(toKick);
 
                 Chat chat = new EventChat("avatar:" + toKick.getUsername(), toKick.getUsername() + " was kicked!");
                 this.webSocketService.sendChatMessage(lobbyId, chat);
                 this.webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+
+                clearPlayer(toKick);
             }
         }
     }
@@ -112,40 +136,46 @@ public class LobbyService {
         Player player = this.playerRepository.findByIdentity(identity);
 
         if (player != null) {
-            String lobbyId = this.playerService.removePlayer(player);
+            String lobbyId = player.getLobbyId();
             Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
             if (lobby != null) {
                 log.info("Lobby " + lobbyId + ": Player " + identity + " left");
 
                 Chat chat = new EventChat("avatar:" + player.getUsername(), player.getUsername() + " left the lobby.");
                 this.webSocketService.sendChatMessage(lobbyId, chat);
-                List<Player> playerList = this.playerRepository.findByLobbyId(lobbyId);
-                if (playerList.size() > 1) {
-                    if (player.isAdmin()) {
-                        setNewHost(lobbyId, playerList.get(0).getUsername());
-                    }
-                    this.webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
-                }
-                else if (playerList.size() == 1) {
-                    if (lobby.isPlaying()) {
-                        Player last = this.playerRepository.findByUsernameAndLobbyId(playerList.get(0).getUsername(), lobbyId);
-                        DisconnectDTO disconnectDTO = new DisconnectDTO("Not enough players to play.");
-                        this.webSocketService.sendToPlayer(last.getIdentity(), "/queue/disconnect", disconnectDTO);
-                        this.playerService.removePlayer(last);
-                        this.lobbyRepository.delete(lobby);
-                        GameRepository.removeGame(lobbyId);
-                    }
-                    else {
-                        if (player.isAdmin()) {
-                            setNewHost(lobbyId, playerList.get(0).getUsername());
-                        }
-                        this.webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
-                    }
-                }
-                else {
-                    this.lobbyRepository.delete(lobby);
-                }
             }
+            clearPlayer(player);
+        }
+    }
+
+    private synchronized void clearPlayer(Player player) {
+        String lobbyId = this.playerService.removePlayer(player);
+        Lobby lobby = this.lobbyRepository.findByLobbyId(lobbyId);
+        List<Player> playerList = this.playerRepository.findByLobbyId(lobbyId);
+        if (playerList.size() > 1) {
+            if (player.isAdmin()) {
+                setNewHost(lobbyId, playerList.get(0).getUsername());
+            }
+            this.webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+        }
+        else if (playerList.size() == 1) {
+            if (lobby.isPlaying()) {
+                Player last = this.playerRepository.findByUsernameAndLobbyId(playerList.get(0).getUsername(), lobbyId);
+                DisconnectDTO disconnectDTO = new DisconnectDTO("Not enough players to play.");
+                this.webSocketService.sendToPlayer(last.getIdentity(), "/queue/disconnect", disconnectDTO);
+                this.playerService.removePlayer(last);
+                this.lobbyRepository.delete(lobby);
+                GameRepository.removeGame(lobbyId);
+            }
+            else {
+                if (player.isAdmin()) {
+                    setNewHost(lobbyId, playerList.get(0).getUsername());
+                }
+                this.webSocketService.sendToLobby(lobbyId, "/lobby-state", getLobbyState(lobbyId));
+            }
+        }
+        else {
+            this.lobbyRepository.delete(lobby);
         }
     }
 
@@ -166,8 +196,11 @@ public class LobbyService {
             if (dto.getLobbyName() != null && !dto.getLobbyName().matches("^\\s*$")) {
                 lobbyToUpdate.setName(dto.getLobbyName());
             }
-            if (dto.getDuration() != null) {
-                lobbyToUpdate.setGameDuration(dto.getDuration());
+            if (dto.getGameDuration() != null) {
+                lobbyToUpdate.setGameDuration(dto.getGameDuration());
+            }
+            if (dto.getTurnDuration() != null) {
+                lobbyToUpdate.setTurnDuration(dto.getTurnDuration());
             }
             if (dto.getPublicLobby() != null) {
                 lobbyToUpdate.setIsPublic(dto.getPublicLobby());
@@ -211,7 +244,8 @@ public class LobbyService {
 
         LobbySettingsDTO settings = new LobbySettingsDTO();
         settings.setLobbyName(lobby.getName());
-        settings.setDuration(lobby.getGameDuration());
+        settings.setGameDuration(lobby.getGameDuration());
+        settings.setTurnDuration(lobby.getTurnDuration());
         settings.setPublicLobby(lobby.isPublic());
 
         return new LobbyStateDTO(players, settings);
@@ -241,5 +275,13 @@ public class LobbyService {
         if (username == null || !username.matches("^\\S{2,20}$")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username missing or invalid.");
         }
+    }
+
+    private List<PlayerScoreDTO> getPlayersInLobby(String lobbyId) {
+        List<PlayerScoreDTO> playerScoreDTOs = new ArrayList<>();
+        for (Player player : this.playerService.getPlayersInLobby(lobbyId)) {
+            playerScoreDTOs.add(new PlayerScoreDTO(player.getUsername(), 0));
+        }
+        return playerScoreDTOs;
     }
 }

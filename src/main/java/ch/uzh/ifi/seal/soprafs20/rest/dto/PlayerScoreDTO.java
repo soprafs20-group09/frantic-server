@@ -6,6 +6,11 @@ public class PlayerScoreDTO {
 
     private int score;
 
+    public PlayerScoreDTO(String username, int score) {
+        this.username = username;
+        this.score = score;
+    }
+
     public String getUsername() {
         return username;
     }

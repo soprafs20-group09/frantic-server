@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs20.entity.events;
 
+import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.entity.Game;
 import ch.uzh.ifi.seal.soprafs20.entity.GameRound;
 import ch.uzh.ifi.seal.soprafs20.entity.Player;
@@ -31,6 +32,7 @@ public class SurprisePartyEventTest {
         MockitoAnnotations.initMocks(this);
         Mockito.when(this.gameRound.getGameService()).thenReturn(this.gameService);
         Mockito.when(this.gameRound.getListOfPlayers()).thenReturn(this.listOfPlayers);
+        Mockito.when(this.gameRound.getTurnDuration()).thenReturn(TurnDuration.NORMAL);
     }
 
     @Test
