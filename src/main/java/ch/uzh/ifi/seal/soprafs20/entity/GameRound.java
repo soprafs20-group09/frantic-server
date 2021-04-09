@@ -973,7 +973,7 @@ public class GameRound {
                 prepareRandomMarket(player);
             }
 
-            if (player == this.currentPlayer) {
+            if (player.getIdentity().equals(this.currentPlayer.getIdentity())) {
                 cancelTimer();
                 prepareNewTurn();
             }
