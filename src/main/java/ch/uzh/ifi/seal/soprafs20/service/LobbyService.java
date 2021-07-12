@@ -118,7 +118,7 @@ public class LobbyService {
             }
 
             Player toKick = this.playerRepository.findByUsernameAndLobbyId(dto.getUsername(), lobbyId);
-            if (!admin.equals(toKick)) {
+            if (toKick != null && !admin.equals(toKick)) {
                 DisconnectDTO disconnectDTO = new DisconnectDTO("You were kicked out of the Lobby.");
                 this.webSocketService.sendToPlayer(toKick.getIdentity(), "/queue/disconnect", disconnectDTO);
 
