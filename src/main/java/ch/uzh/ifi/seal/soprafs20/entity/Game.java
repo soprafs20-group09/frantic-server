@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs20.constant.TurnDuration;
 import ch.uzh.ifi.seal.soprafs20.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs20.service.GameService;
 import ch.uzh.ifi.seal.soprafs20.service.PlayerService;
+import ch.uzh.ifi.seal.soprafs20.utils.FranticUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class Game {
         this.gameDuration = gameDuration;
         this.turnDuration = turnDuration;
         this.listOfPlayers = PlayerService.getInstance().getPlayersInLobby(lobbyId);
-        this.firstPlayer = listOfPlayers.get(0);
+        this.firstPlayer = listOfPlayers.get(FranticUtils.random.nextInt(this.listOfPlayers.size()));
         this.maxPoints = calculateMaxPoints();
     }
 
