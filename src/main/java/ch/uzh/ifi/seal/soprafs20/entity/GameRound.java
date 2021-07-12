@@ -77,7 +77,33 @@ public class GameRound {
     public void startGameRound() {
         initializeGameRound();
         sendCompleteGameState();
-        startTurn();
+
+        // if the first card is a special card, it is treated as if the card dealer played it
+        Card firstCard = this.discardPile.peek();
+        if (firstCard.getType() == Type.SPECIAL && firstCard.getValue() != Value.FUCKYOU) {
+            int playersIndex = this.listOfPlayers.indexOf(this.currentPlayer);
+            if (playersIndex == 0) {
+                playersIndex = this.listOfPlayers.size() - 1;
+            }
+            else {
+                playersIndex = (playersIndex - 1) % this.listOfPlayers.size();
+            }
+            this.currentPlayer = this.listOfPlayers.get(playersIndex);
+
+            this.hasCurrentPlayerMadeMove = true;
+            this.gameService.sendStartTurn(this.lobbyId, this.currentPlayer.getUsername(), 0);
+
+            FranticUtils.wait(6000);
+            if (firstCard.getValue() == Value.SECONDCHANCE) {
+                finishSecondChance();
+            }
+            else {
+                sendActionResponse(this.currentPlayer, firstCard);
+            }
+        }
+        else {
+            startTurn();
+        }
     }
 
     private void initializeGameRound() {
@@ -202,24 +228,28 @@ public class GameRound {
                         else {
                             sendGameState();
                             cancelTimer();
-                            this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
-                            if (this.turnDuration != TurnDuration.OFF) {
-                                if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
-                                    this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
-                                    startTurnTimer((int) (this.seconds * 1.5));
-                                }
-                                else {
-                                    this.gameService.sendTimer(this.lobbyId, this.seconds);
-                                    startTurnTimer(this.seconds);
-                                }
-                            } else {
-                                this.gameService.sendTimer(this.lobbyId, this.seconds);
-                            }
+                            sendActionResponse(player, cardToPlay);
                         }
                     }
                 }
             }
             endProcess();
+        }
+    }
+
+    private void sendActionResponse(Player player, Card cardToPlay) {
+        this.gameService.sendActionResponse(this.lobbyId, player, cardToPlay);
+        if (this.turnDuration != TurnDuration.OFF) {
+            if (cardToPlay.getValue() == Value.FANTASTICFOUR) {
+                this.gameService.sendTimer(this.lobbyId, (int) (this.seconds * 1.5));
+                startTurnTimer((int) (this.seconds * 1.5));
+            }
+            else {
+                this.gameService.sendTimer(this.lobbyId, this.seconds);
+                startTurnTimer(this.seconds);
+            }
+        } else {
+            this.gameService.sendTimer(this.lobbyId, this.seconds);
         }
     }
 
