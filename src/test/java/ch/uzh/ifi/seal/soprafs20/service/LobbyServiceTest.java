@@ -300,7 +300,7 @@ public class LobbyServiceTest {
 
         assertTrue(lobbyRepository.findByLobbyId("abc").getPlayers() > 1);
         lobbyService.handleDisconnect("testIdentity");
-        Mockito.verify(webSocketService, Mockito.times(2)).sendChatMessage(Mockito.matches("lobbyId"), (Chat) Mockito.any());
+        Mockito.verify(webSocketService, Mockito.times(1)).sendChatMessage(Mockito.matches("lobbyId"), (Chat) Mockito.any());
         assertTrue(testPlayer.isAdmin());
         assertEquals("testPlayer", testLobby.getCreator());
         Mockito.verify(webSocketService).sendToLobby(Mockito.matches("lobbyId"), Mockito.matches("/lobby-state"), Mockito.any());

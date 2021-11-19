@@ -34,6 +34,7 @@ public class GameRound {
     private boolean turnIsRunning;
     private boolean attackState;
     private boolean showCards;
+    private String currentEvent;
     private List<Player> eventResponses;
     private List<Chat> eventLogs;
     private Map<Player, Integer> recessionMap;
@@ -62,6 +63,7 @@ public class GameRound {
         this.turnIsRunning = false;
         this.attackState = false;
         this.showCards = false;
+        this.currentEvent = "";
         this.eventResponses = new ArrayList<>();
         this.eventLogs = new ArrayList<>();
         this.recessionMap = new HashMap<>();
@@ -513,6 +515,7 @@ public class GameRound {
 
     private void performEvent() {
         Event event = this.events.remove(0);
+        this.currentEvent = event.getName();
         Chat chat = new EventChat("event:" + event.getName(), event.getMessage());
         this.gameService.sendChatMessage(this.lobbyId, chat);
         event.performEvent();
@@ -535,6 +538,7 @@ public class GameRound {
 
     private void performRecession() {
         cancelTimer();
+        this.currentEvent = "";
         List<Chat> chat = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : this.recessionMap.entrySet()) {
             chat.add(new EventChat("event:recession",
@@ -563,6 +567,7 @@ public class GameRound {
 
     private void performSurpriseParty() {
         cancelTimer();
+        this.currentEvent = "";
         for (Map.Entry<Card, Player> entry : this.surprisePartyMap.entrySet()) {
             entry.getValue().pushCardToHand(entry.getKey());
         }
@@ -606,6 +611,7 @@ public class GameRound {
 
     private void performMerryChristmas() {
         cancelTimer();
+        this.currentEvent = "";
         this.gameService.sendAnimationSpeed(this.lobbyId, 0);
         sendCompleteGameState();
         for (Map.Entry<Player, List<Card>> entry : this.christmasMap.entrySet()) {
@@ -663,10 +669,13 @@ public class GameRound {
             this.gameService.sendMarketWindow(this.lobbyId, nextPlayer, this.marketArray, this.marketDisabledArray);
             int seconds = this.getTurnDuration().getValue();
             this.gameService.sendTimer(this.lobbyId, seconds/2);
-            startMarketTimer(seconds/2, nextPlayer);
+            if (this.turnDuration != TurnDuration.OFF) {
+                startMarketTimer(seconds / 2, nextPlayer);
+            }
         }
         else {
             this.marketArray = new Card[0];
+            this.currentEvent = "";
             finishTurn();
         }
     }
@@ -683,6 +692,8 @@ public class GameRound {
     }
 
     private void performGamblingMan() {
+        cancelTimer();
+        this.currentEvent = "";
         List<Chat> chat = new ArrayList<>();
         Value max = Value.ONE;
         List<Player> highest = new ArrayList<>();
@@ -831,15 +842,15 @@ public class GameRound {
             }
         }
 
-        if (finishedPlayers.size() == 0) {
-            message = "The admin ended this round!";
-        }
-        else if (this.timeBomb) {
+        if (this.timeBomb) {
             icon = "event:time-bomb";
             message += " defused the bomb!";
         }
         else if (emptyStack) {
             message = "The card stack is empty!";
+        }
+        else if (finishedPlayers.size() == 0) {
+            message = "The admin ended this round!";
         }
         else {
             message += " played " + (finishedPlayers.size() != 1 ? "their last card!" : "his/her last card!");
@@ -965,14 +976,42 @@ public class GameRound {
         return this.discardPile.peek();
     }
 
+     // In case timers are off and the last player leaves during an interactive event (or is kicked),
+     // this calls the perform event method to be able to continue
+    private void performEventWhenPlayerLeft() {
+        switch (this.currentEvent) {
+            case "recession":
+                performRecession();
+                break;
+            case "surprise-party":
+                performSurpriseParty();
+                break;
+            case "merry-christmas":
+                performMerryChristmas();
+                break;
+            case "gambling-man":
+                performGamblingMan();
+                break;
+        }
+    }
+
     public void playerLostConnection(Player player) {
         if (this.listOfPlayers.size() > 1) {
-            if (player == this.currentPlayer) {
+
+            // when a player leaves during market, he receives a random card before being deleted
+            if (this.currentEvent.equals("market")) {
+                prepareRandomMarket(player);
+            }
+
+            if (player.getIdentity().equals(this.currentPlayer.getIdentity())) {
                 cancelTimer();
                 prepareNewTurn();
             }
             this.bombMap.remove(player);
             this.listOfPlayers.remove(getPlayerByIdentity(player.getIdentity()));
+            if (this.eventResponses.size() == this.listOfPlayers.size()) {
+                performEventWhenPlayerLeft();
+            }
             sendGameState();
         }
         else {
